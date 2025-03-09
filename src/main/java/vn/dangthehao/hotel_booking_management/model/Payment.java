@@ -1,10 +1,10 @@
-package vn.dangthehao.hotel_booking_management.model.entity;
+package vn.dangthehao.hotel_booking_management.model;
 
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-import vn.dangthehao.hotel_booking_management.model.enums.PaymentMethod;
-import vn.dangthehao.hotel_booking_management.model.enums.PaymentStatus;
+import vn.dangthehao.hotel_booking_management.enums.PaymentMethod;
+import vn.dangthehao.hotel_booking_management.enums.PaymentStatus;
 
 import java.math.BigDecimal;
 import java.util.Objects;

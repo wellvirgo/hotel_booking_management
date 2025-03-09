@@ -1,4 +1,4 @@
-package vn.dangthehao.hotel_booking_management.model.entity;
+package vn.dangthehao.hotel_booking_management.model;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;

@@ -1,12 +1,10 @@
-package vn.dangthehao.hotel_booking_management.model.entity;
+package vn.dangthehao.hotel_booking_management.model;
 
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
-import java.util.HashSet;
 import java.util.Objects;
-import java.util.Set;
 
 @Getter
 @Setter
@@ -33,7 +31,7 @@ public class User extends BaseEntity {
     @Column(columnDefinition = "boolean default false", nullable = false)
     boolean isDeleted;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "role_id", nullable = false)
     Role role;
 

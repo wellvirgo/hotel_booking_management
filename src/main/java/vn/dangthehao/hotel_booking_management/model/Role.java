@@ -1,4 +1,4 @@
-package vn.dangthehao.hotel_booking_management.model.entity;
+package vn.dangthehao.hotel_booking_management.model;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -22,7 +22,7 @@ public class Role extends BaseEntity {
     @Column(columnDefinition = "TEXT")
     String description;
 
-    @ManyToMany
+    @ManyToMany(cascade = CascadeType.PERSIST)
     @JoinTable(
             name = "role_permission",
             joinColumns = @JoinColumn(name = "role_id"),

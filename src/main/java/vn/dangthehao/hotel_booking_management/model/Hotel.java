@@ -1,9 +1,9 @@
-package vn.dangthehao.hotel_booking_management.model.entity;
+package vn.dangthehao.hotel_booking_management.model;
 
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-import vn.dangthehao.hotel_booking_management.model.enums.HotelStatus;
+import vn.dangthehao.hotel_booking_management.enums.HotelStatus;
 
 import java.util.HashSet;
 import java.util.Objects;
