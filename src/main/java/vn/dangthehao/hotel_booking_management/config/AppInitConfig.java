@@ -11,6 +11,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import vn.dangthehao.hotel_booking_management.model.Permission;
 import vn.dangthehao.hotel_booking_management.model.Role;
 import vn.dangthehao.hotel_booking_management.model.User;
+import vn.dangthehao.hotel_booking_management.repository.PermissionRepository;
+import vn.dangthehao.hotel_booking_management.repository.RoleRepository;
 import vn.dangthehao.hotel_booking_management.repository.UserRepository;
 import vn.dangthehao.hotel_booking_management.security.Authorities;
 
@@ -25,31 +27,64 @@ public class AppInitConfig {
     BCryptPasswordEncoder bCryptPasswordEncoder;
 
     @Bean
-    ApplicationRunner applicationRunner(UserRepository userRepository){
-       return args -> {
-         if (!userRepository.existsByUsername("admin")){
-             Permission permission= Permission.builder()
-                     .permissionName(Authorities.ALL_USER)
-                     .build();
-             Set<Permission> permissions=new HashSet<>();
-             permissions.add(permission);
-             Role role= Role.builder()
-                     .roleName(Authorities.ROLE_ADMIN)
-                     .permissions(permissions)
-                     .build();
+    ApplicationRunner applicationRunner(
+            UserRepository userRepository,
+            RoleRepository roleRepository,
+            PermissionRepository permissionRepository) {
+        return args -> {
+            if (!userRepository.existsByUsername("admin")) {
+                Permission permissionAllUser = buildBasicPermission(Authorities.ALL_USER);
+                permissionRepository.save(permissionAllUser);
 
-             User admin=User.builder()
-                     .username("admin")
-                     .password(bCryptPasswordEncoder.encode("admin"))
-                     .email("default")
-                     .fullName("admin")
-                     .role(role)
-                     .build();
+                Set<Permission> permissionsForAdmin = new HashSet<>();
+                permissionsForAdmin.add(permissionAllUser);
+                Role roleAdmin = buildBasicRole(Authorities.ROLE_ADMIN, "Senior admin", permissionsForAdmin);
 
-             userRepository.save(admin);
-             log.info("Admin account is created");
-         }
-       };
+                User admin = User.builder()
+                        .username("admin")
+                        .password(bCryptPasswordEncoder.encode("admin"))
+                        .email("default")
+                        .fullName("admin")
+                        .role(roleAdmin)
+                        .build();
+                userRepository.save(admin);
+                log.info("Admin account is created");
+
+                Permission permissionReadUser = buildBasicPermission(Authorities.READ_USER);
+                permissionRepository.save(permissionReadUser);
+
+                Permission permissionUpdateUser = buildBasicPermission(Authorities.UPDATE_USER);
+                permissionRepository.save(permissionUpdateUser);
+
+                Permission permissionDeleteUser = buildBasicPermission(Authorities.DELETE_USER);
+                permissionRepository.save(permissionDeleteUser);
+
+                Set<Permission> permissionsForUser = new HashSet<>();
+                permissionsForUser.add(permissionReadUser);
+                permissionsForUser.add(permissionUpdateUser);
+                permissionsForUser.add(permissionDeleteUser);
+
+                Role roleUser = buildBasicRole(Authorities.ROLE_USER, "Normal user", permissionsForUser);
+                roleRepository.save(roleUser);
+
+                Role roleHotelOwner = buildBasicRole(
+                        Authorities.ROLE_HOTEL_OWNER, "Hotel owner", permissionsForUser);
+                roleRepository.save(roleHotelOwner);
+            }
+        };
     }
 
+    private Permission buildBasicPermission(String permissionName) {
+        return Permission.builder()
+                .permissionName(permissionName)
+                .build();
+    }
+
+    private Role buildBasicRole(String roleName, String description, Set<Permission> permissions) {
+        return Role.builder()
+                .roleName(roleName)
+                .description(description)
+                .permissions(permissions)
+                .build();
+    }
 }

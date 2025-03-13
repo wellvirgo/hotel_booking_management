@@ -18,8 +18,8 @@ import java.time.LocalDateTime;
 @EntityListeners(AuditingEntityListener.class)
 public abstract class BaseEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    String id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    Long id;
 
     @CreatedDate
     @Column(updatable = false, nullable = false)

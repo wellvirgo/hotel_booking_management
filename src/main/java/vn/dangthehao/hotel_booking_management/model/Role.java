@@ -22,7 +22,7 @@ public class Role extends BaseEntity {
     @Column(columnDefinition = "TEXT")
     String description;
 
-    @ManyToMany(cascade = CascadeType.PERSIST)
+    @ManyToMany
     @JoinTable(
             name = "role_permission",
             joinColumns = @JoinColumn(name = "role_id"),

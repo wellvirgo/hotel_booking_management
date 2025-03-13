@@ -9,7 +9,10 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class ErrorDetail {
-    String field;
-    String message;
+public class UserCrtResponse {
+    String username;
+    String fullName;
+    String phone;
+    String email;
+    String roleName;
 }

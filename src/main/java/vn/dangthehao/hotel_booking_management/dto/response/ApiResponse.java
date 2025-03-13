@@ -1,7 +1,9 @@
 package vn.dangthehao.hotel_booking_management.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import org.springframework.validation.FieldError;
 
 import java.util.List;
 
@@ -11,28 +13,10 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class ApiResponse<T> {
     String status;
     int code;
     String message;
     T data;
-    List<ErrorDetail> errors;
-
-    public static <T> ApiResponse<T> success(int code, String message, T data){
-        return ApiResponse.<T>builder()
-                .status("success")
-                .code(code)
-                .message(message)
-                .data(data)
-                .build();
-    }
-
-    public static <T> ApiResponse<T> error(int code, String message, List<ErrorDetail> errors){
-        return ApiResponse.<T>builder()
-                .status("error")
-                .code(code)
-                .message(message)
-                .errors(errors)
-                .build();
-    }
 }

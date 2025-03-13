@@ -1,6 +1,5 @@
 package vn.dangthehao.hotel_booking_management.security;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -10,6 +9,7 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
+import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
@@ -17,9 +17,11 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableMethodSecurity
 public class SecurityConfig {
     private final CustomDecoder customDecoder;
+    private final AuthenticationEntryPoint authenticationEntryPoint;
 
-    public SecurityConfig(CustomDecoder customDecoder) {
+    public SecurityConfig(CustomDecoder customDecoder, AuthenticationEntryPoint authenticationEntryPoint) {
         this.customDecoder = customDecoder;
+        this.authenticationEntryPoint = authenticationEntryPoint;
     }
 
     @Bean
@@ -30,13 +32,15 @@ public class SecurityConfig {
                         .requestMatchers("/api/auth/login", "/api/auth/register")
                         .permitAll()
                         .requestMatchers("/api/admin/**")
-                        .hasRole(Authorities.ROLE_ADMIN.replace("ROLE_",""))
+                        .hasRole(Authorities.ROLE_ADMIN.replace("ROLE_", ""))
                         .anyRequest().authenticated());
 
-        httpSecurity.oauth2ResourceServer(auth -> auth.jwt(
-                jwtConfigurer -> jwtConfigurer.decoder(customDecoder)
-                        .jwtAuthenticationConverter(jwtAuthenticationConverter())
-        ));
+        httpSecurity.oauth2ResourceServer(auth -> auth
+                .jwt(jwtConfigurer -> jwtConfigurer
+                        .decoder(customDecoder)
+                        .jwtAuthenticationConverter(jwtAuthenticationConverter()))
+                .authenticationEntryPoint(authenticationEntryPoint)
+        );
 
         return httpSecurity.build();
     }
