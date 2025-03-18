@@ -1,4 +1,4 @@
-package vn.dangthehao.hotel_booking_management.service;
+package vn.dangthehao.hotel_booking_management.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletException;
