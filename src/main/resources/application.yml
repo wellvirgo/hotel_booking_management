@@ -19,3 +19,8 @@ logging:
     org:
       springframework:
         security: DEBUG
+
+base_url: http://localhost:8080
+
+file:
+  upload_folder: uploads/images/

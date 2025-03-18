@@ -6,6 +6,7 @@ import lombok.experimental.FieldDefaults;
 import vn.dangthehao.hotel_booking_management.enums.RoomStatus;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Objects;
 
 @Getter
@@ -38,6 +39,8 @@ public class Room extends BaseEntity {
     @Enumerated(value = EnumType.STRING)
     @Column(nullable = false)
     RoomStatus status = RoomStatus.AVAILABLE;
+
+    List<String> image;
 
     @Override
     public boolean equals(Object o) {

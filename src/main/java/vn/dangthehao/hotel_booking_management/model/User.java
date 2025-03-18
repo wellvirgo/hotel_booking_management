@@ -35,6 +35,8 @@ public class User extends BaseEntity {
     @JoinColumn(name = "role_id", nullable = false)
     Role role;
 
+    String avatar;
+
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
