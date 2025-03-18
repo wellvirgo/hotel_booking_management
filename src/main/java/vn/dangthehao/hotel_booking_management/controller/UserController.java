@@ -44,7 +44,7 @@ public class UserController {
     ) {
         Long userId = jwtToken.getClaim("userID");
         User currentUser = userService.findById(userId);
-        ApiResponse<UserUpdateResponse> response = userService.updatePersonalInf(currentUser, request, file);
+        ApiResponse<UserUpdateResponse> response = userService.updateAccountInf(currentUser, request, file);
 
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }

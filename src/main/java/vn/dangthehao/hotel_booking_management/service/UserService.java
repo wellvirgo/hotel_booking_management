@@ -40,7 +40,11 @@ public class UserService {
 
     @NonFinal
     @Value("${base_url}")
-    private String baseUrl;
+    String baseUrl;
+
+    @NonFinal
+    @Value(("${file.user_avatar_folder_name}"))
+    String avatarFolderName;
 
     @NonFinal
     private String status = "Success";
@@ -72,16 +76,15 @@ public class UserService {
                 .build();
     }
 
-    public ApiResponse<UserUpdateResponse> updatePersonalInf(
+    public ApiResponse<UserUpdateResponse> updateAccountInf(
             User currentUser,
             UserUpdateRequest request,
             MultipartFile file) {
-        String targetFolderName = "avatars";
         currentUser.setFullName(request.getFullName());
         currentUser.setEmail(request.getEmail());
         currentUser.setPhone(request.getPhone());
-        String avatar = uploadFileService.saveFile(targetFolderName, file);
-        String avatarFileName = avatar.replace(baseUrl + "/" + targetFolderName, "");
+        String avatar = uploadFileService.saveFile(avatarFolderName, file);
+        String avatarFileName = avatar.replace(baseUrl + "/" + avatarFolderName, "");
         currentUser.setAvatar(avatarFileName);
         UserUpdateResponse userUpdateResponse = userMapper.toUserUpdateResponse(userRepository.save(currentUser));
         userUpdateResponse.setAvatar(avatar);
@@ -97,7 +100,15 @@ public class UserService {
     public ApiResponse<List<UserListResponse>> listUsers() {
         List<User> userList = userRepository.findAll();
         List<UserListResponse> userListResponse = userList.stream()
-                .map(userMapper::toUserListResponse)
+                .map(user -> {
+                    UserListResponse userLResponse = userMapper.toUserListResponse(user);
+                    String avatar = (user.getAvatar() != null)
+                            ? baseUrl + "/" + avatarFolderName + user.getAvatar()
+                            : "";
+                    userLResponse.setAvatar(avatar);
+                    userLResponse.setRoleName(user.getRole().getRoleName());
+                    return userLResponse;
+                })
                 .toList();
 
         return ApiResponse.<List<UserListResponse>>builder()
