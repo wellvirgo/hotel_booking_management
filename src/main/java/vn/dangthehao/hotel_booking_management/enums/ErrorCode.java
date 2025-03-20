@@ -8,16 +8,16 @@ import org.springframework.http.HttpStatus;
 @Getter
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public enum ErrorCode {
-    USER_NOT_FOUND(1001, HttpStatus.NOT_FOUND, ErrorMessage.M_USER_NOT_FOUND.getMessage()),
-    WRONG_PASSWORD(1002, HttpStatus.BAD_REQUEST, ErrorMessage.M_WRONG_PASSWORD.getMessage()),
-    USERNAME_IS_EXISTED(1003, HttpStatus.CONFLICT, ErrorMessage.M_USERNAME_IS_EXISTED.getMessage()),
-    UNAUTHENTICATED(1004, HttpStatus.UNAUTHORIZED, ErrorMessage.M_UNAUTHENTICATED.getMessage()),
-    UNAUTHORIZED(1005, HttpStatus.FORBIDDEN, ErrorMessage.M_UNAUTHORIZED.getMessage()),
-    ROLE_NOT_FOUND(1006, HttpStatus.BAD_REQUEST, ErrorMessage.M_ROLE_NOT_FOUND.getMessage()),
-    FAILED_UPLOAD_FILE(1007, HttpStatus.BAD_REQUEST, ErrorMessage.M_FAILED_UPLOAD_FILE.getMessage()),
-    VALIDATION_FAILED(1008, HttpStatus.BAD_REQUEST, ErrorMessage.M_VALIDATION_FAILED.getMessage()),
-    EMAIL_IS_EXISTED(1009, HttpStatus.CONFLICT, ErrorMessage.M_EMAIL_IS_EXISTED.getMessage()),
-    UNCATEGORIZED_EXCEPTION(9999, HttpStatus.INTERNAL_SERVER_ERROR, ErrorMessage.M_UNCATEGORIZED.getMessage());
+    USER_NOT_FOUND(1001, HttpStatus.NOT_FOUND, "User not found"),
+    WRONG_PASSWORD(1002, HttpStatus.BAD_REQUEST, "Password is incorrect"),
+    UNAUTHENTICATED(1003, HttpStatus.UNAUTHORIZED, "Unauthenticated"),
+    UNAUTHORIZED(1004, HttpStatus.FORBIDDEN, "Access is denied"),
+    ROLE_NOT_FOUND(1005, HttpStatus.BAD_REQUEST, "Role not found"),
+    FAILED_UPLOAD_FILE(1006, HttpStatus.BAD_REQUEST, "Failed upload file"),
+    VALIDATION_FAILED(1007, HttpStatus.BAD_REQUEST, "Validation failed"),
+    TOKEN_IS_REVOKED(1008, HttpStatus.UNAUTHORIZED, "Token is revoked"),
+    REFRESH_TOKEN_NOT_FOUND(1009, HttpStatus.NOT_FOUND, "Refresh token not found"),
+    UNCATEGORIZED_EXCEPTION(9999, HttpStatus.INTERNAL_SERVER_ERROR, "Internal server error");
 
     int code;
     HttpStatus httpStatus;

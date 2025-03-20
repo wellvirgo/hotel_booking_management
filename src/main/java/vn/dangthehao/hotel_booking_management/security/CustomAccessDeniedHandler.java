@@ -26,5 +26,6 @@ public class CustomAccessDeniedHandler implements AccessDeniedHandler {
                 }
                 """, code, message);
         response.getWriter().write(body);
+        response.getWriter().flush();
     }
 }

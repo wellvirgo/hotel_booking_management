@@ -11,14 +11,22 @@ spring:
 
 jwt:
   private_key: ${PRIVATE_KEY}
-  valid_duration: 12 #hours
+  access_token_valid_duration: 1800 #seconds
+  refresh_token_valid_duration: 86400 #seconds
   issuer: hotel_booking_management
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: beans
 
 logging:
   level:
     org:
       springframework:
         security: DEBUG
+        security.oauth2: DEBUG
 
 base_url: http://localhost:8080
 

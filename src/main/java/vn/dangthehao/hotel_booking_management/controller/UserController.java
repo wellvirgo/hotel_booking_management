@@ -43,7 +43,7 @@ public class UserController {
             @RequestPart(name = "file") MultipartFile file
     ) {
         Long userId = jwtToken.getClaim("userID");
-        User currentUser = userService.findById(userId);
+        User currentUser = userService.findByID(userId);
         ApiResponse<UserUpdateResponse> response = userService.updateAccountInf(currentUser, request, file);
 
         return ResponseEntity.status(HttpStatus.OK).body(response);

@@ -25,7 +25,6 @@ import vn.dangthehao.hotel_booking_management.repository.RoleRepository;
 import vn.dangthehao.hotel_booking_management.repository.UserRepository;
 
 import java.util.List;
-import java.util.Optional;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -49,13 +48,14 @@ public class UserService {
     @NonFinal
     private String status = "Success";
 
-    public User findById(Long id) {
+    public User findByID(Long id) {
         return userRepository.findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
     }
 
-    public Optional<User> findByUsername(String username) {
-        return userRepository.findByUsername(username);
+    public User findByUsername(String username) {
+        return userRepository.findByUsername(username)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
     }
 
     public ApiResponse<UserCrtResponse> create(UserCrtRequest request) {
