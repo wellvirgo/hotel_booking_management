@@ -19,12 +19,11 @@ import vn.dangthehao.hotel_booking_management.model.User;
 import vn.dangthehao.hotel_booking_management.security.CustomDecoder;
 import vn.dangthehao.hotel_booking_management.security.TokenGenerator;
 import vn.dangthehao.hotel_booking_management.util.JwtUtil;
-import vn.dangthehao.hotel_booking_management.util.SuccessResponse;
+import vn.dangthehao.hotel_booking_management.util.ResponseGenerator;
 import vn.dangthehao.hotel_booking_management.util.TimeConverter;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
@@ -40,17 +39,17 @@ public class AuthenticationService {
     CustomDecoder customDecoder;
     RefreshTokenService refreshTokenService;
     TokenBlackListService tokenBlackListService;
+    MailService mailService;
+    ResponseGenerator responseGenerator;
     JwtUtil jwtUtil;
 
     public ApiResponse<AuthResponse> authenticate(AuthRequest request) {
         User user = checkUsernameAndPassword(request);
-        Map<String, String> keyPair = generateTokenPair(user);
-        AuthResponse data = AuthResponse.builder()
-                .accessToken(keyPair.get("accessToken"))
-                .refreshToken(keyPair.get("refreshToken"))
-                .build();
+        Map<String, String> keyPair = tokenGenerator.generateTokenPair(user);
+        refreshTokenService.updateRefreshToken(user, keyPair.get("refreshToken"));
+        AuthResponse data = responseGenerator.generateAuthResponse(keyPair);
 
-        return SuccessResponse.buildSuccessResponse("is authenticated", data);
+        return responseGenerator.generateSuccessResponse("Is authenticated", data);
     }
 
     public ApiResponse<AuthResponse> renewAccessAndRefreshToken(String refreshToken) {
@@ -60,13 +59,11 @@ public class AuthenticationService {
             throw new RuntimeException("Refresh token is expired");
 
         User user = userService.findByID(jwtUtil.getUserID(jwtUtil.getClaims(refreshToken)));
-        Map<String, String> keyPair = generateTokenPair(user);
-        AuthResponse data = AuthResponse.builder()
-                .accessToken(keyPair.get("accessToken"))
-                .refreshToken(keyPair.get("refreshToken"))
-                .build();
+        Map<String, String> keyPair = tokenGenerator.generateTokenPair(user);
+        refreshTokenService.updateRefreshToken(user, keyPair.get("refreshToken"));
+        AuthResponse data = responseGenerator.generateAuthResponse(keyPair);
 
-        return SuccessResponse.buildSuccessResponse("Access and refresh token are renewed", data);
+        return responseGenerator.generateSuccessResponse("Access and refresh token are renewed", data);
     }
 
     public ApiResponse<String> logout(Jwt jwt) {
@@ -81,29 +78,19 @@ public class AuthenticationService {
         refreshTokenService.delete(refreshToken);
         SecurityContextHolder.clearContext();
 
-        return SuccessResponse.buildSuccessResponse("Log out successfully");
+        return responseGenerator.generateSuccessResponse("Log out successfully");
     }
 
     public ApiResponse<AuthResponse> changePassword(ChangePasswordRequest request, Jwt jwt) {
-        Long userID = jwt.getClaim("userID");
-        User user = userService.findByID(userID);
-        String newPassword = request.getPassword();
-        if (!bCryptPasswordEncoder.matches(request.getOldPassword(), user.getPassword())) {
-            throw new AppException(ErrorCode.WRONG_PASSWORD);
-        }
-        if (request.getOldPassword().equals(request.getPassword())) {
-            throw new AppException(ErrorCode.THE_SAME_OLD_PASSWORD);
-        }
-        user.setPassword(bCryptPasswordEncoder.encode(newPassword));
-        userService.saveOrUpdate(user);
+        User user = validatePasswordAndGetUser(request, jwt);
+        updatePassword(user, request.getPassword());
         logout(jwt);
-        Map<String, String> keyPair = generateTokenPair(user);
-        AuthResponse data = AuthResponse.builder()
-                .accessToken(keyPair.get("accessToken"))
-                .refreshToken(keyPair.get("refreshToken"))
-                .build();
 
-        return SuccessResponse.buildSuccessResponse("Change password successfully!", data);
+        Map<String, String> keyPair = tokenGenerator.generateTokenPair(user);
+        AuthResponse data = responseGenerator.generateAuthResponse(keyPair);
+        mailService.sendChangePasswordEmailAsync(user.getEmail());
+
+        return responseGenerator.generateSuccessResponse("Change password successfully!", data);
     }
 
     private User checkUsernameAndPassword(AuthRequest request) {
@@ -115,21 +102,30 @@ public class AuthenticationService {
         return user;
     }
 
-    public Map<String, String> generateTokenPair(User user) {
-        String accessToken = tokenGenerator.generateAccessToken(user);
-        String refreshToken = tokenGenerator.generateRefreshToken(user);
-        refreshTokenService.updateRefreshToken(user, refreshToken);
-        Map<String, String> tokenMap = new HashMap<>();
-        tokenMap.put("accessToken", accessToken);
-        tokenMap.put("refreshToken", refreshToken);
-
-        return tokenMap;
-    }
-
     public boolean isExpired(String token) {
         Jwt jwtToken = customDecoder.decode(token);
         LocalDateTime expiredTime = TimeConverter
                 .instantToLocalDateTime(Objects.requireNonNull(jwtToken.getExpiresAt()));
         return expiredTime.isBefore(TimeConverter.instantToLocalDateTime(Instant.now()));
+    }
+
+    private User validatePasswordAndGetUser(ChangePasswordRequest request, Jwt jwt) {
+        Long userID = jwt.getClaim("userID");
+        User user = userService.findByID(userID);
+        String newPassword = request.getPassword();
+
+        if (!bCryptPasswordEncoder.matches(request.getOldPassword(), user.getPassword())) {
+            throw new AppException(ErrorCode.WRONG_PASSWORD);
+        }
+        if (request.getOldPassword().equals(newPassword)) {
+            throw new AppException(ErrorCode.THE_SAME_OLD_PASSWORD);
+        }
+
+        return user;
+    }
+
+    private void updatePassword(User user, String newPassword) {
+        user.setPassword(bCryptPasswordEncoder.encode(newPassword));
+        userService.saveOrUpdate(user);
     }
 }

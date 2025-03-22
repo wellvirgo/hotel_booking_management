@@ -9,9 +9,7 @@ import vn.dangthehao.hotel_booking_management.model.User;
 
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
-import java.util.Date;
-import java.util.StringJoiner;
-import java.util.UUID;
+import java.util.*;
 
 @Component
 public class TokenGenerator {
@@ -82,6 +80,16 @@ public class TokenGenerator {
         }
 
         return jwsObject.serialize();
+    }
+
+    public Map<String, String> generateTokenPair(User user) {
+        String accessToken = generateAccessToken(user);
+        String refreshToken = generateRefreshToken(user);
+        Map<String, String> tokenMap = new HashMap<>();
+        tokenMap.put("accessToken", accessToken);
+        tokenMap.put("refreshToken", refreshToken);
+
+        return tokenMap;
     }
 
     private String buildScope(User user) {

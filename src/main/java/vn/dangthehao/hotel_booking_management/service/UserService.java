@@ -22,7 +22,7 @@ import vn.dangthehao.hotel_booking_management.model.Role;
 import vn.dangthehao.hotel_booking_management.model.User;
 import vn.dangthehao.hotel_booking_management.repository.RoleRepository;
 import vn.dangthehao.hotel_booking_management.repository.UserRepository;
-import vn.dangthehao.hotel_booking_management.util.SuccessResponse;
+import vn.dangthehao.hotel_booking_management.util.ResponseGenerator;
 
 import java.util.List;
 
@@ -36,6 +36,7 @@ public class UserService {
     RoleRepository roleRepository;
     BCryptPasswordEncoder bCryptPasswordEncoder;
     UploadFileService uploadFileService;
+    ResponseGenerator responseGenerator;
 
     @NonFinal
     @Value("${base_url}")
@@ -44,9 +45,6 @@ public class UserService {
     @NonFinal
     @Value(("${file.user_avatar_folder_name}"))
     String avatarFolderName;
-
-    @NonFinal
-    private String status = "Success";
 
     public User findByID(Long id) {
         return userRepository.findById(id)
@@ -68,7 +66,7 @@ public class UserService {
         UserCrtResponse userCrtResponse = userMapper.toUserCrtResponse(user);
         userCrtResponse.setRoleName(role.getRoleName());
 
-        return SuccessResponse.buildSuccessResponse("User is created", userCrtResponse);
+        return responseGenerator.generateSuccessResponse("User is created", userCrtResponse);
     }
 
     public ApiResponse<UserUpdateResponse> updateAccountInf(
@@ -85,7 +83,7 @@ public class UserService {
         UserUpdateResponse userUpdateResponse = userMapper.toUserUpdateResponse(userRepository.save(currentUser));
         userUpdateResponse.setAvatar(avatar);
 
-        return SuccessResponse.buildSuccessResponse("User is updated", userUpdateResponse);
+        return responseGenerator.generateSuccessResponse("User is updated", userUpdateResponse);
     }
 
     public ApiResponse<List<UserListResponse>> listUsers() {
@@ -95,7 +93,7 @@ public class UserService {
                 .map(this::addAvatarAndRoleName)
                 .toList();
 
-        return SuccessResponse.buildSuccessResponse("List users successfully!", userListResponse);
+        return responseGenerator.generateSuccessResponse("List users successfully!", userListResponse);
     }
 
     public ApiResponse<Void> deleteByID(Long id) {
@@ -103,11 +101,11 @@ public class UserService {
         user.setDeleted(true);
         userRepository.save(user);
 
-        return SuccessResponse.buildSuccessResponse("Delete user successfully!");
+        return responseGenerator.generateSuccessResponse("Delete user successfully!");
     }
 
-    public User saveOrUpdate(User user) {
-        return userRepository.save(user);
+    public void saveOrUpdate(User user) {
+        userRepository.save(user);
     }
 
     private UserListResponse addAvatarAndRoleName(User user) {

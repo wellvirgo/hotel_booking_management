@@ -8,6 +8,21 @@ spring:
     hibernate:
       ddl-auto: update
     show-sql: true
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${GMAIL_ID}
+    password: ${APP_PASS_GMAIL}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
+          connectiontimeout: 5000 #seconds
+          timeout: 5000 #seconds
+          writetimeout: 5000 #seconds
 
 jwt:
   private_key: ${PRIVATE_KEY}
@@ -27,6 +42,10 @@ logging:
       springframework:
         security: DEBUG
         security.oauth2: DEBUG
+
+mail:
+  smtp:
+    debug: true
 
 base_url: http://localhost:8080
 
