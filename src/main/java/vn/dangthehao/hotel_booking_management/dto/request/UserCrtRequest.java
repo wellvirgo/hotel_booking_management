@@ -8,7 +8,10 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 import vn.dangthehao.hotel_booking_management.annotations.EmailNotExists;
 import vn.dangthehao.hotel_booking_management.annotations.PasswordMatches;
+import vn.dangthehao.hotel_booking_management.annotations.PasswordStrength;
 import vn.dangthehao.hotel_booking_management.annotations.UsernameNotExists;
+import vn.dangthehao.hotel_booking_management.dto.PasswordConfirm;
+import vn.dangthehao.hotel_booking_management.enums.ErrorCode;
 
 @Getter
 @Setter
@@ -17,15 +20,12 @@ import vn.dangthehao.hotel_booking_management.annotations.UsernameNotExists;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @PasswordMatches(message = "PASSWORD_NOT_MATCH")
-public class UserCrtRequest {
+public class UserCrtRequest implements PasswordConfirm {
     @Size(min = 5, message = "INVALID_USERNAME")
     @UsernameNotExists
     String username;
 
-    @Pattern(
-            regexp = "^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d)(?=.*[@#$%^&+=!])[A-Za-z\\d@#$%^&+=!]{8,}$",
-            message = "INVALID_PASSWORD"
-    )
+    @PasswordStrength
     String password;
     String confirmPassword;
 

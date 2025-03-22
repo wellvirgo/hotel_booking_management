@@ -6,7 +6,6 @@ import lombok.experimental.FieldDefaults;
 import lombok.experimental.NonFinal;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -23,6 +22,7 @@ import vn.dangthehao.hotel_booking_management.model.Role;
 import vn.dangthehao.hotel_booking_management.model.User;
 import vn.dangthehao.hotel_booking_management.repository.RoleRepository;
 import vn.dangthehao.hotel_booking_management.repository.UserRepository;
+import vn.dangthehao.hotel_booking_management.util.SuccessResponse;
 
 import java.util.List;
 
@@ -68,18 +68,14 @@ public class UserService {
         UserCrtResponse userCrtResponse = userMapper.toUserCrtResponse(user);
         userCrtResponse.setRoleName(role.getRoleName());
 
-        return ApiResponse.<UserCrtResponse>builder()
-                .status(status)
-                .code(HttpStatus.CREATED.value())
-                .message("User is created")
-                .data(userCrtResponse)
-                .build();
+        return SuccessResponse.buildSuccessResponse("User is created", userCrtResponse);
     }
 
     public ApiResponse<UserUpdateResponse> updateAccountInf(
-            User currentUser,
+            Long userID,
             UserUpdateRequest request,
             MultipartFile file) {
+        User currentUser = findByID(userID);
         currentUser.setFullName(request.getFullName());
         currentUser.setEmail(request.getEmail());
         currentUser.setPhone(request.getPhone());
@@ -89,33 +85,38 @@ public class UserService {
         UserUpdateResponse userUpdateResponse = userMapper.toUserUpdateResponse(userRepository.save(currentUser));
         userUpdateResponse.setAvatar(avatar);
 
-        return ApiResponse.<UserUpdateResponse>builder()
-                .status(status)
-                .code(HttpStatus.OK.value())
-                .message("User is updated")
-                .data(userUpdateResponse)
-                .build();
+        return SuccessResponse.buildSuccessResponse("User is updated", userUpdateResponse);
     }
 
     public ApiResponse<List<UserListResponse>> listUsers() {
         List<User> userList = userRepository.findAll();
         List<UserListResponse> userListResponse = userList.stream()
-                .map(user -> {
-                    UserListResponse userLResponse = userMapper.toUserListResponse(user);
-                    String avatar = (user.getAvatar() != null)
-                            ? baseUrl + "/" + avatarFolderName + user.getAvatar()
-                            : "";
-                    userLResponse.setAvatar(avatar);
-                    userLResponse.setRoleName(user.getRole().getRoleName());
-                    return userLResponse;
-                })
+                .filter(user -> !user.isDeleted())
+                .map(this::addAvatarAndRoleName)
                 .toList();
 
-        return ApiResponse.<List<UserListResponse>>builder()
-                .status(status)
-                .code(HttpStatus.OK.value())
-                .message("List users successfully")
-                .data(userListResponse)
-                .build();
+        return SuccessResponse.buildSuccessResponse("List users successfully!", userListResponse);
+    }
+
+    public ApiResponse<Void> deleteByID(Long id) {
+        User user = findByID(id);
+        user.setDeleted(true);
+        userRepository.save(user);
+
+        return SuccessResponse.buildSuccessResponse("Delete user successfully!");
+    }
+
+    public User saveOrUpdate(User user) {
+        return userRepository.save(user);
+    }
+
+    private UserListResponse addAvatarAndRoleName(User user) {
+        UserListResponse userLResponse = userMapper.toUserListResponse(user);
+        String avatar = (user.getAvatar() != null)
+                ? baseUrl + "/" + avatarFolderName + user.getAvatar() : "";
+        userLResponse.setAvatar(avatar);
+        userLResponse.setRoleName(user.getRole().getRoleName());
+
+        return userLResponse;
     }
 }

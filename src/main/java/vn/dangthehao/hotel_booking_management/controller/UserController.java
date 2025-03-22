@@ -1,5 +1,6 @@
 package vn.dangthehao.hotel_booking_management.controller;
 
+import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -11,12 +12,14 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import vn.dangthehao.hotel_booking_management.dto.request.ChangePasswordRequest;
 import vn.dangthehao.hotel_booking_management.dto.request.UserUpdateRequest;
 import vn.dangthehao.hotel_booking_management.dto.response.ApiResponse;
+import vn.dangthehao.hotel_booking_management.dto.response.AuthResponse;
 import vn.dangthehao.hotel_booking_management.dto.response.UserListResponse;
 import vn.dangthehao.hotel_booking_management.dto.response.UserUpdateResponse;
-import vn.dangthehao.hotel_booking_management.model.User;
 import vn.dangthehao.hotel_booking_management.security.PermissionChecker;
+import vn.dangthehao.hotel_booking_management.service.AuthenticationService;
 import vn.dangthehao.hotel_booking_management.service.UserService;
 
 import java.util.List;
@@ -28,6 +31,7 @@ import java.util.List;
 @RequestMapping("/api")
 public class UserController {
     UserService userService;
+    AuthenticationService authenticationService;
     PermissionChecker permissionChecker;
 
     @GetMapping("/admin/users")
@@ -43,9 +47,23 @@ public class UserController {
             @RequestPart(name = "file") MultipartFile file
     ) {
         Long userId = jwtToken.getClaim("userID");
-        User currentUser = userService.findByID(userId);
-        ApiResponse<UserUpdateResponse> response = userService.updateAccountInf(currentUser, request, file);
+        ApiResponse<UserUpdateResponse> response = userService.updateAccountInf(userId, request, file);
 
         return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    @DeleteMapping("/users/delete/{id}")
+    @PreAuthorize("hasRole('ADMIN') or (hasRole('USER') and #id==#jwt.getClaim('userID'))")
+    public ResponseEntity<ApiResponse<Void>> deleteUser(
+            @PathVariable(name = "id") Long id,
+            @AuthenticationPrincipal Jwt jwt) {
+        return ResponseEntity.status(HttpStatus.OK).body(userService.deleteByID(id));
+    }
+
+    @PostMapping("/users/change-password")
+    public ResponseEntity<ApiResponse<AuthResponse>> changePassword(
+            @AuthenticationPrincipal Jwt jwt,
+            @Valid @RequestBody ChangePasswordRequest request) {
+        return ResponseEntity.status(HttpStatus.OK).body(authenticationService.changePassword(request, jwt));
     }
 }

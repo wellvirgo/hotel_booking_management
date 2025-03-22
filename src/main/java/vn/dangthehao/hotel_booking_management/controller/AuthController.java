@@ -7,6 +7,8 @@ import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 import vn.dangthehao.hotel_booking_management.dto.request.AuthRequest;
 import vn.dangthehao.hotel_booking_management.dto.request.UserCrtRequest;
@@ -40,8 +42,8 @@ public class AuthController {
 
     @PostMapping("/logout")
     public ResponseEntity<ApiResponse<String>> logout(
-            @RequestHeader("Authorization") String authorizationHeader) throws ParseException {
-        return ResponseEntity.status(HttpStatus.OK).body(authenticationService.logout(authorizationHeader));
+            @AuthenticationPrincipal Jwt jwt) throws ParseException {
+        return ResponseEntity.status(HttpStatus.OK).body(authenticationService.logout(jwt));
     }
 
     @PostMapping("/refresh")
@@ -51,7 +53,7 @@ public class AuthController {
     ) {
         if (!"refresh_token".equals(grantType))
             throw new RuntimeException("invalid grant type");
-        ApiResponse<AuthResponse> apiResponse = authenticationService.renewAccessToken(refreshToken);
+        ApiResponse<AuthResponse> apiResponse = authenticationService.renewAccessAndRefreshToken(refreshToken);
 
         return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
     }

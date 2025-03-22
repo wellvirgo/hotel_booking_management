@@ -7,8 +7,4 @@ import vn.dangthehao.hotel_booking_management.service.UploadFileService;
 @SpringBootTest
 class HotelBookingManagementApplicationTests {
 
-	@Test
-	void contextLoads() {
-	}
-
 }

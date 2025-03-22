@@ -17,6 +17,10 @@ public enum ErrorCode {
     VALIDATION_FAILED(1007, HttpStatus.BAD_REQUEST, "Validation failed"),
     TOKEN_IS_REVOKED(1008, HttpStatus.UNAUTHORIZED, "Token is revoked"),
     REFRESH_TOKEN_NOT_FOUND(1009, HttpStatus.NOT_FOUND, "Refresh token not found"),
+    WEAK_PASSWORD(1010, HttpStatus.BAD_REQUEST,
+            "Password must contain at least 8 characters," +
+                    "including an uppercase letter, a lowercase letter, a number, and a special character."),
+    THE_SAME_OLD_PASSWORD(1011, HttpStatus.BAD_REQUEST, "New password must be different old password"),
     UNCATEGORIZED_EXCEPTION(9999, HttpStatus.INTERNAL_SERVER_ERROR, "Internal server error");
 
     int code;

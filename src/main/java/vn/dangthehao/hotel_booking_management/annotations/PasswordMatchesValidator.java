@@ -2,17 +2,15 @@ package vn.dangthehao.hotel_booking_management.annotations;
 
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
-import vn.dangthehao.hotel_booking_management.dto.request.UserCrtRequest;
+import vn.dangthehao.hotel_booking_management.dto.PasswordConfirm;
 
-public class PasswordMatchesValidator implements ConstraintValidator<PasswordMatches, Object> {
+public class PasswordMatchesValidator implements ConstraintValidator<PasswordMatches, PasswordConfirm> {
     @Override
     public void initialize(PasswordMatches constraintAnnotation) {
     }
 
     @Override
-    public boolean isValid(Object obj, ConstraintValidatorContext context) {
-        UserCrtRequest userCrtRequest = (UserCrtRequest) obj;
-        return userCrtRequest.getPassword() != null
-                && userCrtRequest.getPassword().equals(userCrtRequest.getConfirmPassword());
+    public boolean isValid(PasswordConfirm obj, ConstraintValidatorContext context) {
+        return obj.getConfirmPassword() != null && obj.getConfirmPassword().equals(obj.getPassword());
     }
 }
