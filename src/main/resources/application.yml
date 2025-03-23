@@ -20,9 +20,6 @@ spring:
           starttls:
             enable: true
             required: true
-          connectiontimeout: 5000 #seconds
-          timeout: 5000 #seconds
-          writetimeout: 5000 #seconds
 
 jwt:
   private_key: ${PRIVATE_KEY}
