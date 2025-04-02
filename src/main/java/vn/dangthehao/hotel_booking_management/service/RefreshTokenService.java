@@ -47,7 +47,7 @@ public class RefreshTokenService {
             create(refreshToken, user);
             refreshTokenOptional.ifPresent(this::delete);
         } catch (ParseException e) {
-            throw new RuntimeException(e);
+            throw new AppException(ErrorCode.FAILED_PARSE_TOKEN);
         }
     }
 

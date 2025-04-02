@@ -21,6 +21,9 @@ public enum ErrorCode {
             "Password must contain at least 8 characters," +
                     "including an uppercase letter, a lowercase letter, a number, and a special character."),
     THE_SAME_OLD_PASSWORD(1011, HttpStatus.BAD_REQUEST, "New password must be different old password"),
+    INVALID_GRANT_TYPE_TOKEN(1012, HttpStatus.BAD_REQUEST, "Invalid grant type refresh "),
+    FAILED_PARSE_TOKEN(1013, HttpStatus.BAD_REQUEST, "Failed to parse jwt token"),
+    REFRESH_TOKEN_EXPIRED(1014, HttpStatus.BAD_REQUEST, "Refresh token is expired"),
     UNCATEGORIZED_EXCEPTION(9999, HttpStatus.INTERNAL_SERVER_ERROR, "Internal server error");
 
     int code;

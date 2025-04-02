@@ -13,11 +13,9 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import vn.dangthehao.hotel_booking_management.dto.request.ChangePasswordRequest;
+import vn.dangthehao.hotel_booking_management.dto.request.UserCrtRequest;
 import vn.dangthehao.hotel_booking_management.dto.request.UserUpdateRequest;
-import vn.dangthehao.hotel_booking_management.dto.response.ApiResponse;
-import vn.dangthehao.hotel_booking_management.dto.response.AuthResponse;
-import vn.dangthehao.hotel_booking_management.dto.response.UserListResponse;
-import vn.dangthehao.hotel_booking_management.dto.response.UserUpdateResponse;
+import vn.dangthehao.hotel_booking_management.dto.response.*;
 import vn.dangthehao.hotel_booking_management.security.PermissionChecker;
 import vn.dangthehao.hotel_booking_management.service.AuthenticationService;
 import vn.dangthehao.hotel_booking_management.service.UserService;
@@ -40,27 +38,36 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK).body(userService.listUsers());
     }
 
-    @PutMapping("/users/update-profile")
+    @PostMapping("/users")
+    public ResponseEntity<ApiResponse<UserCrtResponse>> register(
+            @Valid @RequestBody UserCrtRequest request) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(userService.create(request));
+    }
+
+    @PutMapping("/users/me/profile")
     public ResponseEntity<ApiResponse<UserUpdateResponse>> updateUserProfile(
             @AuthenticationPrincipal Jwt jwtToken,
             @RequestPart(name = "data") UserUpdateRequest request,
-            @RequestPart(name = "file") MultipartFile file
-    ) {
+            @RequestPart(name = "file") MultipartFile file) {
         Long userId = jwtToken.getClaim("userID");
         ApiResponse<UserUpdateResponse> response = userService.updateAccountInf(userId, request, file);
 
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
-    @DeleteMapping("/users/delete/{id}")
-    @PreAuthorize("hasRole('ADMIN') or (hasRole('USER') and #id==#jwt.getClaim('userID'))")
-    public ResponseEntity<ApiResponse<Void>> deleteUser(
-            @PathVariable(name = "id") Long id,
-            @AuthenticationPrincipal Jwt jwt) {
+    @DeleteMapping("/users/me")
+    public ResponseEntity<ApiResponse<Void>> deleteUser(@AuthenticationPrincipal Jwt jwt) {
+        Long userID = jwt.getClaim("userID");
+        return ResponseEntity.status(HttpStatus.OK).body(userService.deleteByID(userID));
+    }
+
+    @DeleteMapping("/admin/users/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<ApiResponse<Void>> deleteUserByAdmin(@PathVariable Long id) {
         return ResponseEntity.status(HttpStatus.OK).body(userService.deleteByID(id));
     }
 
-    @PostMapping("/users/change-password")
+    @PatchMapping("/users/me/password")
     public ResponseEntity<ApiResponse<AuthResponse>> changePassword(
             @AuthenticationPrincipal Jwt jwt,
             @Valid @RequestBody ChangePasswordRequest request) {

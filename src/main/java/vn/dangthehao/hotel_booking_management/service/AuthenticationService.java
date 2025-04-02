@@ -54,9 +54,9 @@ public class AuthenticationService {
 
     public ApiResponse<AuthResponse> renewAccessAndRefreshToken(String refreshToken) {
         if (!refreshTokenService.verifyRefreshToken(refreshToken))
-            throw new RuntimeException("Refresh token is invalid");
+            throw new AppException(ErrorCode.REFRESH_TOKEN_NOT_FOUND);
         if (isExpired(refreshToken))
-            throw new RuntimeException("Refresh token is expired");
+            throw new AppException(ErrorCode.REFRESH_TOKEN_EXPIRED);
 
         User user = userService.findByID(jwtUtil.getUserID(jwtUtil.getClaims(refreshToken)));
         Map<String, String> keyPair = tokenGenerator.generateTokenPair(user);
@@ -72,6 +72,7 @@ public class AuthenticationService {
         if (expiredTime.isAfter(now)) {
             tokenBlackListService.revokeAccessToken(jwt.getTokenValue());
         }
+
         Long userID = jwtUtil.getUserID(jwt);
         User user = userService.findByID(userID);
         RefreshToken refreshToken = refreshTokenService.findByUser(user);

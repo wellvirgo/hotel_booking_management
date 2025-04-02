@@ -1,6 +1,5 @@
 package vn.dangthehao.hotel_booking_management.controller;
 
-import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -11,12 +10,11 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 import vn.dangthehao.hotel_booking_management.dto.request.AuthRequest;
-import vn.dangthehao.hotel_booking_management.dto.request.UserCrtRequest;
 import vn.dangthehao.hotel_booking_management.dto.response.ApiResponse;
 import vn.dangthehao.hotel_booking_management.dto.response.AuthResponse;
-import vn.dangthehao.hotel_booking_management.dto.response.UserCrtResponse;
+import vn.dangthehao.hotel_booking_management.enums.ErrorCode;
+import vn.dangthehao.hotel_booking_management.exception.AppException;
 import vn.dangthehao.hotel_booking_management.service.AuthenticationService;
-import vn.dangthehao.hotel_booking_management.service.UserService;
 
 import java.text.ParseException;
 
@@ -27,32 +25,24 @@ import java.text.ParseException;
 @RequestMapping("/api/auth")
 public class AuthController {
     AuthenticationService authenticationService;
-    UserService userService;
 
-    @PostMapping("/login")
+    @PostMapping("/sessions")
     public ResponseEntity<ApiResponse<AuthResponse>> login(@RequestBody AuthRequest request) {
         return ResponseEntity.status(HttpStatus.OK).body(authenticationService.authenticate(request));
     }
 
-    @PostMapping("/register")
-    public ResponseEntity<ApiResponse<UserCrtResponse>> register(
-            @Valid @RequestBody UserCrtRequest request) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(userService.create(request));
-    }
-
-    @PostMapping("/logout")
+    @DeleteMapping("/sessions")
     public ResponseEntity<ApiResponse<String>> logout(
             @AuthenticationPrincipal Jwt jwt) throws ParseException {
         return ResponseEntity.status(HttpStatus.OK).body(authenticationService.logout(jwt));
     }
 
-    @PostMapping("/refresh")
+    @PostMapping("/tokens")
     public ResponseEntity<ApiResponse<AuthResponse>> refreshToken(
             @RequestParam("grant_type") String grantType,
-            @RequestParam("refresh_token") String refreshToken
-    ) {
+            @RequestParam("refresh_token") String refreshToken) {
         if (!"refresh_token".equals(grantType))
-            throw new RuntimeException("invalid grant type");
+            throw new AppException(ErrorCode.INVALID_GRANT_TYPE_TOKEN);
         ApiResponse<AuthResponse> apiResponse = authenticationService.renewAccessAndRefreshToken(refreshToken);
 
         return ResponseEntity.status(HttpStatus.OK).body(apiResponse);

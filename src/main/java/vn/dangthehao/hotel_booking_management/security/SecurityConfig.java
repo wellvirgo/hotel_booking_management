@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -26,17 +27,22 @@ public class SecurityConfig {
     CustomAccessDeniedHandler customAccessDeniedHandler;
     TokenRevocationFilter tokenRevocationFilter;
 
-    String[] PUBLIC_ENDPOINT={"/api/auth/login", "/api/auth/register", "/api/auth/refresh","/avatars/**"};
+    String[] PUBLIC_POST_ENDPOINT = {"/api/auth/sessions", "/api/auth/tokens", "/api/users"};
+    String[] PUBLIC_GET_ENDPOINT = {"/avatars/**"};
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(authorized -> authorized
-                        .requestMatchers(PUBLIC_ENDPOINT)
-                        .permitAll()
+                        // Public post endpoint
+                        .requestMatchers(HttpMethod.POST, PUBLIC_POST_ENDPOINT).permitAll()
+                        // Public get endpoint
+                        .requestMatchers(HttpMethod.GET, PUBLIC_GET_ENDPOINT).permitAll()
+                        // Admin endpoint
                         .requestMatchers("/api/admin/**", "/actuator/**")
                         .hasRole(Authorities.ROLE_ADMIN.replace("ROLE_", ""))
+                        // Any other endpoint require authentication
                         .anyRequest().authenticated())
                 .exceptionHandling(exception -> exception
                         .accessDeniedHandler(customAccessDeniedHandler));
