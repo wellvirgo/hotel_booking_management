@@ -3,11 +3,14 @@ package vn.dangthehao.hotel_booking_management.repository;
 import org.springframework.data.jpa.repository.JpaRepository;
 import vn.dangthehao.hotel_booking_management.model.User;
 
+import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 public interface UserRepository extends JpaRepository<User, Long> {
-    Optional<User> findByUsername(String username);
-    boolean existsByUsername(String username);
-    boolean existsByEmail(String email);
+    Optional<User> findByIdAndIsDeletedFalse(Long id);
+    Optional<User> findByUsernameAndIsDeletedFalse(String username);
+    Optional<User> findByEmailAndIsDeletedFalse(String email);
+    List<User> findAllByIsDeletedFalse();
+    boolean existsByUsernameAndIsDeletedFalse(String username);
+    boolean existsByEmailAndIsDeletedFalse(String email);
 }

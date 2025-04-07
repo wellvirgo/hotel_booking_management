@@ -47,12 +47,12 @@ public class UserService {
     String avatarFolderName;
 
     public User findByID(Long id) {
-        return userRepository.findById(id)
+        return userRepository.findByIdAndIsDeletedFalse(id)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
     }
 
     public User findByUsername(String username) {
-        return userRepository.findByUsername(username)
+        return userRepository.findByUsernameAndIsDeletedFalse(username)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
     }
 
@@ -87,9 +87,8 @@ public class UserService {
     }
 
     public ApiResponse<List<UserListResponse>> listUsers() {
-        List<User> userList = userRepository.findAll();
+        List<User> userList = userRepository.findAllByIsDeletedFalse();
         List<UserListResponse> userListResponse = userList.stream()
-                .filter(user -> !user.isDeleted())
                 .map(this::addAvatarAndRoleName)
                 .toList();
 
