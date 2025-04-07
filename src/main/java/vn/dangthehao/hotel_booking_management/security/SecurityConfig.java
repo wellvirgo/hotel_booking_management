@@ -27,8 +27,10 @@ public class SecurityConfig {
     CustomAccessDeniedHandler customAccessDeniedHandler;
     TokenRevocationFilter tokenRevocationFilter;
 
-    String[] PUBLIC_POST_ENDPOINT = {"/api/auth/sessions", "/api/auth/tokens", "/api/users"};
+    String[] PUBLIC_POST_ENDPOINT = {"/api/auth/sessions", "/api/auth/tokens", "/api/users",
+            "/api/auth/passwords/resets/**"};
     String[] PUBLIC_GET_ENDPOINT = {"/avatars/**"};
+    String[] PUBLIC_PUT_ENDPOINT={"/api/auth/passwords/resets"};
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
@@ -37,11 +39,17 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorized -> authorized
                         // Public post endpoint
                         .requestMatchers(HttpMethod.POST, PUBLIC_POST_ENDPOINT).permitAll()
+
                         // Public get endpoint
                         .requestMatchers(HttpMethod.GET, PUBLIC_GET_ENDPOINT).permitAll()
+
+                        // Public put endpoint
+                        .requestMatchers(HttpMethod.PUT, PUBLIC_PUT_ENDPOINT).permitAll()
+
                         // Admin endpoint
                         .requestMatchers("/api/admin/**", "/actuator/**")
                         .hasRole(Authorities.ROLE_ADMIN.replace("ROLE_", ""))
+
                         // Any other endpoint require authentication
                         .anyRequest().authenticated())
                 .exceptionHandling(exception -> exception

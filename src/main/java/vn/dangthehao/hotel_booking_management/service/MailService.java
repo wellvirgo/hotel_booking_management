@@ -5,6 +5,7 @@ import jakarta.mail.internet.MimeMessage;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.env.Environment;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -12,6 +13,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import vn.dangthehao.hotel_booking_management.model.Mail;
 
+@Slf4j
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @Service
@@ -21,13 +23,13 @@ public class MailService {
 
     @Async
     public void sendChangePasswordEmailAsync(String mailTo) {
-        String mailFrom= env.getProperty("spring.mail.username");
-        Mail mail = Mail.builder()
-                .mailTo(mailTo)
-                .mailFrom(mailFrom)
-                .subject("Change password")
-                .content("You have changed password!")
-                .build();
+        Mail mail = generateMail(mailTo, "Change Password", "You have changed your password");
+        sendEmail(mail);
+    }
+
+    @Async
+    public void sendOTPEmailAsync(String mailTo,String otp) {
+        Mail mail=generateMail(mailTo, "OTP for reset password", otp);
         sendEmail(mail);
     }
 
@@ -43,5 +45,15 @@ public class MailService {
         } catch (MessagingException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private Mail generateMail(String mailTo, String subject, String content) {
+        String mailFrom = env.getProperty("spring.mail.username");
+        return Mail.builder()
+                .mailTo(mailTo)
+                .mailFrom(mailFrom)
+                .subject(subject)
+                .content(content)
+                .build();
     }
 }

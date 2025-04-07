@@ -8,10 +8,10 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
-import vn.dangthehao.hotel_booking_management.dto.request.AuthRequest;
-import vn.dangthehao.hotel_booking_management.dto.request.ChangePasswordRequest;
+import vn.dangthehao.hotel_booking_management.dto.request.*;
 import vn.dangthehao.hotel_booking_management.dto.response.ApiResponse;
 import vn.dangthehao.hotel_booking_management.dto.response.AuthResponse;
+import vn.dangthehao.hotel_booking_management.dto.response.VerifyOTPResponse;
 import vn.dangthehao.hotel_booking_management.enums.ErrorCode;
 import vn.dangthehao.hotel_booking_management.exception.AppException;
 import vn.dangthehao.hotel_booking_management.model.RefreshToken;
@@ -19,6 +19,7 @@ import vn.dangthehao.hotel_booking_management.model.User;
 import vn.dangthehao.hotel_booking_management.security.CustomDecoder;
 import vn.dangthehao.hotel_booking_management.security.TokenGenerator;
 import vn.dangthehao.hotel_booking_management.util.JwtUtil;
+import vn.dangthehao.hotel_booking_management.util.OTPUtil;
 import vn.dangthehao.hotel_booking_management.util.ResponseGenerator;
 import vn.dangthehao.hotel_booking_management.util.TimeConverter;
 
@@ -26,6 +27,7 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.Objects;
+import java.util.UUID;
 
 
 @Slf4j
@@ -42,6 +44,7 @@ public class AuthenticationService {
     MailService mailService;
     ResponseGenerator responseGenerator;
     JwtUtil jwtUtil;
+    RedisService redisService;
 
     public ApiResponse<AuthResponse> authenticate(AuthRequest request) {
         User user = checkUsernameAndPassword(request);
@@ -88,10 +91,58 @@ public class AuthenticationService {
         logout(jwt);
 
         Map<String, String> keyPair = tokenGenerator.generateTokenPair(user);
+        refreshTokenService.updateRefreshToken(user, keyPair.get("refreshToken"));
         AuthResponse data = responseGenerator.generateAuthResponse(keyPair);
         mailService.sendChangePasswordEmailAsync(user.getEmail());
 
         return responseGenerator.generateSuccessResponse("Change password successfully!", data);
+    }
+
+    public ApiResponse<Void> sendOTP(CheckEmailRequest request) {
+        if (checkEmailExist(request)) {
+            String otp = OTPUtil.generateOTP();
+            String email = request.getEmail();
+            mailService.sendOTPEmailAsync(email, otp);
+            redisService.saveOTPWithExpiredTime(email, otp);
+        }
+
+        return responseGenerator.generateSuccessResponse("OTP will be sent to your email");
+    }
+
+    public ApiResponse<Void> resetPassword(ResetPasswordRequest request, String resetToken) {
+        String email = request.getEmail();
+        String keyResetToken = email + "_resetToken";
+        // Check reset token
+        resetToken = resetToken == null ? "" : resetToken;
+        if (!resetToken.equals(redisService.get(keyResetToken)))
+            throw new AppException(ErrorCode.INVALID_RESET_TOKEN);
+        // If reset token is valid, allow reset password
+        User user = userService.findByEmail(email);
+        updatePassword(user, request.getPassword());
+        mailService.sendChangePasswordEmailAsync(email);
+        redisService.delete(keyResetToken);
+
+        return responseGenerator.generateSuccessResponse("Reset password successfully");
+    }
+
+
+    public ApiResponse<VerifyOTPResponse> verifyOTP(VerifyOTPRequest request) {
+        String email = request.getEmail();
+        String keyOTP = email + "_otp";
+        if (!request.getOtp().equals(redisService.get(keyOTP))) {
+            throw new AppException(ErrorCode.INVALID_OTP);
+        }
+        // Delete otp from redis
+        redisService.delete(keyOTP);
+        // Save reset token into redis
+        String resetToken = String.valueOf(UUID.randomUUID());
+        redisService.saveResetToken(email, resetToken);
+        // Build response
+        VerifyOTPResponse data = VerifyOTPResponse.builder()
+                .resetToken(resetToken)
+                .build();
+
+        return responseGenerator.generateSuccessResponse("Verify OTP successfully", data);
     }
 
     private User checkUsernameAndPassword(AuthRequest request) {
@@ -101,6 +152,15 @@ public class AuthenticationService {
             throw new AppException(ErrorCode.WRONG_PASSWORD);
 
         return user;
+    }
+
+    public boolean checkEmailExist(CheckEmailRequest request) {
+        String email = request.getEmail();
+        if (!userService.checkEmailExist(email)) {
+            throw new AppException(ErrorCode.EMAIL_NOT_EXIST);
+        }
+
+        return true;
     }
 
     public boolean isExpired(String token) {

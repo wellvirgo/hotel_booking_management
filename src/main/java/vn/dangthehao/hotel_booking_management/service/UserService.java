@@ -11,10 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import vn.dangthehao.hotel_booking_management.dto.request.UserCrtRequest;
 import vn.dangthehao.hotel_booking_management.dto.request.UserUpdateRequest;
-import vn.dangthehao.hotel_booking_management.dto.response.ApiResponse;
-import vn.dangthehao.hotel_booking_management.dto.response.UserCrtResponse;
-import vn.dangthehao.hotel_booking_management.dto.response.UserListResponse;
-import vn.dangthehao.hotel_booking_management.dto.response.UserUpdateResponse;
+import vn.dangthehao.hotel_booking_management.dto.response.*;
 import vn.dangthehao.hotel_booking_management.enums.ErrorCode;
 import vn.dangthehao.hotel_booking_management.exception.AppException;
 import vn.dangthehao.hotel_booking_management.mapper.UserMapper;
@@ -54,6 +51,15 @@ public class UserService {
     public User findByUsername(String username) {
         return userRepository.findByUsernameAndIsDeletedFalse(username)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+    }
+
+    public User findByEmail(String email) {
+        return userRepository.findByEmailAndIsDeletedFalse(email)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+    }
+
+    public boolean checkEmailExist(String email) {
+        return userRepository.existsByEmailAndIsDeletedFalse(email);
     }
 
     public ApiResponse<UserCrtResponse> create(UserCrtRequest request) {
