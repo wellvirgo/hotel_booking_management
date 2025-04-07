@@ -8,6 +8,12 @@ spring:
     hibernate:
       ddl-auto: update
     show-sql: true
+    properties:
+      format_sql: true
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 20MB
   mail:
     host: smtp.gmail.com
     port: 587
@@ -20,19 +26,26 @@ spring:
           starttls:
             enable: true
             required: true
+  data:
+    redis:
+      host: localhost
+      port: 6379
 
+#Config JWT token
 jwt:
   private_key: ${PRIVATE_KEY}
   access_token_valid_duration: 1800 #seconds
   refresh_token_valid_duration: 86400 #seconds
   issuer: hotel_booking_management
 
+#Spring actuator
 management:
   endpoints:
     web:
       exposure:
         include: beans
 
+#Begin for log and debug
 logging:
   level:
     org:
@@ -43,9 +56,11 @@ logging:
 mail:
   smtp:
     debug: true
+#End for log and debug
 
 base_url: http://localhost:8080
 
+#Config upload file
 file:
   upload_folder: uploads/images/
   user_avatar_folder_name: avatars
