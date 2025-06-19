@@ -18,23 +18,23 @@ public class RedisService {
         redisTemplate.opsForValue().set(key, value);
     }
 
-    public boolean setTimeToLive(String key, long timeout) {
-        return redisTemplate.expire(key, timeout, TimeUnit.MINUTES);
+    public void setTimeToLive(String key, long timeout) {
+        redisTemplate.expire(key, timeout, TimeUnit.MINUTES);
     }
 
     public Object get(String key) {
         return redisTemplate.opsForValue().get(key);
     }
 
-    public boolean delete(String key) {
-        return redisTemplate.delete(key);
+    public void delete(String key) {
+        redisTemplate.delete(key);
     }
 
     public void saveOTPWithExpiredTime(String email, String otp) {
         final long expiredTimeOTP = 5;
         String key = email + "_otp";
         set(key, otp);
-        setTimeToLive(email, expiredTimeOTP);
+        setTimeToLive(key, expiredTimeOTP);
     }
 
     public void saveResetToken(String email, String resetToken) {

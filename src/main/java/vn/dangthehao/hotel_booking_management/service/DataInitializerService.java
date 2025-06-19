@@ -57,6 +57,7 @@ public class DataInitializerService {
     }
 
     public List<Permission> createPermissions() {
+        // Dùng linked hash map -> thứ tự insert vào db giống thứ tự put vào map
         Map<String, String> permissionsSpec = new LinkedHashMap<>();
         permissionsSpec.put(Authorities.ALL_USER, "Full control user resource");
         permissionsSpec.put(Authorities.READ_USER, "Only read user resource");

@@ -7,7 +7,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import vn.dangthehao.hotel_booking_management.dto.response.ApiResponse;
 import vn.dangthehao.hotel_booking_management.dto.response.AuthResponse;
-import vn.dangthehao.hotel_booking_management.model.User;
 import vn.dangthehao.hotel_booking_management.security.TokenGenerator;
 
 import java.util.Map;

@@ -21,7 +21,6 @@ import vn.dangthehao.hotel_booking_management.enums.ErrorCode;
 import vn.dangthehao.hotel_booking_management.exception.AppException;
 import vn.dangthehao.hotel_booking_management.service.AuthenticationService;
 
-import java.text.ParseException;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -37,8 +36,7 @@ public class AuthController {
     }
 
     @DeleteMapping("/sessions")
-    public ResponseEntity<ApiResponse<String>> logout(
-            @AuthenticationPrincipal Jwt jwt) throws ParseException {
+    public ResponseEntity<ApiResponse<String>> logout(@AuthenticationPrincipal Jwt jwt) {
         return ResponseEntity.status(HttpStatus.OK).body(authenticationService.logout(jwt));
     }
 

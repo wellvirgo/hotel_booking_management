@@ -44,7 +44,7 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.CREATED).body(userService.create(request));
     }
 
-    @PutMapping("/users/me/profile")
+    @PutMapping("/users/me")
     public ResponseEntity<ApiResponse<UserUpdateResponse>> updateUserProfile(
             @AuthenticationPrincipal Jwt jwtToken,
             @RequestPart(name = "data") UserUpdateRequest request,

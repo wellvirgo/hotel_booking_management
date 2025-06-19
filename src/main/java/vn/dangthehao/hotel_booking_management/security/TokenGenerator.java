@@ -39,7 +39,6 @@ public class TokenGenerator {
     }
 
     public String generateAccessToken(User user) {
-        JWSHeader header = new JWSHeader(JWSAlgorithm.HS512);
         JWTClaimsSet claimsSet = new JWTClaimsSet.Builder()
                 .jwtID(UUID.randomUUID().toString())
                 .claim("userID", user.getId())
@@ -49,20 +48,11 @@ public class TokenGenerator {
                 .expirationTime(Date.from(Instant.now().plusSeconds(this.acTokenValidDuration)))
                 .claim("scope", buildScope(user))
                 .build();
-        Payload payload = new Payload(claimsSet.toJSONObject());
 
-        JWSObject jwsObject = new JWSObject(header, payload);
-        try {
-            jwsObject.sign(this.signer);
-        } catch (JOSEException e) {
-            throw new RuntimeException(e);
-        }
-
-        return jwsObject.serialize();
+        return buildToken(claimsSet);
     }
 
     public String generateRefreshToken(User user) {
-        JWSHeader header = new JWSHeader(JWSAlgorithm.HS512);
         JWTClaimsSet claimsSet = new JWTClaimsSet.Builder()
                 .jwtID(UUID.randomUUID().toString())
                 .claim("userID", user.getId())
@@ -70,16 +60,8 @@ public class TokenGenerator {
                 .issueTime(new Date())
                 .expirationTime(Date.from(Instant.now().plusSeconds(this.rfTokenValidDuration)))
                 .build();
-        Payload payload = new Payload(claimsSet.toJSONObject());
 
-        JWSObject jwsObject = new JWSObject(header, payload);
-        try {
-            jwsObject.sign(this.signer);
-        } catch (JOSEException e) {
-            throw new RuntimeException(e);
-        }
-
-        return jwsObject.serialize();
+        return buildToken(claimsSet);
     }
 
     public Map<String, String> generateTokenPair(User user) {
@@ -99,5 +81,18 @@ public class TokenGenerator {
                 .forEach(permission -> joiner.add(permission.getPermissionName()));
 
         return String.valueOf(joiner);
+    }
+
+    private String buildToken(JWTClaimsSet claimsSet) {
+        JWSHeader header = new JWSHeader(JWSAlgorithm.HS512);
+        Payload payload = new Payload(claimsSet.toJSONObject());
+        JWSObject jwsObject = new JWSObject(header, payload);
+        try {
+            jwsObject.sign(this.signer);
+        } catch (JOSEException e) {
+            throw new RuntimeException(e);
+        }
+
+        return jwsObject.serialize();
     }
 }
