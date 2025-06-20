@@ -7,6 +7,7 @@ import lombok.experimental.NonFinal;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import vn.dangthehao.hotel_booking_management.dto.request.UserCrtRequest;
@@ -75,6 +76,20 @@ public class UserService {
         return responseGenerator.generateSuccessResponse("User is created", userCrtResponse);
     }
 
+    public ApiResponse<UserResponse> getCurrentUser(Jwt jwt) {
+        Long userId = jwt.getClaim("userID");
+        User currentUser = findByID(userId);
+        UserResponse userResponse = userMapper.toUserResponse(currentUser);
+        String avatar = (currentUser.getAvatar() != null)
+                ? String.format("%s/%s/%s", baseUrl, avatarFolderName, currentUser.getAvatar())
+                : "";
+        userResponse.setAvatar(avatar);
+        userResponse.setRoleName(currentUser.getRole().getRoleName());
+
+        return responseGenerator.generateSuccessResponse(
+                "Current user's information", userResponse);
+    }
+
     public ApiResponse<UserUpdateResponse> updateAccountInf(
             Long userID,
             UserUpdateRequest request,
@@ -84,7 +99,7 @@ public class UserService {
         currentUser.setEmail(request.getEmail());
         currentUser.setPhone(request.getPhone());
         String avatar = uploadFileService.saveFile(avatarFolderName, file);
-        String avatarFileName = avatar.replace(baseUrl + "/" + avatarFolderName, "");
+        String avatarFileName = avatar.replace(String.format("%s/%s/", baseUrl, avatarFolderName), "");
         currentUser.setAvatar(avatarFileName);
         UserUpdateResponse userUpdateResponse = userMapper.toUserUpdateResponse(userRepository.save(currentUser));
         userUpdateResponse.setAvatar(avatar);
@@ -113,10 +128,11 @@ public class UserService {
         userRepository.save(user);
     }
 
+    // Used in list users to map link avatar in server and role name
     private UserListResponse addAvatarAndRoleName(User user) {
         UserListResponse userLResponse = userMapper.toUserListResponse(user);
         String avatar = (user.getAvatar() != null)
-                ? baseUrl + "/" + avatarFolderName + user.getAvatar() : "";
+                ? String.format("%s/%s/%s", baseUrl, avatarFolderName, user.getAvatar()) : "";
         userLResponse.setAvatar(avatar);
         userLResponse.setRoleName(user.getRole().getRoleName());
 

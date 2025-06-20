@@ -16,6 +16,7 @@ import vn.dangthehao.hotel_booking_management.dto.request.ChangePasswordRequest;
 import vn.dangthehao.hotel_booking_management.dto.request.UserCrtRequest;
 import vn.dangthehao.hotel_booking_management.dto.request.UserUpdateRequest;
 import vn.dangthehao.hotel_booking_management.dto.response.*;
+import vn.dangthehao.hotel_booking_management.model.User;
 import vn.dangthehao.hotel_booking_management.security.PermissionChecker;
 import vn.dangthehao.hotel_booking_management.service.AuthenticationService;
 import vn.dangthehao.hotel_booking_management.service.UserService;
@@ -36,6 +37,11 @@ public class UserController {
     @PreAuthorize("@permissionChecker.hasAuthorities({'read:user','all:user'})")
     public ResponseEntity<ApiResponse<List<UserListResponse>>> getAllUsers() {
         return ResponseEntity.status(HttpStatus.OK).body(userService.listUsers());
+    }
+
+    @GetMapping("/users/me")
+    public ResponseEntity<ApiResponse<UserResponse>> getCurrentUser(@AuthenticationPrincipal Jwt jwt) {
+        return ResponseEntity.status(HttpStatus.OK).body(userService.getCurrentUser(jwt));
     }
 
     @PostMapping("/users")

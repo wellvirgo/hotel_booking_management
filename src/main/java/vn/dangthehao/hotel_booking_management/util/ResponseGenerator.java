@@ -7,7 +7,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import vn.dangthehao.hotel_booking_management.dto.response.ApiResponse;
 import vn.dangthehao.hotel_booking_management.dto.response.AuthResponse;
-import vn.dangthehao.hotel_booking_management.security.TokenGenerator;
 
 import java.util.Map;
 
@@ -15,7 +14,6 @@ import java.util.Map;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @Component
 public class ResponseGenerator {
-    TokenGenerator tokenGenerator;
 
     public <T> ApiResponse<T> generateSuccessResponse(String message, T data) {
         return ApiResponse.<T>builder()
