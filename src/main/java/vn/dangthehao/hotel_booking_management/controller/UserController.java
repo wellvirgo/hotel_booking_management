@@ -39,6 +39,12 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK).body(userService.listUsers());
     }
 
+    @DeleteMapping("/admin/users/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<ApiResponse<Void>> deleteUserByAdmin(@PathVariable Long id) {
+        return ResponseEntity.status(HttpStatus.OK).body(userService.deleteByID(id));
+    }
+
     @GetMapping("/users/me")
     public ResponseEntity<ApiResponse<UserResponse>> getCurrentUser(@AuthenticationPrincipal Jwt jwt) {
         return ResponseEntity.status(HttpStatus.OK).body(userService.getCurrentUser(jwt));
@@ -65,12 +71,6 @@ public class UserController {
     public ResponseEntity<ApiResponse<Void>> deleteUser(@AuthenticationPrincipal Jwt jwt) {
         Long userID = jwt.getClaim("userID");
         return ResponseEntity.status(HttpStatus.OK).body(userService.deleteByID(userID));
-    }
-
-    @DeleteMapping("/admin/users/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<ApiResponse<Void>> deleteUserByAdmin(@PathVariable Long id) {
-        return ResponseEntity.status(HttpStatus.OK).body(userService.deleteByID(id));
     }
 
     @PatchMapping("/users/me/password")
