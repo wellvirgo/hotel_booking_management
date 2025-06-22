@@ -40,7 +40,7 @@ public class Room extends BaseEntity {
     @Column(nullable = false)
     RoomStatus status = RoomStatus.AVAILABLE;
 
-    List<String> image;
+    String images;
 
     @Override
     public boolean equals(Object o) {

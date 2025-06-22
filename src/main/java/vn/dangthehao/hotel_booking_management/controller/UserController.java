@@ -27,36 +27,23 @@ import java.util.List;
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/users")
 public class UserController {
     UserService userService;
     AuthenticationService authenticationService;
-    PermissionChecker permissionChecker;
 
-    @GetMapping("/admin/users")
-    @PreAuthorize("@permissionChecker.hasAuthorities({'read:user','all:user'})")
-    public ResponseEntity<ApiResponse<List<UserListResponse>>> getAllUsers() {
-        return ResponseEntity.status(HttpStatus.OK).body(userService.listUsers());
-    }
-
-    @DeleteMapping("/admin/users/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<ApiResponse<Void>> deleteUserByAdmin(@PathVariable Long id) {
-        return ResponseEntity.status(HttpStatus.OK).body(userService.deleteByID(id));
-    }
-
-    @GetMapping("/users/me")
+    @GetMapping("/me")
     public ResponseEntity<ApiResponse<UserResponse>> getCurrentUser(@AuthenticationPrincipal Jwt jwt) {
         return ResponseEntity.status(HttpStatus.OK).body(userService.getCurrentUser(jwt));
     }
 
-    @PostMapping("/users")
+    @PostMapping
     public ResponseEntity<ApiResponse<UserCrtResponse>> register(
             @Valid @RequestBody UserCrtRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(userService.create(request));
     }
 
-    @PutMapping("/users/me")
+    @PutMapping("/me")
     public ResponseEntity<ApiResponse<UserUpdateResponse>> updateUserProfile(
             @AuthenticationPrincipal Jwt jwtToken,
             @RequestPart(name = "data") UserUpdateRequest request,
@@ -67,13 +54,13 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
-    @DeleteMapping("/users/me")
+    @DeleteMapping("/me")
     public ResponseEntity<ApiResponse<Void>> deleteUser(@AuthenticationPrincipal Jwt jwt) {
         Long userID = jwt.getClaim("userID");
         return ResponseEntity.status(HttpStatus.OK).body(userService.deleteByID(userID));
     }
 
-    @PatchMapping("/users/me/password")
+    @PatchMapping("/me/password")
     public ResponseEntity<ApiResponse<AuthResponse>> changePassword(
             @AuthenticationPrincipal Jwt jwt,
             @Valid @RequestBody ChangePasswordRequest request) {

@@ -32,7 +32,7 @@ public class Hotel extends BaseEntity {
 
     @Column(nullable = false)
     @Enumerated(value = EnumType.STRING)
-    HotelStatus status = HotelStatus.PENDING_REVIEW;
+    HotelStatus status = HotelStatus.INACTIVE;
 
     @Column(columnDefinition = "boolean default false", nullable = false)
     boolean isApproved;
@@ -40,8 +40,8 @@ public class Hotel extends BaseEntity {
     @Column(columnDefinition = "boolean default false", nullable = false)
     boolean isDeleted;
 
-    float depositRate;
-    float depositDeadlineHours;
+    Float depositRate;
+    Float depositDeadlineHours;
 
     @ManyToMany
     @JoinTable(name = "hotels_room_types",
