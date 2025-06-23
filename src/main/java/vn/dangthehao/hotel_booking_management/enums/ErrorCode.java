@@ -27,6 +27,7 @@ public enum ErrorCode {
     EMAIL_NOT_EXIST(1015, HttpStatus.BAD_REQUEST, "Email is not registered in the system"),
     INVALID_OTP(1016, HttpStatus.BAD_REQUEST, "Invalid OTP"),
     INVALID_RESET_TOKEN(1017, HttpStatus.BAD_REQUEST, "Reset password token is invalid"),
+    HOTEL_NOT_FOUND(1018, HttpStatus.NOT_FOUND, "Hotel not found"),
     UNCATEGORIZED_EXCEPTION(9999, HttpStatus.INTERNAL_SERVER_ERROR, "Internal server error");
 
     int code;

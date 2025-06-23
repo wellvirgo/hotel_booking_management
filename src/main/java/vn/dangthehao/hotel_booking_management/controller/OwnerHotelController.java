@@ -23,7 +23,7 @@ import vn.dangthehao.hotel_booking_management.service.HotelService;
 public class OwnerHotelController {
     HotelService hotelService;
 
-    @PostMapping()
+    @PostMapping
     public ResponseEntity<ApiResponse<Void>> registerHotel(
             @Valid @RequestBody HotelRegistrationRequest request,
             @AuthenticationPrincipal Jwt jwt) {
