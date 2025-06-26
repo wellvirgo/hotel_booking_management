@@ -29,4 +29,14 @@ public class AdminHotelController {
     public ResponseEntity<ApiResponse<DetailHotelResponse>> getUnapprovedHotel(@PathVariable(name = "id") long id) {
         return ResponseEntity.status(HttpStatus.OK).body(hotelService.getDetailHotel(id));
     }
+
+    @PostMapping("/{id}/approve")
+    public ResponseEntity<ApiResponse<Void>> approveHotel(@PathVariable(name = "id") long id) {
+        return ResponseEntity.status(HttpStatus.OK).body(hotelService.approveHotel(id));
+    }
+
+    @PostMapping("/{id}/reject")
+    public ResponseEntity<ApiResponse<Void>> rejectHotel(@PathVariable(name = "id") long id) {
+        return ResponseEntity.status(HttpStatus.OK).body(hotelService.rejectHotel(id));
+    }
 }

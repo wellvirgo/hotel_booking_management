@@ -28,6 +28,8 @@ public enum ErrorCode {
     INVALID_OTP(1016, HttpStatus.BAD_REQUEST, "Invalid OTP"),
     INVALID_RESET_TOKEN(1017, HttpStatus.BAD_REQUEST, "Reset password token is invalid"),
     HOTEL_NOT_FOUND(1018, HttpStatus.NOT_FOUND, "Hotel not found"),
+    CAN_NOT_APPROVE_HOTEL(1019, HttpStatus.BAD_REQUEST, "Can't approve the hotel"),
+    CAN_NOT_REJECT_HOTEL(1020, HttpStatus.BAD_REQUEST, "Can't reject the hotel"),
     UNCATEGORIZED_EXCEPTION(9999, HttpStatus.INTERNAL_SERVER_ERROR, "Internal server error");
 
     int code;

@@ -28,8 +28,28 @@ public class MailService {
     }
 
     @Async
-    public void sendOTPEmailAsync(String mailTo,String otp) {
-        Mail mail=generateMail(mailTo, "OTP for reset password", otp);
+    public void sendOTPEmailAsync(String mailTo, String otp) {
+        Mail mail = generateMail(mailTo, "OTP for reset password", otp);
+        sendEmail(mail);
+    }
+
+    @Async
+    public void sendApproveHotelEmailAsync(String mailTo, String hotelName) {
+        Mail mail = generateMail(
+                mailTo,
+                "Approve Hotel",
+                String.format("Your %s hotel has been approved", hotelName)
+        );
+        sendEmail(mail);
+    }
+
+    @Async
+    public void sendRejectHotelEmailAsync(String mailTo, String hotelName) {
+        Mail mail = generateMail(
+                mailTo,
+                "Reject Hotel",
+                String.format("Your %s hotel has been reject", hotelName)
+        );
         sendEmail(mail);
     }
 

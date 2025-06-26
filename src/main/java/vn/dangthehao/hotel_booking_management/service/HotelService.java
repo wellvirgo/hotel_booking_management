@@ -14,6 +14,7 @@ import vn.dangthehao.hotel_booking_management.dto.response.ApiResponse;
 import vn.dangthehao.hotel_booking_management.dto.response.DetailHotelResponse;
 import vn.dangthehao.hotel_booking_management.dto.response.UnapprovedHotelListResponse;
 import vn.dangthehao.hotel_booking_management.enums.ErrorCode;
+import vn.dangthehao.hotel_booking_management.enums.HotelStatus;
 import vn.dangthehao.hotel_booking_management.exception.AppException;
 import vn.dangthehao.hotel_booking_management.mapper.HotelMapper;
 import vn.dangthehao.hotel_booking_management.model.Hotel;
@@ -30,8 +31,14 @@ public class HotelService {
     JwtUtil jwtUtil;
     ResponseGenerator responseGenerator;
     UserService userService;
+    MailService mailService;
 
     static String BASE_AVATAR_URL = "http://localhost:8080/avatars/";
+
+    public Hotel findById(Long id) {
+        return hotelRepository.findByIdAndIsDeletedFalse(id)
+                .orElseThrow(() -> new AppException(ErrorCode.HOTEL_NOT_FOUND));
+    }
 
     public ApiResponse<Void> register(HotelRegistrationRequest request, Jwt jwt) {
         Hotel registeredHotel = hotelMapper.toHotel(request);
@@ -44,7 +51,7 @@ public class HotelService {
 
     public ApiResponse<UnapprovedHotelListResponse> findUnapprovedHotels(int page, int size) {
         Pageable pageable = PageRequest.of(page - 1, size);
-        Page<UnapprovedHotelDTO> unapprovedHotelDTOPage = hotelRepository.findUnapprovedHotels(pageable);
+        Page<UnapprovedHotelDTO> unapprovedHotelDTOPage = hotelRepository.findUnapprovedHotels(pageable, HotelStatus.INACTIVE);
 
         UnapprovedHotelListResponse unapprovedHotelListResponse = UnapprovedHotelListResponse.builder()
                 .unapprovedHotels(unapprovedHotelDTOPage.getContent())
@@ -55,8 +62,7 @@ public class HotelService {
     }
 
     public ApiResponse<DetailHotelResponse> getDetailHotel(Long id) {
-        Hotel hotel = hotelRepository.findById(id)
-                .orElseThrow(() -> new AppException(ErrorCode.HOTEL_NOT_FOUND));
+        Hotel hotel = findById(id);
         DetailHotelResponse response = hotelMapper.toDetailHotelResponse(hotel);
         response.setOwnerFullName(hotel.getOwner().getFullName());
         response.setOwnerEmail(hotel.getOwner().getEmail());
@@ -67,5 +73,35 @@ public class HotelService {
         response.setOwnerAvatar(avatarUrl);
 
         return responseGenerator.generateSuccessResponse("Hotel detail", response);
+    }
+
+    public ApiResponse<Void> approveHotel(Long id) {
+        Hotel hotel = findById(id);
+
+        if (hotel.isApproved() || HotelStatus.REJECTED.equals(hotel.getStatus()))
+            throw new AppException(ErrorCode.CAN_NOT_APPROVE_HOTEL);
+
+        hotel.setApproved(true);
+        hotel.setStatus(HotelStatus.MAINTENANCE);
+        hotelRepository.save(hotel);
+        String ownerEmail = hotel.getOwner().getEmail();
+        mailService.sendApproveHotelEmailAsync(ownerEmail, hotel.getHotelName());
+
+        return responseGenerator.generateSuccessResponse("Hotel is approved");
+    }
+
+    public ApiResponse<Void> rejectHotel(Long id) {
+        Hotel hotel = findById(id);
+
+        if (hotel.isApproved() || HotelStatus.REJECTED.equals(hotel.getStatus()))
+            throw new AppException(ErrorCode.CAN_NOT_REJECT_HOTEL);
+
+        hotel.setApproved(false);
+        hotel.setStatus(HotelStatus.REJECTED);
+        hotelRepository.save(hotel);
+        String ownerEmail = hotel.getOwner().getEmail();
+        mailService.sendRejectHotelEmailAsync(ownerEmail, hotel.getHotelName());
+
+        return responseGenerator.generateSuccessResponse("Hotel is rejected");
     }
 }
