@@ -8,11 +8,13 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
+import vn.dangthehao.hotel_booking_management.dto.OwnerHotelItemDTO;
 import vn.dangthehao.hotel_booking_management.dto.UnapprovedHotelDTO;
 import vn.dangthehao.hotel_booking_management.dto.request.HotelRegistrationRequest;
 import vn.dangthehao.hotel_booking_management.dto.response.ApiResponse;
 import vn.dangthehao.hotel_booking_management.dto.response.DetailHotelResponse;
-import vn.dangthehao.hotel_booking_management.dto.response.UnapprovedHotelListResponse;
+import vn.dangthehao.hotel_booking_management.dto.response.OwnerHotelsResponse;
+import vn.dangthehao.hotel_booking_management.dto.response.UnapprovedHotelsResponse;
 import vn.dangthehao.hotel_booking_management.enums.ErrorCode;
 import vn.dangthehao.hotel_booking_management.enums.HotelStatus;
 import vn.dangthehao.hotel_booking_management.exception.AppException;
@@ -21,6 +23,9 @@ import vn.dangthehao.hotel_booking_management.model.Hotel;
 import vn.dangthehao.hotel_booking_management.repository.HotelRepository;
 import vn.dangthehao.hotel_booking_management.util.JwtUtil;
 import vn.dangthehao.hotel_booking_management.util.ResponseGenerator;
+
+import java.util.List;
+import java.util.Optional;
 
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -49,16 +54,16 @@ public class HotelService {
         return responseGenerator.generateSuccessResponse("Your application will be handled soon!");
     }
 
-    public ApiResponse<UnapprovedHotelListResponse> findUnapprovedHotels(int page, int size) {
+    public ApiResponse<UnapprovedHotelsResponse> findUnapprovedHotels(int page, int size) {
         Pageable pageable = PageRequest.of(page - 1, size);
         Page<UnapprovedHotelDTO> unapprovedHotelDTOPage = hotelRepository.findUnapprovedHotels(pageable, HotelStatus.INACTIVE);
 
-        UnapprovedHotelListResponse unapprovedHotelListResponse = UnapprovedHotelListResponse.builder()
+        UnapprovedHotelsResponse unapprovedHotelsResponse = UnapprovedHotelsResponse.builder()
                 .unapprovedHotels(unapprovedHotelDTOPage.getContent())
                 .currentPage(page)
                 .totalPages(unapprovedHotelDTOPage.getTotalPages())
                 .build();
-        return responseGenerator.generateSuccessResponse("List of unapproved hotels", unapprovedHotelListResponse);
+        return responseGenerator.generateSuccessResponse("List of unapproved hotels", unapprovedHotelsResponse);
     }
 
     public ApiResponse<DetailHotelResponse> getDetailHotel(Long id) {
@@ -103,5 +108,30 @@ public class HotelService {
         mailService.sendRejectHotelEmailAsync(ownerEmail, hotel.getHotelName());
 
         return responseGenerator.generateSuccessResponse("Hotel is rejected");
+    }
+
+    public ApiResponse<OwnerHotelsResponse> findHotelsByOwner(Jwt jwt, String isApproved, int page, int size) {
+        Pageable pageable = PageRequest.of(page - 1, size);
+        Page<OwnerHotelItemDTO> ownerHotelItemDTOPage = null;
+        OwnerHotelsResponse ownerHotelsResponse = null;
+        if ("false".equals(isApproved)) {
+            ownerHotelItemDTOPage = hotelRepository.findUnApprovedHotelsByOwner(pageable, jwtUtil.getUserID(jwt));
+            ownerHotelsResponse = OwnerHotelsResponse.builder()
+                    .ownerHotelItems(ownerHotelItemDTOPage.getContent())
+                    .currentPage(page)
+                    .totalPages(ownerHotelItemDTOPage.getTotalPages())
+                    .build();
+
+            return responseGenerator.generateSuccessResponse("List of owner unapproved hotels", ownerHotelsResponse);
+        }
+
+        ownerHotelItemDTOPage = hotelRepository.findApprovedHotelsByOwner(pageable, jwtUtil.getUserID(jwt));
+        ownerHotelsResponse = OwnerHotelsResponse.builder()
+                .ownerHotelItems(ownerHotelItemDTOPage.getContent())
+                .currentPage(page)
+                .totalPages(ownerHotelItemDTOPage.getTotalPages())
+                .build();
+
+        return responseGenerator.generateSuccessResponse("List of approved hotels", ownerHotelsResponse);
     }
 }

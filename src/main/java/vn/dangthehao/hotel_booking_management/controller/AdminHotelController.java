@@ -8,7 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import vn.dangthehao.hotel_booking_management.dto.response.ApiResponse;
 import vn.dangthehao.hotel_booking_management.dto.response.DetailHotelResponse;
-import vn.dangthehao.hotel_booking_management.dto.response.UnapprovedHotelListResponse;
+import vn.dangthehao.hotel_booking_management.dto.response.UnapprovedHotelsResponse;
 import vn.dangthehao.hotel_booking_management.service.HotelService;
 
 @RequiredArgsConstructor
@@ -19,7 +19,7 @@ public class AdminHotelController {
     HotelService hotelService;
 
     @GetMapping("/pending-approval")
-    public ResponseEntity<ApiResponse<UnapprovedHotelListResponse>> listUnapprovedHotels(
+    public ResponseEntity<ApiResponse<UnapprovedHotelsResponse>> listUnapprovedHotels(
             @RequestParam(name = "page", defaultValue = "1") int page,
             @RequestParam(name = "size", defaultValue = "5") int size) {
         return ResponseEntity.status(HttpStatus.OK).body(hotelService.findUnapprovedHotels(page, size));

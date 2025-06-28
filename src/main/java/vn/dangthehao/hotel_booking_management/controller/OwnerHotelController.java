@@ -8,12 +8,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import vn.dangthehao.hotel_booking_management.dto.request.HotelRegistrationRequest;
 import vn.dangthehao.hotel_booking_management.dto.response.ApiResponse;
+import vn.dangthehao.hotel_booking_management.dto.response.OwnerHotelsResponse;
 import vn.dangthehao.hotel_booking_management.service.HotelService;
 
 @RequiredArgsConstructor
@@ -28,5 +26,14 @@ public class OwnerHotelController {
             @Valid @RequestBody HotelRegistrationRequest request,
             @AuthenticationPrincipal Jwt jwt) {
         return ResponseEntity.status(HttpStatus.OK).body(hotelService.register(request, jwt));
+    }
+
+    @GetMapping
+    public ResponseEntity<ApiResponse<OwnerHotelsResponse>> findAllHotels(
+            @AuthenticationPrincipal Jwt jwt,
+            @RequestParam(name = "isApproved", defaultValue = "true") String isApproved,
+            @RequestParam(name = "page", defaultValue = "1") int page,
+            @RequestParam(name = "size", defaultValue = "5") int size) {
+        return ResponseEntity.status(HttpStatus.OK).body(hotelService.findHotelsByOwner(jwt, isApproved, page, size));
     }
 }

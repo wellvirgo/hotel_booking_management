@@ -59,7 +59,7 @@ public class SecurityConfig {
                         .hasRole(Authorities.ROLE_ADMIN.replace("ROLE_", ""))
 
                         // Hotel owner endpoint
-                        .requestMatchers("/api/hotel-owner/**")
+                        .requestMatchers("/api/owner/**")
                         .hasRole(Authorities.ROLE_HOTEL_OWNER.replace("ROLE_", ""))
 
                         // Any other endpoint require authentication
