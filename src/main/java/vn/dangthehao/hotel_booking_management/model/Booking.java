@@ -8,6 +8,7 @@ import vn.dangthehao.hotel_booking_management.enums.BookingStatus;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Objects;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -22,14 +23,20 @@ public class Booking extends BaseEntity{
     User user;
 
     @ManyToOne
-    @JoinColumn(name = "room_id", nullable = false)
-    Room room;
+    @JoinColumn(name = "hotel_id", nullable = false)
+    Hotel hotel;
+
+    @ManyToOne
+    @JoinColumn(name = "room_type_id", nullable = false)
+    RoomType roomType;
+
+    int numRooms;
 
     @Column(nullable = false)
-    LocalDateTime check_in;
+    LocalDateTime checkIn;
 
     @Column(nullable = false)
-    LocalDateTime check_out;
+    LocalDateTime checkOut;
 
     @Column(nullable = false, precision = 10, scale = 2)
     BigDecimal totalPrice;
@@ -41,19 +48,6 @@ public class Booking extends BaseEntity{
     @Enumerated(value = EnumType.STRING)
     BookingStatus status= BookingStatus.PENDING;
 
-    @Override
-    public boolean equals(Object o) {
-        if (o == null || getClass() != o.getClass()) return false;
-        Booking booking = (Booking) o;
-        return Objects.equals(user, booking.user)
-                && Objects.equals(room, booking.room)
-                && Objects.equals(check_in, booking.check_in)
-                && Objects.equals(check_out, booking.check_out)
-                && status == booking.status;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(user, room, check_in, check_out, status);
-    }
+    @OneToMany(mappedBy = "booking")
+    Set<BookingRoom> bookingRooms;
 }

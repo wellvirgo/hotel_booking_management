@@ -1,11 +1,12 @@
 package vn.dangthehao.hotel_booking_management.model;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
+import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+import java.math.BigDecimal;
 import java.util.Objects;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -14,23 +15,53 @@ import java.util.Objects;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Entity
-public class RoomType extends BaseEntity{
-    @Column(nullable = false)
-    String room_type_name;
+public class RoomType extends BaseEntity {
+
+    @ManyToOne
+    @JoinColumn(name = "hotel_id")
+    Hotel hotel;
+
+    @Column(nullable = false, unique = true)
+    String name;
 
     @Column(columnDefinition = "MEDIUMTEXT")
     String description;
 
+    @Column(precision = 10, scale = 2)
+    BigDecimal pricePerNight;
+
+    int capacity;
+    int numOfBeds;
+    String bedType;
+    int totalRooms;
+    boolean isActive;
+
+    @ManyToMany
+    @JoinTable(
+            name = "room_type_amenity",
+            joinColumns = @JoinColumn(name = "room_type_id"),
+            inverseJoinColumns = @JoinColumn(name = "amenity_id")
+    )
+    Set<Amenity> amenities;
+
     @Override
-    public boolean equals(Object o) {
-        if (o == null || getClass() != o.getClass()) return false;
-        RoomType roomType = (RoomType) o;
-        return Objects.equals(room_type_name, roomType.room_type_name)
-                && Objects.equals(description, roomType.description);
+    public boolean equals(Object object) {
+        if (object == null || getClass() != object.getClass()) return false;
+        RoomType roomType = (RoomType) object;
+        return capacity == roomType.capacity
+                && numOfBeds == roomType.numOfBeds
+                && totalRooms == roomType.totalRooms
+                && isActive == roomType.isActive
+                && Objects.equals(hotel, roomType.hotel)
+                && Objects.equals(name, roomType.name)
+                && Objects.equals(description, roomType.description)
+                && Objects.equals(pricePerNight, roomType.pricePerNight)
+                && Objects.equals(bedType, roomType.bedType)
+                && Objects.equals(amenities, roomType.amenities);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(room_type_name, description);
+        return Objects.hash(hotel, name, description, pricePerNight, capacity, numOfBeds, bedType, totalRooms, isActive, amenities);
     }
 }

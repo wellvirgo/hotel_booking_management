@@ -5,7 +5,6 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 import vn.dangthehao.hotel_booking_management.enums.HotelStatus;
 
-import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
@@ -43,11 +42,8 @@ public class Hotel extends BaseEntity {
     Float depositRate;
     Float depositDeadlineHours;
 
-    @ManyToMany
-    @JoinTable(name = "hotels_room_types",
-            joinColumns = @JoinColumn(name = "hotel_id"),
-            inverseJoinColumns = @JoinColumn(name = "room_type_id"))
-    Set<RoomType> roomTypes = new HashSet<>();
+    @OneToMany(mappedBy = "hotel")
+    Set<RoomType> roomTypes;
 
     @Override
     public boolean equals(Object o) {

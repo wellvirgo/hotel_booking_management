@@ -8,6 +8,7 @@ import vn.dangthehao.hotel_booking_management.enums.RoomStatus;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -21,20 +22,11 @@ public class Room extends BaseEntity {
     @JoinColumn(name = "room_type_id")
     RoomType roomType;
 
-    @ManyToOne
-    @JoinColumn(name = "hotel_id", nullable = false)
-    Hotel hotel;
-
+    String roomNumber;
     String description;
 
-    @Column(nullable = false, precision = 10, scale = 2)
-    BigDecimal pricePerNight;
-
-    @Column(nullable = false)
-    int capacity;
-
-    @Column(columnDefinition = "boolean default false", nullable = false)
-    boolean isDeleted;
+    @Column(columnDefinition = "boolean default true", nullable = false)
+    boolean isActive;
 
     @Enumerated(value = EnumType.STRING)
     @Column(nullable = false)
@@ -42,18 +34,23 @@ public class Room extends BaseEntity {
 
     String images;
 
+    @OneToMany(mappedBy = "room")
+    Set<BookingRoom> bookingRooms;
+
     @Override
-    public boolean equals(Object o) {
-        if (o == null || getClass() != o.getClass()) return false;
-        Room room = (Room) o;
-        return capacity == room.capacity && Objects.equals(roomType, room.roomType)
-                && Objects.equals(hotel, room.hotel)
+    public boolean equals(Object object) {
+        if (object == null || getClass() != object.getClass()) return false;
+        Room room = (Room) object;
+        return isActive == room.isActive
+                && Objects.equals(roomType, room.roomType)
+                && Objects.equals(roomNumber, room.roomNumber)
                 && Objects.equals(description, room.description)
-                && Objects.equals(pricePerNight, room.pricePerNight) && status == room.status;
+                && status == room.status && Objects.equals(images, room.images)
+                && Objects.equals(bookingRooms, room.bookingRooms);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(roomType, hotel, description, pricePerNight, capacity, status);
+        return Objects.hash(roomType, roomNumber, description, isActive, status, images, bookingRooms);
     }
 }
