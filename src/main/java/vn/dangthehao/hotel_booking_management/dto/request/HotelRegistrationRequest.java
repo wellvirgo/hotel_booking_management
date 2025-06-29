@@ -18,6 +18,9 @@ public class HotelRegistrationRequest {
 
     @NotBlank(message = "INVALID_ADDRESS")
     String address;
+
+    @NotBlank(message = "INVALID_LOCATION")
+    String location;
     String description;
 
     @DecimalMin(value = "0", inclusive = false)

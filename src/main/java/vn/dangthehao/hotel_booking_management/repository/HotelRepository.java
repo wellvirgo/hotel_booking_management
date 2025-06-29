@@ -15,7 +15,7 @@ import java.util.Optional;
 @Repository
 public interface HotelRepository extends JpaRepository<Hotel, Long> {
     @Query("select new vn.dangthehao.hotel_booking_management.dto.UnapprovedHotelDTO(" +
-            "h.hotelName, ow.fullName, h.address, h.depositRate, h.depositDeadlineHours) " +
+            "h.hotelName, ow.fullName, h.address, h.location, h.depositRate, h.depositDeadlineHours) " +
             "from Hotel h join h.owner ow " +
             "where h.isApproved=false and h.isDeleted=false and h.status=:status")
     Page<UnapprovedHotelDTO> findUnapprovedHotels(Pageable pageable, HotelStatus status);

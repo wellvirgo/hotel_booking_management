@@ -30,6 +30,7 @@ public enum ErrorCode {
     HOTEL_NOT_FOUND(1018, HttpStatus.NOT_FOUND, "Hotel not found"),
     CAN_NOT_APPROVE_HOTEL(1019, HttpStatus.BAD_REQUEST, "Can't approve the hotel"),
     CAN_NOT_REJECT_HOTEL(1020, HttpStatus.BAD_REQUEST, "Can't reject the hotel"),
+    AMENITY_EXISTS(1021, HttpStatus.BAD_REQUEST, "Amenity already exists"),
     UNCATEGORIZED_EXCEPTION(9999, HttpStatus.INTERNAL_SERVER_ERROR, "Internal server error");
 
     int code;

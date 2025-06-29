@@ -26,6 +26,9 @@ public class Hotel extends BaseEntity {
     @Column(nullable = false)
     String address;
 
+    @Column(nullable = false)
+    String location;
+
     String description;
     float rating = 0;
 

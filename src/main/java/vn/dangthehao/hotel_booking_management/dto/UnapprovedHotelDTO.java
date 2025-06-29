@@ -13,6 +13,7 @@ public class UnapprovedHotelDTO {
     String hotelName;
     String ownerName;
     String address;
+    String location;
     Float depositRate;
     Float depositDeadlineHours;
 }

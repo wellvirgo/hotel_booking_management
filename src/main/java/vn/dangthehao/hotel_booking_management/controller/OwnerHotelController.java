@@ -25,7 +25,7 @@ public class OwnerHotelController {
     public ResponseEntity<ApiResponse<Void>> registerHotel(
             @Valid @RequestBody HotelRegistrationRequest request,
             @AuthenticationPrincipal Jwt jwt) {
-        return ResponseEntity.status(HttpStatus.OK).body(hotelService.register(request, jwt));
+        return ResponseEntity.status(HttpStatus.CREATED).body(hotelService.register(request, jwt));
     }
 
     @GetMapping
@@ -36,4 +36,6 @@ public class OwnerHotelController {
             @RequestParam(name = "size", defaultValue = "5") int size) {
         return ResponseEntity.status(HttpStatus.OK).body(hotelService.findHotelsByOwner(jwt, isApproved, page, size));
     }
+
+
 }

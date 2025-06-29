@@ -14,11 +14,12 @@ import java.util.Objects;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Entity
-public class Amenity extends BaseEntity{
+public class Amenity extends BaseEntity {
+    @Column(nullable = false, unique = true)
     String name;
 
     @Column(columnDefinition = "boolean default true")
-    boolean isActive;
+    boolean isActive = true;
 
     @Override
     public boolean equals(Object object) {

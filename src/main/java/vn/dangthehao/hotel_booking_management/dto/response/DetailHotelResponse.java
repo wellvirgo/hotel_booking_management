@@ -12,6 +12,7 @@ import lombok.experimental.FieldDefaults;
 public class DetailHotelResponse {
     String hotelName;
     String address;
+    String location;
     String description;
     float rating;
     String status;

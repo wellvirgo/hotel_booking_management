@@ -2,7 +2,6 @@ package vn.dangthehao.hotel_booking_management.dto.request;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -11,7 +10,6 @@ import vn.dangthehao.hotel_booking_management.annotations.PasswordMatches;
 import vn.dangthehao.hotel_booking_management.annotations.PasswordStrength;
 import vn.dangthehao.hotel_booking_management.annotations.UsernameNotExists;
 import vn.dangthehao.hotel_booking_management.dto.PasswordConfirm;
-import vn.dangthehao.hotel_booking_management.enums.ErrorCode;
 
 @Getter
 @Setter
