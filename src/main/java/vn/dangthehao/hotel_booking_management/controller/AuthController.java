@@ -26,7 +26,7 @@ import vn.dangthehao.hotel_booking_management.service.AuthenticationService;
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @RestController
-@RequestMapping("/api/auth")
+@RequestMapping("/api/v1/auth")
 public class AuthController {
     AuthenticationService authenticationService;
 

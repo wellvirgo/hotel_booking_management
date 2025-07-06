@@ -16,7 +16,7 @@ import vn.dangthehao.hotel_booking_management.service.AmenityService;
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @RestController
-@RequestMapping("/api/admin/amenities")
+@RequestMapping("/api/v1/admin/amenities")
 public class AdminAmenityController {
     AmenityService amenityService;
 

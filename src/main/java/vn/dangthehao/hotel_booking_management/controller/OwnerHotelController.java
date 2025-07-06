@@ -22,7 +22,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @RestController
-@RequestMapping("/api/owner/hotels")
+@RequestMapping("/api/v1/owner/hotels")
 public class OwnerHotelController {
     HotelService hotelService;
     RoomTypeService roomTypeService;

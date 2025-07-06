@@ -14,7 +14,7 @@ import vn.dangthehao.hotel_booking_management.service.HotelService;
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @RestController
-@RequestMapping("/api/admin/hotels")
+@RequestMapping("/api/v1/admin/hotels")
 public class AdminHotelController {
     HotelService hotelService;
 
