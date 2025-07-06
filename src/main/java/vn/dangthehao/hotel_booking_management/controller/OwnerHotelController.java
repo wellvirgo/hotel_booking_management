@@ -10,9 +10,11 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 import vn.dangthehao.hotel_booking_management.dto.request.HotelRegistrationRequest;
+import vn.dangthehao.hotel_booking_management.dto.request.RoomTypeCrtRequest;
 import vn.dangthehao.hotel_booking_management.dto.response.ApiResponse;
 import vn.dangthehao.hotel_booking_management.dto.response.OwnerHotelsResponse;
 import vn.dangthehao.hotel_booking_management.service.HotelService;
+import vn.dangthehao.hotel_booking_management.service.RoomTypeService;
 
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -20,6 +22,7 @@ import vn.dangthehao.hotel_booking_management.service.HotelService;
 @RequestMapping("/api/owner/hotels")
 public class OwnerHotelController {
     HotelService hotelService;
+    RoomTypeService roomTypeService;
 
     @PostMapping
     public ResponseEntity<ApiResponse<Void>> registerHotel(
@@ -37,5 +40,9 @@ public class OwnerHotelController {
         return ResponseEntity.status(HttpStatus.OK).body(hotelService.findHotelsByOwner(jwt, isApproved, page, size));
     }
 
+    @PostMapping("/room-types")
+    public ResponseEntity<ApiResponse<Void>> createRoomType(@RequestBody RoomTypeCrtRequest request) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(roomTypeService.create(request));
+    }
 
 }

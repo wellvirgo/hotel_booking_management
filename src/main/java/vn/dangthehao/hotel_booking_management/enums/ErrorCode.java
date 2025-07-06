@@ -31,6 +31,8 @@ public enum ErrorCode {
     CAN_NOT_APPROVE_HOTEL(1019, HttpStatus.BAD_REQUEST, "Can't approve the hotel"),
     CAN_NOT_REJECT_HOTEL(1020, HttpStatus.BAD_REQUEST, "Can't reject the hotel"),
     AMENITY_EXISTS(1021, HttpStatus.BAD_REQUEST, "Amenity already exists"),
+    DUPLICATE_DATA(1022, HttpStatus.BAD_REQUEST, "Invalid data, duplicate data in field not allowed"),
+    HOTEL_NOT_APPROVED(1023, HttpStatus.BAD_REQUEST, "Hotel is not approved"),
     UNCATEGORIZED_EXCEPTION(9999, HttpStatus.INTERNAL_SERVER_ERROR, "Internal server error");
 
     int code;

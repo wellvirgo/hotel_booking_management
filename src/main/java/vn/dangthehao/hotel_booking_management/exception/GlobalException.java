@@ -1,8 +1,10 @@
 package vn.dangthehao.hotel_booking_management.exception;
 
+import jakarta.validation.ConstraintViolation;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -57,6 +59,29 @@ public class GlobalException {
                 .build();
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+    }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<ApiResponse<Void>> handleDataIntegrityViolationException(DataIntegrityViolationException exception) {
+        String message = getConstraintViolationMessage(exception);
+        ApiResponse<Void> response = ApiResponse.<Void>builder()
+                .status(errorStatus)
+                .code(ErrorCode.DUPLICATE_DATA.getCode())
+                .message(message)
+                .build();
+
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
+    }
+
+    private String getConstraintViolationMessage(DataIntegrityViolationException exception) {
+        Throwable rootCause = exception.getRootCause();
+        String message = rootCause != null ? rootCause.getMessage() : exception.getMessage();
+
+        if (message != null && message.contains("room_type") && message.contains("Duplicate entry")) {
+            return "Room type already exists. Please choose a different name";
+        }
+
+        return ErrorCode.DUPLICATE_DATA.getMessage();
     }
 
     private List<ErrorDetail> extractErrors(MethodArgumentNotValidException exception) {

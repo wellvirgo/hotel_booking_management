@@ -34,6 +34,8 @@ public class RoomType extends BaseEntity {
     int numOfBeds;
     String bedType;
     int totalRooms;
+
+    @Column(columnDefinition = "boolean default true", nullable = false)
     boolean isActive;
 
     @ManyToMany
