@@ -30,8 +30,6 @@ public class Room extends BaseEntity {
     @Column(nullable = false)
     RoomStatus status = RoomStatus.AVAILABLE;
 
-    String images;
-
     @OneToMany(mappedBy = "room")
     Set<BookingRoom> bookingRooms;
 
@@ -43,12 +41,12 @@ public class Room extends BaseEntity {
                 && Objects.equals(roomType, room.roomType)
                 && Objects.equals(roomNumber, room.roomNumber)
                 && Objects.equals(description, room.description)
-                && status == room.status && Objects.equals(images, room.images)
+                && status == room.status
                 && Objects.equals(bookingRooms, room.bookingRooms);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(roomType, roomNumber, description, isActive, status, images, bookingRooms);
+        return Objects.hash(roomType, roomNumber, description, isActive, status, bookingRooms);
     }
 }

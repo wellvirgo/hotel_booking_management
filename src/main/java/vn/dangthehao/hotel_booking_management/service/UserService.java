@@ -41,7 +41,7 @@ public class UserService {
     String baseUrl;
 
     @NonFinal
-    @Value(("${file.user_avatar_folder_name}"))
+    @Value("${file.user_avatar_folder_name}")
     String avatarFolderName;
 
     public User findByID(Long id) {

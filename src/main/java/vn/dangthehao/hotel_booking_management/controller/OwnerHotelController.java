@@ -9,12 +9,15 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import vn.dangthehao.hotel_booking_management.dto.request.HotelRegistrationRequest;
 import vn.dangthehao.hotel_booking_management.dto.request.RoomTypeCrtRequest;
 import vn.dangthehao.hotel_booking_management.dto.response.ApiResponse;
 import vn.dangthehao.hotel_booking_management.dto.response.OwnerHotelsResponse;
 import vn.dangthehao.hotel_booking_management.service.HotelService;
 import vn.dangthehao.hotel_booking_management.service.RoomTypeService;
+
+import java.util.List;
 
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -41,8 +44,10 @@ public class OwnerHotelController {
     }
 
     @PostMapping("/room-types")
-    public ResponseEntity<ApiResponse<Void>> createRoomType(@RequestBody RoomTypeCrtRequest request) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(roomTypeService.create(request));
+    public ResponseEntity<ApiResponse<Void>> createRoomType(
+            @RequestPart(name = "data") RoomTypeCrtRequest request,
+            @RequestPart(name = "images") List<MultipartFile> imageFiles) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(roomTypeService.create(request, imageFiles));
     }
 
 }

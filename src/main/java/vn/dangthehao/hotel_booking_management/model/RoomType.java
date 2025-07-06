@@ -5,6 +5,7 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
@@ -37,6 +38,11 @@ public class RoomType extends BaseEntity {
 
     @Column(columnDefinition = "boolean default true", nullable = false)
     boolean isActive;
+
+    @ElementCollection
+    @CollectionTable(name = "room_type_img",
+            joinColumns = @JoinColumn(name = "room_type_id"))
+    List<String> imageUrls;
 
     @ManyToMany
     @JoinTable(
