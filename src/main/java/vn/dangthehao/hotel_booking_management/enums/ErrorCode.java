@@ -33,6 +33,8 @@ public enum ErrorCode {
     AMENITY_EXISTS(1021, HttpStatus.BAD_REQUEST, "Amenity already exists"),
     DUPLICATE_DATA(1022, HttpStatus.BAD_REQUEST, "Invalid data, duplicate data in field not allowed"),
     HOTEL_NOT_APPROVED(1023, HttpStatus.BAD_REQUEST, "Hotel is not approved"),
+    ROOM_TYPE_NOT_FOUND(1024, HttpStatus.NOT_FOUND, "Room type with id %s not found"),
+    QUANTITY_ROOM_EXCEEDED(1025, HttpStatus.BAD_REQUEST, "The number of rooms has reached maximum"),
     UNCATEGORIZED_EXCEPTION(9999, HttpStatus.INTERNAL_SERVER_ERROR, "Internal server error");
 
     int code;
@@ -43,5 +45,9 @@ public enum ErrorCode {
         this.code = code;
         this.httpStatus = httpStatus;
         this.message = message;
+    }
+
+    public String formatMessage(Object... args) {
+        return String.format(message, args);
     }
 }

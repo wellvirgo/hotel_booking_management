@@ -34,10 +34,10 @@ public class SecurityConfig {
     CustomAccessDeniedHandler customAccessDeniedHandler;
     TokenRevocationFilter tokenRevocationFilter;
 
-    String[] PUBLIC_POST_ENDPOINT = {"/api/auth/sessions", "/api/auth/tokens", "/api/users",
-            "/api/auth/passwords/resets/**"};
+    String[] PUBLIC_POST_ENDPOINT = {"/api/v1/auth/sessions", "/api/v1/auth/tokens", "/api/v1/users",
+            "/api/v1/auth/passwords/resets/**"};
     String[] PUBLIC_GET_ENDPOINT = {"/avatars/**"};
-    String[] PUBLIC_PUT_ENDPOINT = {"/api/auth/passwords/resets"};
+    String[] PUBLIC_PUT_ENDPOINT = {"/api/v1/auth/passwords/resets"};
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {

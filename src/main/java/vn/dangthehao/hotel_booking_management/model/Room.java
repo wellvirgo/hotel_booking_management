@@ -20,6 +20,7 @@ public class Room extends BaseEntity {
     @JoinColumn(name = "room_type_id")
     RoomType roomType;
 
+    @Column(unique = true, nullable = false)
     String roomNumber;
     String description;
 

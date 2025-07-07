@@ -29,7 +29,7 @@ public class GlobalException {
         ApiResponse<Void> response = ApiResponse.<Void>builder()
                 .status(errorStatus)
                 .code(exception.getErrorCode().getCode())
-                .message(exception.getErrorCode().getMessage())
+                .message(exception.getErrorMessage())
                 .build();
 
         return ResponseEntity.status(errorCode.getHttpStatus()).body(response);

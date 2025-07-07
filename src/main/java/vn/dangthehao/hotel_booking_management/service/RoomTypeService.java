@@ -62,6 +62,11 @@ public class RoomTypeService {
         return responseGenerator.generateSuccessResponse("Config room type successfully!");
     }
 
+    public RoomType findById(Long id){
+        return roomTypeRepository.findById(id)
+                .orElseThrow(()->new AppException(ErrorCode.ROOM_TYPE_NOT_FOUND, id));
+    }
+
     private List<String> saveRoomTypeImages(List<MultipartFile> imageFiles) {
         List<String> imageUrls = new ArrayList<>();
         for (MultipartFile imageFile : imageFiles) {
