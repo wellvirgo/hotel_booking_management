@@ -134,4 +134,9 @@ public class HotelService {
 
         return responseGenerator.generateSuccessResponse("List of approved hotels", ownerHotelsResponse);
     }
+
+    public boolean isOwner(Long hotelId, Jwt jwt){
+        Long ownerId = findById(hotelId).getOwner().getId();
+        return ownerId.equals(jwtUtil.getUserID(jwt));
+    }
 }

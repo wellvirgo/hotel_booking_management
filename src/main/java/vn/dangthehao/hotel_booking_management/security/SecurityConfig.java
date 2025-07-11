@@ -55,11 +55,11 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.PUT, PUBLIC_PUT_ENDPOINT).permitAll()
 
                         // Admin endpoint
-                        .requestMatchers("/api/admin/**", "/actuator/**")
+                        .requestMatchers("/api/v1/admin/**", "/actuator/**")
                         .hasRole(Authorities.ROLE_ADMIN.replace("ROLE_", ""))
 
                         // Hotel owner endpoint
-                        .requestMatchers("/api/owner/**")
+                        .requestMatchers("/api/v1/owner/**")
                         .hasRole(Authorities.ROLE_HOTEL_OWNER.replace("ROLE_", ""))
 
                         // Any other endpoint require authentication

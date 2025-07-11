@@ -5,10 +5,17 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.NonFinal;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import vn.dangthehao.hotel_booking_management.dto.OwnerRoomTypeDTO;
 import vn.dangthehao.hotel_booking_management.dto.request.RoomTypeCrtRequest;
 import vn.dangthehao.hotel_booking_management.dto.response.ApiResponse;
+import vn.dangthehao.hotel_booking_management.dto.response.OwnerRoomTypesResponse;
 import vn.dangthehao.hotel_booking_management.enums.ErrorCode;
 import vn.dangthehao.hotel_booking_management.exception.AppException;
 import vn.dangthehao.hotel_booking_management.mapper.RoomTypeMapper;
@@ -62,9 +69,23 @@ public class RoomTypeService {
         return responseGenerator.generateSuccessResponse("Config room type successfully!");
     }
 
-    public RoomType findById(Long id){
+    public RoomType findById(Long id) {
         return roomTypeRepository.findById(id)
-                .orElseThrow(()->new AppException(ErrorCode.ROOM_TYPE_NOT_FOUND, id));
+                .orElseThrow(() -> new AppException(ErrorCode.ROOM_TYPE_NOT_FOUND, id));
+    }
+
+    @PreAuthorize("@hotelService.isOwner(#hotelId, authentication.principal)")
+    public ApiResponse<OwnerRoomTypesResponse> getRoomTypesByHotelId(Long hotelId, int page, int size) {
+        Pageable pageable = PageRequest.of(page - 1, size);
+        Page<OwnerRoomTypeDTO> ownerRoomTypeDTOPage = roomTypeRepository.findByHotelId(hotelId, pageable);
+        List<OwnerRoomTypeDTO> ownerRoomTypeDTOList = ownerRoomTypeDTOPage.getContent();
+        OwnerRoomTypesResponse response = OwnerRoomTypesResponse.builder()
+                .roomTypes(ownerRoomTypeDTOList)
+                .currentPage(page)
+                .totalPages(ownerRoomTypeDTOPage.getTotalPages())
+                .build();
+
+        return responseGenerator.generateSuccessResponse("List room type in this hotel", response);
     }
 
     private List<String> saveRoomTypeImages(List<MultipartFile> imageFiles) {

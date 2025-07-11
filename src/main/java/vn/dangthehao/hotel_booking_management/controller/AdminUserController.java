@@ -9,7 +9,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import vn.dangthehao.hotel_booking_management.dto.response.ApiResponse;
 import vn.dangthehao.hotel_booking_management.dto.response.UserListResponse;
-import vn.dangthehao.hotel_booking_management.security.PermissionChecker;
 import vn.dangthehao.hotel_booking_management.service.UserService;
 
 import java.util.List;
@@ -20,7 +19,6 @@ import java.util.List;
 @RequestMapping("/api/v1/admin/users")
 public class AdminUserController {
     UserService userService;
-    PermissionChecker permissionChecker;
 
     @GetMapping
     @PreAuthorize("@permissionChecker.hasAuthorities({'read:user','all:user'})")
