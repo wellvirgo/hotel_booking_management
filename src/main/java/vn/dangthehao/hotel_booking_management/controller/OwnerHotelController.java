@@ -46,7 +46,7 @@ public class OwnerHotelController {
 
     @PostMapping("/room-types")
     public ResponseEntity<ApiResponse<Void>> createRoomType(
-            @RequestPart(name = "data") RoomTypeCrtRequest request,
+            @Valid @RequestPart(name = "data") RoomTypeCrtRequest request,
             @RequestPart(name = "images") List<MultipartFile> imageFiles) {
         return ResponseEntity.status(HttpStatus.CREATED).body(roomTypeService.create(request, imageFiles));
     }

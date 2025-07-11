@@ -50,6 +50,7 @@ public class RoomTypeService {
     @Value("${file.room_type_img_folder_name}")
     String roomTypeImgFolderName;
 
+    @PreAuthorize("@hotelService.isOwner(#request.hotelId, authentication.principal)")
     public ApiResponse<Void> create(RoomTypeCrtRequest request, List<MultipartFile> imageFiles) {
         Hotel hotel = hotelService.findById(request.getHotelId());
         if (!hotel.isApproved())

@@ -3,7 +3,6 @@ package vn.dangthehao.hotel_booking_management.dto.response;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.SuperBuilder;
-import vn.dangthehao.hotel_booking_management.dto.BaseFormListResponse;
 import vn.dangthehao.hotel_booking_management.dto.OwnerRoomTypeDTO;
 
 import java.util.List;

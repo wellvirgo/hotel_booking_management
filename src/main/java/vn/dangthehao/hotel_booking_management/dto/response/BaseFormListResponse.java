@@ -1,4 +1,4 @@
-package vn.dangthehao.hotel_booking_management.dto;
+package vn.dangthehao.hotel_booking_management.dto.response;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
