@@ -12,9 +12,11 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import vn.dangthehao.hotel_booking_management.dto.request.HotelRegistrationRequest;
 import vn.dangthehao.hotel_booking_management.dto.request.RoomTypeCrtRequest;
+import vn.dangthehao.hotel_booking_management.dto.request.RoomTypeUpdateRequest;
 import vn.dangthehao.hotel_booking_management.dto.response.ApiResponse;
 import vn.dangthehao.hotel_booking_management.dto.response.OwnerHotelsResponse;
 import vn.dangthehao.hotel_booking_management.dto.response.OwnerRoomTypesResponse;
+import vn.dangthehao.hotel_booking_management.dto.response.RoomTypeUpdateResponse;
 import vn.dangthehao.hotel_booking_management.service.HotelService;
 import vn.dangthehao.hotel_booking_management.service.RoomTypeService;
 
@@ -57,6 +59,16 @@ public class OwnerHotelController {
             @RequestParam(name = "page", defaultValue = "1") int page,
             @RequestParam(name = "size", defaultValue = "5") int size) {
         return ResponseEntity.status(HttpStatus.OK).body(roomTypeService.getRoomTypesByHotelId(id, page, size));
+    }
+
+    @PutMapping("/{hotelId}/room-types/{roomTypeId}")
+    public ResponseEntity<ApiResponse<RoomTypeUpdateResponse>> updateRoomType(
+            @PathVariable(name = "hotelId") Long hotelId,
+            @PathVariable(name = "roomTypeId") Long roomTypeId,
+            @Valid @RequestPart(name = "data") RoomTypeUpdateRequest request,
+            @RequestPart(name = "images") List<MultipartFile> imageFiles) {
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(roomTypeService.updateRoomType(roomTypeId, hotelId, request, imageFiles));
     }
 
 }
