@@ -13,10 +13,7 @@ import org.springframework.web.multipart.MultipartFile;
 import vn.dangthehao.hotel_booking_management.dto.request.HotelRegistrationRequest;
 import vn.dangthehao.hotel_booking_management.dto.request.RoomTypeCrtRequest;
 import vn.dangthehao.hotel_booking_management.dto.request.RoomTypeUpdateRequest;
-import vn.dangthehao.hotel_booking_management.dto.response.ApiResponse;
-import vn.dangthehao.hotel_booking_management.dto.response.OwnerHotelsResponse;
-import vn.dangthehao.hotel_booking_management.dto.response.OwnerRoomTypesResponse;
-import vn.dangthehao.hotel_booking_management.dto.response.RoomTypeUpdateResponse;
+import vn.dangthehao.hotel_booking_management.dto.response.*;
 import vn.dangthehao.hotel_booking_management.service.HotelService;
 import vn.dangthehao.hotel_booking_management.service.RoomTypeService;
 
@@ -71,4 +68,10 @@ public class OwnerHotelController {
                 .body(roomTypeService.updateRoomType(roomTypeId, hotelId, request, imageFiles));
     }
 
+    @GetMapping("/{hotelId}/room-types/{roomTypeId}")
+    public ResponseEntity<ApiResponse<OwnerDetailRoomTypeResponse>> detailRoomType(
+            @PathVariable(name = "hotelId") Long hotelId,
+            @PathVariable(name = "roomTypeId") Long roomTypeId) {
+        return ResponseEntity.status(HttpStatus.OK).body(roomTypeService.detailRoomType(hotelId, roomTypeId));
+    }
 }

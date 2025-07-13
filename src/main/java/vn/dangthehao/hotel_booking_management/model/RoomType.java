@@ -42,7 +42,7 @@ public class RoomType extends BaseEntity {
     @ElementCollection
     @CollectionTable(name = "room_type_img",
             joinColumns = @JoinColumn(name = "room_type_id"))
-    List<String> imageUrls;
+    List<String> imageNames;
 
     @ManyToMany
     @JoinTable(

@@ -4,6 +4,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.NonFinal;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -15,6 +16,7 @@ import vn.dangthehao.hotel_booking_management.dto.OwnerRoomTypeDTO;
 import vn.dangthehao.hotel_booking_management.dto.request.RoomTypeCrtRequest;
 import vn.dangthehao.hotel_booking_management.dto.request.RoomTypeUpdateRequest;
 import vn.dangthehao.hotel_booking_management.dto.response.ApiResponse;
+import vn.dangthehao.hotel_booking_management.dto.response.OwnerDetailRoomTypeResponse;
 import vn.dangthehao.hotel_booking_management.dto.response.OwnerRoomTypesResponse;
 import vn.dangthehao.hotel_booking_management.dto.response.RoomTypeUpdateResponse;
 import vn.dangthehao.hotel_booking_management.enums.ErrorCode;
@@ -25,6 +27,7 @@ import vn.dangthehao.hotel_booking_management.model.Hotel;
 import vn.dangthehao.hotel_booking_management.model.RoomType;
 import vn.dangthehao.hotel_booking_management.repository.AmenityRepository;
 import vn.dangthehao.hotel_booking_management.repository.RoomTypeRepository;
+import vn.dangthehao.hotel_booking_management.util.ImageNameToUrlMapper;
 import vn.dangthehao.hotel_booking_management.util.ResponseGenerator;
 
 import java.io.File;
@@ -32,6 +35,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+@Slf4j
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @Service
@@ -43,6 +47,7 @@ public class RoomTypeService {
     ResponseGenerator responseGenerator;
     AmenityRepository amenityRepository;
     UploadFileService uploadFileService;
+    ImageNameToUrlMapper imageNameToUrlMapper;
 
     @NonFinal
     @Value("${base_url}")
@@ -67,7 +72,7 @@ public class RoomTypeService {
         roomType.setHotel(hotel);
         roomType.setAmenities(amenities);
         roomType.setActive(true);
-        roomType.setImageUrls(saveRoomTypeImages(imageFiles));
+        roomType.setImageNames(saveRoomTypeImages(imageFiles));
         RoomType savedRoomType = roomTypeRepository.save(roomType);
 
         // Tạo trước 6 tháng trống tương ứng trong RoomInventory
@@ -111,6 +116,18 @@ public class RoomTypeService {
         return responseGenerator.generateSuccessResponse("Update room type successfully!", response);
     }
 
+    @PreAuthorize("@hotelService.isOwner(#hotelId, authentication.principal)")
+    public ApiResponse<OwnerDetailRoomTypeResponse> detailRoomType(Long hotelId, Long roomTypeId) {
+        RoomType roomType = findById(roomTypeId);
+        OwnerDetailRoomTypeResponse response = roomTypeMapper.toOwnerDetailRoomTypeResponse(roomType);
+        response.setAmenityNames(convertToAmenityNames(roomType.getAmenities()));
+        List<String> imageUrls = imageNameToUrlMapper.toUrls(roomType.getImageNames(), roomTypeImgFolderName);
+        response.setImageUrls(imageUrls);
+
+        String message = String.format("Detail of information about room type %s", roomType.getName());
+        return responseGenerator.generateSuccessResponse(message, response);
+    }
+
     private List<String> saveRoomTypeImages(List<MultipartFile> imageFiles) {
         List<String> imageUrls = new ArrayList<>();
         for (MultipartFile imageFile : imageFiles) {
@@ -133,7 +150,7 @@ public class RoomTypeService {
 
     private void updateRoomTypeImages(RoomType roomType, List<MultipartFile> imageFiles) {
         if (!imageFiles.isEmpty()) {
-            for (String oldImage : roomType.getImageUrls()) {
+            for (String oldImage : roomType.getImageNames()) {
                 String pathImage = String.format("%s%s/%s",
                         uploadFolder,
                         roomTypeImgFolderName,
@@ -142,24 +159,22 @@ public class RoomTypeService {
                 if (fileImage.exists())
                     fileImage.delete();
             }
-            roomType.setImageUrls(saveRoomTypeImages(imageFiles));
+            roomType.setImageNames(saveRoomTypeImages(imageFiles));
         }
     }
 
     private RoomTypeUpdateResponse mapRoomTypeToRoomTypeUpdateResponse(RoomType roomType) {
         RoomTypeUpdateResponse response = roomTypeMapper.toRoomTypeUpdateResponse(roomType);
-        List<String> imageFileNames = roomType.getImageUrls();
-        List<String> imageUrls = new ArrayList<>();
-        for (String imageFileName : imageFileNames) {
-            imageUrls.add(String.format("%s/%s/%s", baseUrl, roomTypeImgFolderName, imageFileName));
-        }
+        List<String> imageUrls = imageNameToUrlMapper.toUrls(roomType.getImageNames(), roomTypeImgFolderName);
         response.setImageUrls(imageUrls);
-
-        List<String> amenityNames = roomType.getAmenities()
-                .stream().map(Amenity::getName)
-                .toList();
-        response.setAmenityNames(amenityNames);
+        response.setAmenityNames(convertToAmenityNames(roomType.getAmenities()));
 
         return response;
+    }
+
+    private List<String> convertToAmenityNames(Set<Amenity> amenities) {
+        return amenities.stream()
+                .map(Amenity::getName)
+                .toList();
     }
 }
