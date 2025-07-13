@@ -11,6 +11,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 import vn.dangthehao.hotel_booking_management.dto.OwnerRoomTypeDTO;
 import vn.dangthehao.hotel_booking_management.dto.request.RoomTypeCrtRequest;
@@ -34,6 +35,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Predicate;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -72,7 +74,12 @@ public class RoomTypeService {
         roomType.setHotel(hotel);
         roomType.setAmenities(amenities);
         roomType.setActive(true);
-        roomType.setImageNames(saveRoomTypeImages(imageFiles));
+
+        if (imageFiles != null) {
+            List<MultipartFile> validImageFiles = getValidImageFiles(imageFiles);
+            if (!validImageFiles.isEmpty())
+                roomType.setImageNames(saveRoomTypeImages(imageFiles));
+        }
         RoomType savedRoomType = roomTypeRepository.save(roomType);
 
         // Tạo trước 6 tháng trống tương ứng trong RoomInventory
@@ -129,13 +136,13 @@ public class RoomTypeService {
     }
 
     private List<String> saveRoomTypeImages(List<MultipartFile> imageFiles) {
-        List<String> imageUrls = new ArrayList<>();
+        List<String> imageNames = new ArrayList<>();
         for (MultipartFile imageFile : imageFiles) {
             String imageUrl = uploadFileService.saveFile(roomTypeImgFolderName, imageFile);
-            imageUrls.add(imageUrl.replace(String.format("%s/%s/", baseUrl, roomTypeImgFolderName), ""));
+            imageNames.add(imageUrl.replace(String.format("%s/%s/", baseUrl, roomTypeImgFolderName), ""));
         }
 
-        return imageUrls;
+        return imageNames;
     }
 
     private void mapRoomTypeUpdateRequestToRoomType(RoomTypeUpdateRequest request, RoomType roomType) {
@@ -149,18 +156,33 @@ public class RoomTypeService {
     }
 
     private void updateRoomTypeImages(RoomType roomType, List<MultipartFile> imageFiles) {
-        if (!imageFiles.isEmpty()) {
+        if (imageFiles == null) return;
+
+        List<MultipartFile> validImageFiles = getValidImageFiles(imageFiles);
+        if (!validImageFiles.isEmpty()) {
             for (String oldImage : roomType.getImageNames()) {
                 String pathImage = String.format("%s%s/%s",
                         uploadFolder,
                         roomTypeImgFolderName,
                         oldImage);
                 File fileImage = new File(pathImage);
+                System.out.println("Deleting image");
                 if (fileImage.exists())
                     fileImage.delete();
             }
-            roomType.setImageNames(saveRoomTypeImages(imageFiles));
+            System.out.println("Saving image");
+            roomType.setImageNames(saveRoomTypeImages(validImageFiles));
         }
+    }
+
+    private List<MultipartFile> getValidImageFiles(List<MultipartFile> imageFiles) {
+        Predicate<MultipartFile> isValidImageFile = file -> file != null
+                && !file.isEmpty()
+                && StringUtils.hasText(file.getOriginalFilename());
+
+        return imageFiles.stream()
+                .filter(isValidImageFile)
+                .toList();
     }
 
     private RoomTypeUpdateResponse mapRoomTypeToRoomTypeUpdateResponse(RoomType roomType) {

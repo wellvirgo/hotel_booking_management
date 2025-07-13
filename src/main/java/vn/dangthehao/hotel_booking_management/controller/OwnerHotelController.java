@@ -46,7 +46,7 @@ public class OwnerHotelController {
     @PostMapping("/room-types")
     public ResponseEntity<ApiResponse<Void>> createRoomType(
             @Valid @RequestPart(name = "data") RoomTypeCrtRequest request,
-            @RequestPart(name = "images") List<MultipartFile> imageFiles) {
+            @RequestPart(name = "images", required = false) List<MultipartFile> imageFiles) {
         return ResponseEntity.status(HttpStatus.CREATED).body(roomTypeService.create(request, imageFiles));
     }
 
@@ -63,7 +63,7 @@ public class OwnerHotelController {
             @PathVariable(name = "hotelId") Long hotelId,
             @PathVariable(name = "roomTypeId") Long roomTypeId,
             @Valid @RequestPart(name = "data") RoomTypeUpdateRequest request,
-            @RequestPart(name = "images") List<MultipartFile> imageFiles) {
+            @RequestPart(name = "images", required = false) List<MultipartFile> imageFiles) {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(roomTypeService.updateRoomType(roomTypeId, hotelId, request, imageFiles));
     }
