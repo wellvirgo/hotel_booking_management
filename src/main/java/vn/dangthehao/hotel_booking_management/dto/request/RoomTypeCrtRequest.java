@@ -16,9 +16,6 @@ import java.util.Set;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class RoomTypeCrtRequest {
-    @NotNull(message = "INVALID HOTEL ID")
-    Long hotelId;
-
     @NotBlank(message = "INVALID NAME")
     String name;
     String description;

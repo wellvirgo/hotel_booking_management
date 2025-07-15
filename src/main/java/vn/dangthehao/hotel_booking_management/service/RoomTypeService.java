@@ -16,10 +16,7 @@ import org.springframework.web.multipart.MultipartFile;
 import vn.dangthehao.hotel_booking_management.dto.OwnerRoomTypeDTO;
 import vn.dangthehao.hotel_booking_management.dto.request.RoomTypeCrtRequest;
 import vn.dangthehao.hotel_booking_management.dto.request.RoomTypeUpdateRequest;
-import vn.dangthehao.hotel_booking_management.dto.response.ApiResponse;
-import vn.dangthehao.hotel_booking_management.dto.response.OwnerDetailRoomTypeResponse;
-import vn.dangthehao.hotel_booking_management.dto.response.OwnerRoomTypesResponse;
-import vn.dangthehao.hotel_booking_management.dto.response.RoomTypeUpdateResponse;
+import vn.dangthehao.hotel_booking_management.dto.response.*;
 import vn.dangthehao.hotel_booking_management.enums.ErrorCode;
 import vn.dangthehao.hotel_booking_management.exception.AppException;
 import vn.dangthehao.hotel_booking_management.mapper.RoomTypeMapper;
@@ -63,29 +60,19 @@ public class RoomTypeService {
     @Value("${file.upload_folder}")
     String uploadFolder;
 
-    @PreAuthorize("@hotelService.isOwner(#request.hotelId, authentication.principal)")
-    public ApiResponse<Void> create(RoomTypeCrtRequest request, List<MultipartFile> imageFiles) {
-        Hotel hotel = hotelService.findById(request.getHotelId());
-        if (!hotel.isApproved())
-            throw new AppException(ErrorCode.HOTEL_NOT_APPROVED);
-
-        Set<Amenity> amenities = amenityRepository.findByNameIn(request.getAmenityNames());
-        RoomType roomType = roomTypeMapper.roomTypeCrtRequestToRoomType(request);
-        roomType.setHotel(hotel);
-        roomType.setAmenities(amenities);
-        roomType.setActive(true);
-
-        if (imageFiles != null) {
-            List<MultipartFile> validImageFiles = getValidImageFiles(imageFiles);
-            if (!validImageFiles.isEmpty())
-                roomType.setImageNames(saveRoomTypeImages(imageFiles));
-        }
+    @PreAuthorize("@hotelService.isOwner(#hotelId, authentication.principal)")
+    public ApiResponse<RoomTypeCrtResponse> create(Long hotelId,
+                                                   RoomTypeCrtRequest request,
+                                                   List<MultipartFile> imageFiles) {
+        Hotel hotel = validateAndGetHotel(hotelId);
+        RoomType roomType = buildRoomType(hotel, request, imageFiles);
         RoomType savedRoomType = roomTypeRepository.save(roomType);
+        RoomTypeCrtResponse roomTypeCrtResponse = buildRoomTypeCrtResponse(savedRoomType, hotel);
 
         // Tạo trước 6 tháng trống tương ứng trong RoomInventory
         roomInventoryService.createRoomInventories(savedRoomType);
 
-        return responseGenerator.generateSuccessResponse("Config room type successfully!");
+        return responseGenerator.generateSuccessResponse("Config room type successfully!", roomTypeCrtResponse);
     }
 
     public RoomType findById(Long id) {
@@ -133,6 +120,40 @@ public class RoomTypeService {
 
         String message = String.format("Detail of information about room type %s", roomType.getName());
         return responseGenerator.generateSuccessResponse(message, response);
+    }
+
+    private Hotel validateAndGetHotel(Long hotelId) {
+        Hotel hotel = hotelService.findById(hotelId);
+        if (!hotel.isApproved())
+            throw new AppException(ErrorCode.HOTEL_NOT_APPROVED);
+
+        return hotel;
+    }
+
+    private RoomType buildRoomType(Hotel hotel, RoomTypeCrtRequest request, List<MultipartFile> imageFiles) {
+        Set<Amenity> amenities = amenityRepository.findByNameIn(request.getAmenityNames());
+        RoomType roomType = roomTypeMapper.roomTypeCrtRequestToRoomType(request);
+        roomType.setHotel(hotel);
+        roomType.setAmenities(amenities);
+        roomType.setActive(true);
+
+        if (imageFiles != null) {
+            List<MultipartFile> validImageFiles = getValidImageFiles(imageFiles);
+            if (!validImageFiles.isEmpty())
+                roomType.setImageNames(saveRoomTypeImages(imageFiles));
+        }
+
+        return roomType;
+    }
+
+    private RoomTypeCrtResponse buildRoomTypeCrtResponse(RoomType savedRoomType, Hotel hotel) {
+        RoomTypeCrtResponse roomTypeCrtResponse = roomTypeMapper.toRoomTypeCrtResponse(savedRoomType);
+        roomTypeCrtResponse.setHotelId(hotel.getId());
+        List<String> imageUrls = imageNameToUrlMapper.toUrls(savedRoomType.getImageNames(), roomTypeImgFolderName);
+        roomTypeCrtResponse.setImageUrls(imageUrls);
+        roomTypeCrtResponse.setAmenityNames(convertToAmenityNames(savedRoomType.getAmenities()));
+
+        return roomTypeCrtResponse;
     }
 
     private List<String> saveRoomTypeImages(List<MultipartFile> imageFiles) {

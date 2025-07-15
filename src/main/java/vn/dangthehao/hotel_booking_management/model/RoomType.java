@@ -16,13 +16,14 @@ import java.util.Set;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Entity
+@Table(uniqueConstraints = {@UniqueConstraint(columnNames = {"hotel_id", "name"})})
 public class RoomType extends BaseEntity {
 
     @ManyToOne
     @JoinColumn(name = "hotel_id")
     Hotel hotel;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     String name;
 
     @Column(columnDefinition = "MEDIUMTEXT")

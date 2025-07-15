@@ -4,6 +4,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import vn.dangthehao.hotel_booking_management.dto.request.RoomTypeCrtRequest;
 import vn.dangthehao.hotel_booking_management.dto.response.OwnerDetailRoomTypeResponse;
+import vn.dangthehao.hotel_booking_management.dto.response.RoomTypeCrtResponse;
 import vn.dangthehao.hotel_booking_management.dto.response.RoomTypeUpdateResponse;
 import vn.dangthehao.hotel_booking_management.model.RoomType;
 
@@ -15,4 +16,6 @@ public interface RoomTypeMapper {
     RoomTypeUpdateResponse toRoomTypeUpdateResponse(RoomType roomType);
 
     OwnerDetailRoomTypeResponse toOwnerDetailRoomTypeResponse(RoomType roomType);
+
+    RoomTypeCrtResponse toRoomTypeCrtResponse(RoomType roomType);
 }

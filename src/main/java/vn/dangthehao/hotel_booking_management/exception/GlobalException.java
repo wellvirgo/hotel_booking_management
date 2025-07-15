@@ -1,6 +1,5 @@
 package vn.dangthehao.hotel_booking_management.exception;
 
-import jakarta.validation.ConstraintViolation;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;

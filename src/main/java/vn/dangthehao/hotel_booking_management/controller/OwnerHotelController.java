@@ -10,6 +10,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import vn.dangthehao.hotel_booking_management.dto.request.HotelRegistrationRequest;
 import vn.dangthehao.hotel_booking_management.dto.request.RoomTypeCrtRequest;
 import vn.dangthehao.hotel_booking_management.dto.request.RoomTypeUpdateRequest;
@@ -17,6 +18,7 @@ import vn.dangthehao.hotel_booking_management.dto.response.*;
 import vn.dangthehao.hotel_booking_management.service.HotelService;
 import vn.dangthehao.hotel_booking_management.service.RoomTypeService;
 
+import java.net.URI;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -43,11 +45,19 @@ public class OwnerHotelController {
         return ResponseEntity.status(HttpStatus.OK).body(hotelService.findHotelsByOwner(jwt, isApproved, page, size));
     }
 
-    @PostMapping("/room-types")
-    public ResponseEntity<ApiResponse<Void>> createRoomType(
+    @PostMapping("{id}/room-types")
+    public ResponseEntity<ApiResponse<RoomTypeCrtResponse>> createRoomType(
+            @PathVariable(name = "id") Long hotelId,
             @Valid @RequestPart(name = "data") RoomTypeCrtRequest request,
             @RequestPart(name = "images", required = false) List<MultipartFile> imageFiles) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(roomTypeService.create(request, imageFiles));
+        ApiResponse<RoomTypeCrtResponse> apiResponse = roomTypeService.create(hotelId, request, imageFiles);
+        URI location = ServletUriComponentsBuilder
+                .fromCurrentRequest()
+                .path("/{id}")
+                .buildAndExpand(apiResponse.getData().getId())
+                .toUri();
+
+        return ResponseEntity.created(location).body(apiResponse);
     }
 
     @GetMapping("/{id}/room-types")
