@@ -30,10 +30,18 @@ public class OwnerHotelController {
     RoomTypeService roomTypeService;
 
     @PostMapping
-    public ResponseEntity<ApiResponse<Void>> registerHotel(
-            @Valid @RequestBody HotelRegistrationRequest request,
+    public ResponseEntity<ApiResponse<HotelRegistrationResponse>> registerHotel(
+            @Valid @RequestPart(name = "data") HotelRegistrationRequest request,
+            @RequestPart(name = "thumbnail", required = false) MultipartFile thumbnail,
             @AuthenticationPrincipal Jwt jwt) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(hotelService.register(request, jwt));
+        ApiResponse<HotelRegistrationResponse> response = hotelService.register(request, thumbnail, jwt);
+        URI location = ServletUriComponentsBuilder
+                .fromCurrentRequest()
+                .path("/{id}")
+                .buildAndExpand(response.getData().getId())
+                .toUri();
+
+        return ResponseEntity.created(location).body(response);
     }
 
     @GetMapping

@@ -30,6 +30,7 @@ public class Hotel extends BaseEntity {
     String location;
 
     String description;
+    String thumbnail;
     float rating = 0;
 
     @Column(nullable = false)

@@ -65,3 +65,4 @@ file:
   upload_folder: uploads/images/
   user_avatar_folder_name: avatars
   room_type_img_folder_name: roomTypeImages
+  hotel_img_folder_name: hotelImages

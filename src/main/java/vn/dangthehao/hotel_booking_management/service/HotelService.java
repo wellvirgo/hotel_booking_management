@@ -3,27 +3,30 @@ package vn.dangthehao.hotel_booking_management.service;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import lombok.experimental.NonFinal;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
+import org.springframework.web.multipart.MultipartFile;
 import vn.dangthehao.hotel_booking_management.dto.OwnerHotelItemDTO;
 import vn.dangthehao.hotel_booking_management.dto.UnapprovedHotelDTO;
 import vn.dangthehao.hotel_booking_management.dto.request.HotelRegistrationRequest;
-import vn.dangthehao.hotel_booking_management.dto.response.ApiResponse;
-import vn.dangthehao.hotel_booking_management.dto.response.DetailHotelResponse;
-import vn.dangthehao.hotel_booking_management.dto.response.OwnerHotelsResponse;
-import vn.dangthehao.hotel_booking_management.dto.response.UnapprovedHotelsResponse;
+import vn.dangthehao.hotel_booking_management.dto.response.*;
 import vn.dangthehao.hotel_booking_management.enums.ErrorCode;
 import vn.dangthehao.hotel_booking_management.enums.HotelStatus;
 import vn.dangthehao.hotel_booking_management.exception.AppException;
 import vn.dangthehao.hotel_booking_management.mapper.HotelMapper;
 import vn.dangthehao.hotel_booking_management.model.Hotel;
 import vn.dangthehao.hotel_booking_management.repository.HotelRepository;
+import vn.dangthehao.hotel_booking_management.util.ImageNameToUrlMapper;
 import vn.dangthehao.hotel_booking_management.util.JwtUtil;
 import vn.dangthehao.hotel_booking_management.util.ResponseGenerator;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -37,21 +40,32 @@ public class HotelService {
     ResponseGenerator responseGenerator;
     UserService userService;
     MailService mailService;
+    UploadFileService uploadFileService;
+    ImageNameToUrlMapper imageNameToUrlMapper;
 
     static String BASE_AVATAR_URL = "http://localhost:8080/avatars/";
+
+    @NonFinal
+    @Value("${base_url}")
+    String baseUrl;
+
+    @NonFinal
+    @Value("${file.hotel_img_folder_name}")
+    String hotelImgFolderName;
 
     public Hotel findById(Long id) {
         return hotelRepository.findByIdAndIsDeletedFalse(id)
                 .orElseThrow(() -> new AppException(ErrorCode.HOTEL_NOT_FOUND));
     }
 
-    public ApiResponse<Void> register(HotelRegistrationRequest request, Jwt jwt) {
-        Hotel registeredHotel = hotelMapper.toHotel(request);
-        Long ownerId = jwtUtil.getUserID(jwt);
-        registeredHotel.setOwner(userService.findByID(ownerId));
-        hotelRepository.save(registeredHotel);
+    public ApiResponse<HotelRegistrationResponse> register(HotelRegistrationRequest request,
+                                                           MultipartFile thumbnailFile,
+                                                           Jwt jwt) {
+        Hotel registeredHotel = createHotelFromRequest(request, thumbnailFile, jwt);
+        Hotel savedHotel = hotelRepository.save(registeredHotel);
+        HotelRegistrationResponse response = buildHotelRegistrationResponse(savedHotel, jwtUtil.getUserID(jwt));
 
-        return responseGenerator.generateSuccessResponse("Your application will be handled soon!");
+        return responseGenerator.generateSuccessResponse("Your application will be handled soon!", response);
     }
 
     public ApiResponse<UnapprovedHotelsResponse> findUnapprovedHotels(int page, int size) {
@@ -135,8 +149,38 @@ public class HotelService {
         return responseGenerator.generateSuccessResponse("List of approved hotels", ownerHotelsResponse);
     }
 
-    public boolean isOwner(Long hotelId, Jwt jwt){
+    public boolean isOwner(Long hotelId, Jwt jwt) {
         Long ownerId = findById(hotelId).getOwner().getId();
         return ownerId.equals(jwtUtil.getUserID(jwt));
+    }
+
+    private Hotel createHotelFromRequest(HotelRegistrationRequest request, MultipartFile thumbnailFile, Jwt jwt) {
+        Hotel registeredHotel = hotelMapper.toHotel(request);
+        Long ownerId = jwtUtil.getUserID(jwt);
+        registeredHotel.setOwner(userService.findByID(ownerId));
+
+        if (validateThumbnailFile(thumbnailFile)) {
+            String thumbnail = uploadFileService.saveFile(hotelImgFolderName, thumbnailFile)
+                    .replace(String.format("%s/%s/", baseUrl, hotelImgFolderName), "");
+            registeredHotel.setThumbnail(thumbnail);
+        }
+
+        return registeredHotel;
+    }
+
+    private boolean validateThumbnailFile(MultipartFile thumbnailFile) {
+        return thumbnailFile != null
+                && !thumbnailFile.isEmpty()
+                && StringUtils.hasText(thumbnailFile.getOriginalFilename());
+    }
+
+    private HotelRegistrationResponse buildHotelRegistrationResponse(Hotel hotel, Long ownerId) {
+        HotelRegistrationResponse response = hotelMapper.toHotelRegistrationRequest(hotel);
+        response.setOwnerId(ownerId);
+        response.setApproved(hotel.isApproved());
+        response.setThumbnailUrl(imageNameToUrlMapper.toUrl(hotel.getThumbnail(), this.hotelImgFolderName));
+        response.setRoomTypes(Collections.emptyList());
+
+        return response;
     }
 }

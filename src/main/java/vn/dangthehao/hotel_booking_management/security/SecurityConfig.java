@@ -36,7 +36,7 @@ public class SecurityConfig {
 
     String[] PUBLIC_POST_ENDPOINT = {"/api/v1/auth/sessions", "/api/v1/auth/tokens", "/api/v1/users",
             "/api/v1/auth/passwords/resets/**"};
-    String[] PUBLIC_GET_ENDPOINT = {"/avatars/**", "/roomTypeImages/**"};
+    String[] PUBLIC_GET_ENDPOINT = {"/avatars/**", "/roomTypeImages/**", "/hotelImages/**"};
     String[] PUBLIC_PUT_ENDPOINT = {"/api/v1/auth/passwords/resets"};
 
     @Bean
