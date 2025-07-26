@@ -6,8 +6,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import vn.dangthehao.hotel_booking_management.dto.OwnerRoomTypeDTO;
-import vn.dangthehao.hotel_booking_management.dto.response.OwnerRoomTypesResponse;
 import vn.dangthehao.hotel_booking_management.model.RoomType;
+
+import java.util.List;
 
 @Repository
 public interface RoomTypeRepository extends JpaRepository<RoomType, Long> {
@@ -17,4 +18,6 @@ public interface RoomTypeRepository extends JpaRepository<RoomType, Long> {
             "from RoomType rt " +
             "where rt.hotel.id=:hotelId")
     Page<OwnerRoomTypeDTO> findByHotelId(Long hotelId, Pageable pageable);
+
+    List<RoomType> findByHotelIdInAndCapacityGreaterThanEqual(List<Long> hotelIds, int numGuests);
 }

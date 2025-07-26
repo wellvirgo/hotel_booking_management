@@ -50,19 +50,25 @@ public class Hotel extends BaseEntity {
     Set<RoomType> roomTypes;
 
     @Override
-    public boolean equals(Object o) {
-        if (o == null || getClass() != o.getClass()) return false;
-        Hotel hotel = (Hotel) o;
-        return Float.compare(rating, hotel.rating) == 0
+    public boolean equals(Object object) {
+        if (object == null || getClass() != object.getClass()) return false;
+        Hotel hotel = (Hotel) object;
+        return this.getId().equals(hotel.getId())
+                && Float.compare(rating, hotel.rating) == 0
+                && isApproved == hotel.isApproved
+                && isDeleted == hotel.isDeleted
                 && Objects.equals(hotelName, hotel.hotelName)
-                && Objects.equals(owner, hotel.owner)
                 && Objects.equals(address, hotel.address)
+                && Objects.equals(location, hotel.location)
                 && Objects.equals(description, hotel.description)
-                && status == hotel.status && Objects.equals(roomTypes, hotel.roomTypes);
+                && Objects.equals(thumbnail, hotel.thumbnail)
+                && status == hotel.status
+                && Objects.equals(depositRate, hotel.depositRate)
+                && Objects.equals(depositDeadlineHours, hotel.depositDeadlineHours);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(hotelName, owner, address, description, rating, status, roomTypes);
+        return Objects.hash(this.getId(), hotelName, address, location, description, thumbnail, rating, status, isApproved, isDeleted, depositRate, depositDeadlineHours);
     }
 }

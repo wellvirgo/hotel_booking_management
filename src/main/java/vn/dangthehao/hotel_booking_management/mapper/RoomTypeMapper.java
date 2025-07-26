@@ -2,6 +2,7 @@ package vn.dangthehao.hotel_booking_management.mapper;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import vn.dangthehao.hotel_booking_management.dto.LowestPriceRoomType;
 import vn.dangthehao.hotel_booking_management.dto.request.RoomTypeCrtRequest;
 import vn.dangthehao.hotel_booking_management.dto.response.OwnerDetailRoomTypeResponse;
 import vn.dangthehao.hotel_booking_management.dto.response.RoomTypeCrtResponse;
@@ -18,4 +19,6 @@ public interface RoomTypeMapper {
     OwnerDetailRoomTypeResponse toOwnerDetailRoomTypeResponse(RoomType roomType);
 
     RoomTypeCrtResponse toRoomTypeCrtResponse(RoomType roomType);
+
+    LowestPriceRoomType toLowestPriceRoomType(RoomType roomType);
 }
