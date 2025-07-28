@@ -10,10 +10,10 @@ import lombok.experimental.FieldDefaults;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class UserResponse {
-    String username;
-    String fullName;
-    String email;
-    String phone;
-    String roleName;
-    String avatar;
+  String username;
+  String fullName;
+  String email;
+  String phone;
+  String roleName;
+  String avatar;
 }

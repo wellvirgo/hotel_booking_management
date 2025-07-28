@@ -11,6 +11,6 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class BaseFormListResponse {
-    int currentPage;
-    int totalPages;
+  int currentPage;
+  int totalPages;
 }

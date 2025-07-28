@@ -10,8 +10,8 @@ import lombok.experimental.FieldDefaults;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class UserListResponse {
-    Long id;
-    String username;
-    String avatar;
-    String roleName;
+  Long id;
+  String username;
+  String avatar;
+  String roleName;
 }

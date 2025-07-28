@@ -10,10 +10,10 @@ import vn.dangthehao.hotel_booking_management.repository.UserRepository;
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class EmailNotExistsValidator implements ConstraintValidator<EmailNotExists, String> {
-    UserRepository userRepository;
+  UserRepository userRepository;
 
-    @Override
-    public boolean isValid(String email, ConstraintValidatorContext constraintValidatorContext) {
-        return !userRepository.existsByEmailAndIsDeletedFalse(email);
-    }
+  @Override
+  public boolean isValid(String email, ConstraintValidatorContext constraintValidatorContext) {
+    return !userRepository.existsByEmailAndIsDeletedFalse(email);
+  }
 }

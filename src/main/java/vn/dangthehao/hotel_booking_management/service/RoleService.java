@@ -13,10 +13,11 @@ import vn.dangthehao.hotel_booking_management.repository.RoleRepository;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @Service
 public class RoleService {
-    RoleRepository roleRepository;
+  RoleRepository roleRepository;
 
-    public Role findByRoleName(String roleName) {
-        return roleRepository.findByRoleName(roleName)
-                .orElseThrow(() -> new RuntimeException("Role not found"));
-    }
+  public Role findByRoleName(String roleName) {
+    return roleRepository
+        .findByRoleName(roleName)
+        .orElseThrow(() -> new RuntimeException("Role not found"));
+  }
 }

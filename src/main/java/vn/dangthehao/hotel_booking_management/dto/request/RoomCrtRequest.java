@@ -10,7 +10,7 @@ import lombok.experimental.FieldDefaults;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class RoomCrtRequest {
-    Long roomTypeId;
-    String roomNumber;
-    String description;
+  Long roomTypeId;
+  String roomNumber;
+  String description;
 }

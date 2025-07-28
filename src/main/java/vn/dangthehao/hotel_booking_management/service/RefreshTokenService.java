@@ -1,5 +1,9 @@
 package vn.dangthehao.hotel_booking_management.service;
 
+import java.text.ParseException;
+import java.time.LocalDateTime;
+import java.util.Map;
+import java.util.Optional;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -13,55 +17,47 @@ import vn.dangthehao.hotel_booking_management.model.User;
 import vn.dangthehao.hotel_booking_management.repository.RefreshTokenRepository;
 import vn.dangthehao.hotel_booking_management.util.JwtUtil;
 
-import java.text.ParseException;
-import java.time.LocalDateTime;
-import java.util.Map;
-import java.util.Optional;
-
 @Slf4j
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @Service
 public class RefreshTokenService {
-    RefreshTokenRepository refreshTokenRepository;
-    JwtUtil jwtUtil;
+  RefreshTokenRepository refreshTokenRepository;
+  JwtUtil jwtUtil;
 
-    public RefreshToken create(String token, User user) throws ParseException {
-        Map<String, Object> claims = jwtUtil.getClaims(token);
-        String tokenID = jwtUtil.getTokenID(claims);
-        LocalDateTime expiredTime = jwtUtil.getExpiredTime(claims);
-        RefreshToken refreshToken = RefreshToken.builder()
-                .id(tokenID)
-                .token(token)
-                .user(user)
-                .expiredTime(expiredTime)
-                .build();
+  public RefreshToken create(String token, User user) throws ParseException {
+    Map<String, Object> claims = jwtUtil.getClaims(token);
+    String tokenID = jwtUtil.getTokenID(claims);
+    LocalDateTime expiredTime = jwtUtil.getExpiredTime(claims);
+    RefreshToken refreshToken =
+        RefreshToken.builder().id(tokenID).token(token).user(user).expiredTime(expiredTime).build();
 
-        return refreshTokenRepository.save(refreshToken);
+    return refreshTokenRepository.save(refreshToken);
+  }
+
+  @Transactional
+  public void updateRefreshToken(User user, String refreshToken) {
+    try {
+      Optional<RefreshToken> refreshTokenOptional = refreshTokenRepository.findByUser(user);
+      create(refreshToken, user);
+      refreshTokenOptional.ifPresent(this::delete);
+    } catch (ParseException e) {
+      throw new AppException(ErrorCode.FAILED_PARSE_TOKEN);
     }
+  }
 
-    @Transactional
-    public void updateRefreshToken(User user, String refreshToken) {
-        try {
-            Optional<RefreshToken> refreshTokenOptional = refreshTokenRepository.findByUser(user);
-            create(refreshToken, user);
-            refreshTokenOptional.ifPresent(this::delete);
-        } catch (ParseException e) {
-            throw new AppException(ErrorCode.FAILED_PARSE_TOKEN);
-        }
-    }
+  public RefreshToken findByUser(User user) {
+    return refreshTokenRepository
+        .findByUser(user)
+        .orElseThrow(() -> new AppException(ErrorCode.REFRESH_TOKEN_NOT_FOUND));
+  }
 
-    public RefreshToken findByUser(User user) {
-        return refreshTokenRepository.findByUser(user)
-                .orElseThrow(() -> new AppException(ErrorCode.REFRESH_TOKEN_NOT_FOUND));
-    }
+  public boolean verifyRefreshToken(String refreshToken) {
+    String tokenID = jwtUtil.getTokenID(jwtUtil.getClaims(refreshToken));
+    return refreshTokenRepository.existsById(tokenID);
+  }
 
-    public boolean verifyRefreshToken(String refreshToken) {
-        String tokenID = jwtUtil.getTokenID(jwtUtil.getClaims(refreshToken));
-        return refreshTokenRepository.existsById(tokenID);
-    }
-
-    public void delete(RefreshToken refreshToken) {
-        refreshTokenRepository.delete(refreshToken);
-    }
+  public void delete(RefreshToken refreshToken) {
+    refreshTokenRepository.delete(refreshToken);
+  }
 }

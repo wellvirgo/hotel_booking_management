@@ -18,10 +18,10 @@ import vn.dangthehao.hotel_booking_management.service.AmenityService;
 @RestController
 @RequestMapping("/api/v1/admin/amenities")
 public class AdminAmenityController {
-    AmenityService amenityService;
+  AmenityService amenityService;
 
-    @PostMapping
-    public ResponseEntity<ApiResponse<Void>> create(@RequestBody AmenityCrtRequest request) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(amenityService.createAmenity(request));
-    }
+  @PostMapping
+  public ResponseEntity<ApiResponse<Void>> create(@RequestBody AmenityCrtRequest request) {
+    return ResponseEntity.status(HttpStatus.CREATED).body(amenityService.createAmenity(request));
+  }
 }

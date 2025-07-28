@@ -11,16 +11,16 @@ import vn.dangthehao.hotel_booking_management.model.User;
 
 @Mapper(componentModel = "spring")
 public interface UserMapper {
-    User toUser(UserCrtRequest request);
+  User toUser(UserCrtRequest request);
 
-    UserCrtResponse toUserCrtResponse(User user);
+  UserCrtResponse toUserCrtResponse(User user);
 
-    @Mapping(target = "avatar", ignore = true)
-    UserUpdateResponse toUserUpdateResponse(User user);
+  @Mapping(target = "avatar", ignore = true)
+  UserUpdateResponse toUserUpdateResponse(User user);
 
-    @Mapping(target = "avatar", ignore = true)
-    UserListResponse toUserListResponse(User user);
+  @Mapping(target = "avatar", ignore = true)
+  UserListResponse toUserListResponse(User user);
 
-    @Mapping(target = "avatar", ignore = true)
-    UserResponse toUserResponse(User user);
+  @Mapping(target = "avatar", ignore = true)
+  UserResponse toUserResponse(User user);
 }

@@ -1,6 +1,8 @@
 package vn.dangthehao.hotel_booking_management.controller;
 
 import jakarta.validation.Valid;
+import java.net.URI;
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -18,78 +20,80 @@ import vn.dangthehao.hotel_booking_management.dto.response.*;
 import vn.dangthehao.hotel_booking_management.service.HotelService;
 import vn.dangthehao.hotel_booking_management.service.RoomTypeService;
 
-import java.net.URI;
-import java.util.List;
-
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @RestController
 @RequestMapping("/api/v1/owner/hotels")
 public class OwnerHotelController {
-    HotelService hotelService;
-    RoomTypeService roomTypeService;
+  HotelService hotelService;
+  RoomTypeService roomTypeService;
 
-    @PostMapping
-    public ResponseEntity<ApiResponse<HotelRegistrationResponse>> registerHotel(
-            @Valid @RequestPart(name = "data") HotelRegistrationRequest request,
-            @RequestPart(name = "thumbnail", required = false) MultipartFile thumbnail,
-            @AuthenticationPrincipal Jwt jwt) {
-        ApiResponse<HotelRegistrationResponse> response = hotelService.register(request, thumbnail, jwt);
-        URI location = ServletUriComponentsBuilder
-                .fromCurrentRequest()
-                .path("/{id}")
-                .buildAndExpand(response.getData().getId())
-                .toUri();
+  @PostMapping
+  public ResponseEntity<ApiResponse<HotelRegistrationResponse>> registerHotel(
+      @Valid @RequestPart(name = "data") HotelRegistrationRequest request,
+      @RequestPart(name = "thumbnail", required = false) MultipartFile thumbnail,
+      @AuthenticationPrincipal Jwt jwt) {
+    ApiResponse<HotelRegistrationResponse> response =
+        hotelService.register(request, thumbnail, jwt);
+    URI location =
+        ServletUriComponentsBuilder.fromCurrentRequest()
+            .path("/{id}")
+            .buildAndExpand(response.getData().getId())
+            .toUri();
 
-        return ResponseEntity.created(location).body(response);
-    }
+    return ResponseEntity.created(location).body(response);
+  }
 
-    @GetMapping
-    public ResponseEntity<ApiResponse<OwnerHotelsResponse>> findAllHotels(
-            @AuthenticationPrincipal Jwt jwt,
-            @RequestParam(name = "isApproved", defaultValue = "true") String isApproved,
-            @RequestParam(name = "page", defaultValue = "1") int page,
-            @RequestParam(name = "size", defaultValue = "5") int size) {
-        return ResponseEntity.status(HttpStatus.OK).body(hotelService.findHotelsByOwner(jwt, isApproved, page, size));
-    }
+  @GetMapping
+  public ResponseEntity<ApiResponse<OwnerHotelsResponse>> findAllHotels(
+      @AuthenticationPrincipal Jwt jwt,
+      @RequestParam(name = "isApproved", defaultValue = "true") String isApproved,
+      @RequestParam(name = "page", defaultValue = "1") int page,
+      @RequestParam(name = "size", defaultValue = "5") int size) {
+    return ResponseEntity.status(HttpStatus.OK)
+        .body(hotelService.findHotelsByOwner(jwt, isApproved, page, size));
+  }
 
-    @PostMapping("{id}/room-types")
-    public ResponseEntity<ApiResponse<RoomTypeCrtResponse>> createRoomType(
-            @PathVariable(name = "id") Long hotelId,
-            @Valid @RequestPart(name = "data") RoomTypeCrtRequest request,
-            @RequestPart(name = "images", required = false) List<MultipartFile> imageFiles) {
-        ApiResponse<RoomTypeCrtResponse> apiResponse = roomTypeService.create(hotelId, request, imageFiles);
-        URI location = ServletUriComponentsBuilder
-                .fromCurrentRequest()
-                .path("/{id}")
-                .buildAndExpand(apiResponse.getData().getId())
-                .toUri();
+  @PostMapping("{id}/room-types")
+  public ResponseEntity<ApiResponse<RoomTypeCrtResponse>> createRoomType(
+      @PathVariable(name = "id") Long hotelId,
+      @Valid @RequestPart(name = "data") RoomTypeCrtRequest request,
+      @RequestPart(name = "images", required = false) List<MultipartFile> imageFiles) {
+    ApiResponse<RoomTypeCrtResponse> apiResponse =
+        roomTypeService.create(hotelId, request, imageFiles);
+    URI location =
+        ServletUriComponentsBuilder.fromCurrentRequest()
+            .path("/{id}")
+            .buildAndExpand(apiResponse.getData().getId())
+            .toUri();
 
-        return ResponseEntity.created(location).body(apiResponse);
-    }
+    return ResponseEntity.created(location).body(apiResponse);
+  }
 
-    @GetMapping("/{id}/room-types")
-    public ResponseEntity<ApiResponse<OwnerRoomTypesResponse>> listRoomTypes(
-            @PathVariable(name = "id") Long id,
-            @RequestParam(name = "page", defaultValue = "1") int page,
-            @RequestParam(name = "size", defaultValue = "5") int size) {
-        return ResponseEntity.status(HttpStatus.OK).body(roomTypeService.getRoomTypesByHotelId(id, page, size));
-    }
+  @GetMapping("/{id}/room-types")
+  public ResponseEntity<ApiResponse<OwnerRoomTypesResponse>> listRoomTypes(
+      @PathVariable(name = "id") Long id,
+      @RequestParam(name = "page", defaultValue = "1") int page,
+      @RequestParam(name = "size", defaultValue = "5") int size) {
+    return ResponseEntity.status(HttpStatus.OK)
+        .body(roomTypeService.getRoomTypesByHotelId(id, page, size));
+  }
 
-    @PutMapping("/{hotelId}/room-types/{roomTypeId}")
-    public ResponseEntity<ApiResponse<RoomTypeUpdateResponse>> updateRoomType(
-            @PathVariable(name = "hotelId") Long hotelId,
-            @PathVariable(name = "roomTypeId") Long roomTypeId,
-            @Valid @RequestPart(name = "data") RoomTypeUpdateRequest request,
-            @RequestPart(name = "images", required = false) List<MultipartFile> imageFiles) {
-        return ResponseEntity.status(HttpStatus.OK)
-                .body(roomTypeService.updateRoomType(roomTypeId, hotelId, request, imageFiles));
-    }
+  @PutMapping("/{hotelId}/room-types/{roomTypeId}")
+  public ResponseEntity<ApiResponse<RoomTypeUpdateResponse>> updateRoomType(
+      @PathVariable(name = "hotelId") Long hotelId,
+      @PathVariable(name = "roomTypeId") Long roomTypeId,
+      @Valid @RequestPart(name = "data") RoomTypeUpdateRequest request,
+      @RequestPart(name = "images", required = false) List<MultipartFile> imageFiles) {
+    return ResponseEntity.status(HttpStatus.OK)
+        .body(roomTypeService.updateRoomType(roomTypeId, hotelId, request, imageFiles));
+  }
 
-    @GetMapping("/{hotelId}/room-types/{roomTypeId}")
-    public ResponseEntity<ApiResponse<OwnerDetailRoomTypeResponse>> detailRoomType(
-            @PathVariable(name = "hotelId") Long hotelId,
-            @PathVariable(name = "roomTypeId") Long roomTypeId) {
-        return ResponseEntity.status(HttpStatus.OK).body(roomTypeService.detailRoomType(hotelId, roomTypeId));
-    }
+  @GetMapping("/{hotelId}/room-types/{roomTypeId}")
+  public ResponseEntity<ApiResponse<OwnerDetailRoomTypeResponse>> detailRoomType(
+      @PathVariable(name = "hotelId") Long hotelId,
+      @PathVariable(name = "roomTypeId") Long roomTypeId) {
+    return ResponseEntity.status(HttpStatus.OK)
+        .body(roomTypeService.detailRoomType(hotelId, roomTypeId));
+  }
 }

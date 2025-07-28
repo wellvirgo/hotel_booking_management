@@ -10,9 +10,9 @@ import lombok.experimental.FieldDefaults;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class UserCrtResponse {
-    String username;
-    String fullName;
-    String phone;
-    String email;
-    String roleName;
+  String username;
+  String fullName;
+  String phone;
+  String email;
+  String roleName;
 }

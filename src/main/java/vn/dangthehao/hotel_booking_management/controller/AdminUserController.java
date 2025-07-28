@@ -1,5 +1,6 @@
 package vn.dangthehao.hotel_booking_management.controller;
 
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -11,24 +12,22 @@ import vn.dangthehao.hotel_booking_management.dto.response.ApiResponse;
 import vn.dangthehao.hotel_booking_management.dto.response.UserListResponse;
 import vn.dangthehao.hotel_booking_management.service.UserService;
 
-import java.util.List;
-
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @RestController
 @RequestMapping("/api/v1/admin/users")
 public class AdminUserController {
-    UserService userService;
+  UserService userService;
 
-    @GetMapping
-    @PreAuthorize("@permissionChecker.hasAuthorities({'read:user','all:user'})")
-    public ResponseEntity<ApiResponse<List<UserListResponse>>> getAllUsers() {
-        return ResponseEntity.status(HttpStatus.OK).body(userService.listUsers());
-    }
+  @GetMapping
+  @PreAuthorize("@permissionChecker.hasAuthorities({'read:user','all:user'})")
+  public ResponseEntity<ApiResponse<List<UserListResponse>>> getAllUsers() {
+    return ResponseEntity.status(HttpStatus.OK).body(userService.listUsers());
+  }
 
-    @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<ApiResponse<Void>> deleteUserByAdmin(@PathVariable Long id) {
-        return ResponseEntity.status(HttpStatus.OK).body(userService.deleteByID(id));
-    }
+  @DeleteMapping("/{id}")
+  @PreAuthorize("hasRole('ADMIN')")
+  public ResponseEntity<ApiResponse<Void>> deleteUserByAdmin(@PathVariable Long id) {
+    return ResponseEntity.status(HttpStatus.OK).body(userService.deleteByID(id));
+  }
 }

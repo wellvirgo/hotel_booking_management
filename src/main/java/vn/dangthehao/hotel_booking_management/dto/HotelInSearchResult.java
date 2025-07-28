@@ -10,11 +10,11 @@ import lombok.experimental.FieldDefaults;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class HotelInSearchResult {
-    Long id;
-    String hotelName;
-    String address;
-    String thumbnailUrl;
-    float rating;
-    int totalReviewCount;
-    LowestPriceRoomType lowestPriceRoomType;
+  Long id;
+  String hotelName;
+  String address;
+  String thumbnailUrl;
+  float rating;
+  int totalReviewCount;
+  LowestPriceRoomType lowestPriceRoomType;
 }

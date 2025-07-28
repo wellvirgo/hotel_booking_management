@@ -10,10 +10,10 @@ import lombok.experimental.FieldDefaults;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class RoomCrtResponse {
-    Long id;
-    String roomNumber;
-    String roomTypeName;
-    String description;
-    boolean active;
-    String status;
+  Long id;
+  String roomNumber;
+  String roomTypeName;
+  String description;
+  boolean active;
+  String status;
 }

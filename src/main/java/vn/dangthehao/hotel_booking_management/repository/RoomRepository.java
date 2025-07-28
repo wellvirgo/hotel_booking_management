@@ -6,5 +6,5 @@ import vn.dangthehao.hotel_booking_management.model.Room;
 
 @Repository
 public interface RoomRepository extends JpaRepository<Room, Long> {
-    long countByRoomTypeId(Long id);
+  long countByRoomTypeId(Long id);
 }

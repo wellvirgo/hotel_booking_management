@@ -15,10 +15,8 @@ import vn.dangthehao.hotel_booking_management.dto.PasswordConfirm;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @PasswordMatches
 public class ChangePasswordRequest implements PasswordConfirm {
-    @NotBlank
-    String oldPassword;
+  @NotBlank String oldPassword;
 
-    @PasswordStrength
-    String password;
-    String confirmPassword;
+  @PasswordStrength String password;
+  String confirmPassword;
 }

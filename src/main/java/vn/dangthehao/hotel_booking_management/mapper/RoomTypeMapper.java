@@ -11,14 +11,14 @@ import vn.dangthehao.hotel_booking_management.model.RoomType;
 
 @Mapper(componentModel = "spring")
 public interface RoomTypeMapper {
-    RoomType roomTypeCrtRequestToRoomType(RoomTypeCrtRequest roomTypeCrtRequest);
+  RoomType roomTypeCrtRequestToRoomType(RoomTypeCrtRequest roomTypeCrtRequest);
 
-    @Mapping(target = "imageUrls", ignore = true)
-    RoomTypeUpdateResponse toRoomTypeUpdateResponse(RoomType roomType);
+  @Mapping(target = "imageUrls", ignore = true)
+  RoomTypeUpdateResponse toRoomTypeUpdateResponse(RoomType roomType);
 
-    OwnerDetailRoomTypeResponse toOwnerDetailRoomTypeResponse(RoomType roomType);
+  OwnerDetailRoomTypeResponse toOwnerDetailRoomTypeResponse(RoomType roomType);
 
-    RoomTypeCrtResponse toRoomTypeCrtResponse(RoomType roomType);
+  RoomTypeCrtResponse toRoomTypeCrtResponse(RoomType roomType);
 
-    LowestPriceRoomType toLowestPriceRoomType(RoomType roomType);
+  LowestPriceRoomType toLowestPriceRoomType(RoomType roomType);
 }

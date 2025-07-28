@@ -13,20 +13,21 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class HotelRegistrationRequest {
-    @NotBlank(message = "INVALID_HOTEL_NAME")
-    String hotelName;
+  @NotBlank(message = "INVALID_HOTEL_NAME")
+  String hotelName;
 
-    @NotBlank(message = "INVALID_ADDRESS")
-    String address;
+  @NotBlank(message = "INVALID_ADDRESS")
+  String address;
 
-    @NotBlank(message = "INVALID_LOCATION")
-    String location;
-    String description;
+  @NotBlank(message = "INVALID_LOCATION")
+  String location;
 
-    @DecimalMin(value = "0", inclusive = false)
-    @DecimalMax(value = "1")
-    Float depositRate;
+  String description;
 
-    @DecimalMin(value = "0", inclusive = false)
-    Float depositDeadlineHours;
+  @DecimalMin(value = "0", inclusive = false)
+  @DecimalMax(value = "1")
+  Float depositRate;
+
+  @DecimalMin(value = "0", inclusive = false)
+  Float depositDeadlineHours;
 }

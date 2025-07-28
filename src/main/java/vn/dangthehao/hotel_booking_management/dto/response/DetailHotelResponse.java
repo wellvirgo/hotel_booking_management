@@ -10,16 +10,16 @@ import lombok.experimental.FieldDefaults;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class DetailHotelResponse {
-    String hotelName;
-    String address;
-    String location;
-    String description;
-    float rating;
-    String status;
-    Float depositRate;
-    Float depositDeadlineHours;
-    String ownerFullName;
-    String ownerEmail;
-    String ownerPhone;
-    String ownerAvatar;
+  String hotelName;
+  String address;
+  String location;
+  String description;
+  float rating;
+  String status;
+  Float depositRate;
+  Float depositDeadlineHours;
+  String ownerFullName;
+  String ownerEmail;
+  String ownerPhone;
+  String ownerAvatar;
 }

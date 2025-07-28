@@ -9,8 +9,8 @@ import vn.dangthehao.hotel_booking_management.model.InvalidToken;
 
 @Repository
 public interface InvalidTokenRepository extends JpaRepository<InvalidToken, String> {
-    @Modifying
-    @Transactional
-    @Query("DELETE FROM InvalidToken it where it.expiredTime < CURRENT_TIMESTAMP")
-    void deleteByExpiredTime();
+  @Modifying
+  @Transactional
+  @Query("DELETE FROM InvalidToken it where it.expiredTime < CURRENT_TIMESTAMP")
+  void deleteByExpiredTime();
 }

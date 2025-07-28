@@ -15,10 +15,9 @@ import vn.dangthehao.hotel_booking_management.dto.PasswordConfirm;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @PasswordMatches
 public class ResetPasswordRequest implements PasswordConfirm {
-    @Email(message = "INVALID_EMAIL")
-    String email;
+  @Email(message = "INVALID_EMAIL")
+  String email;
 
-    @PasswordStrength
-    String password;
-    String confirmPassword;
+  @PasswordStrength String password;
+  String confirmPassword;
 }

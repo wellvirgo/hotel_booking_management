@@ -1,9 +1,8 @@
 package vn.dangthehao.hotel_booking_management.dto;
 
+import java.math.BigDecimal;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-
-import java.math.BigDecimal;
 
 @Getter
 @Setter
@@ -12,8 +11,8 @@ import java.math.BigDecimal;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class OwnerRoomTypeDTO {
-    String name;
-    String description;
-    BigDecimal pricePerNight;
-    boolean active;
+  String name;
+  String description;
+  BigDecimal pricePerNight;
+  boolean active;
 }

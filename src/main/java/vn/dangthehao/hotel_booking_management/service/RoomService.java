@@ -20,30 +20,30 @@ import vn.dangthehao.hotel_booking_management.util.ResponseGenerator;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @Service
 public class RoomService {
-    RoomRepository roomRepository;
-    RoomMapper roomMapper;
-    RoomTypeService roomTypeService;
-    ResponseGenerator responseGenerator;
+  RoomRepository roomRepository;
+  RoomMapper roomMapper;
+  RoomTypeService roomTypeService;
+  ResponseGenerator responseGenerator;
 
-    public ApiResponse<RoomCrtResponse> createRoom(RoomCrtRequest roomCrtRequest) {
-        Long roomTypeId = roomCrtRequest.getRoomTypeId();
-        RoomType roomType = roomTypeService.findById(roomTypeId);
-        if (roomRepository.countByRoomTypeId(roomTypeId) >= roomType.getTotalRooms())
-            throw new AppException(ErrorCode.QUANTITY_ROOM_EXCEEDED);
+  public ApiResponse<RoomCrtResponse> createRoom(RoomCrtRequest roomCrtRequest) {
+    Long roomTypeId = roomCrtRequest.getRoomTypeId();
+    RoomType roomType = roomTypeService.findById(roomTypeId);
+    if (roomRepository.countByRoomTypeId(roomTypeId) >= roomType.getTotalRooms())
+      throw new AppException(ErrorCode.QUANTITY_ROOM_EXCEEDED);
 
-        Room room = roomMapper.toRoom(roomCrtRequest);
-        room.setActive(true);
-        room.setStatus(RoomStatus.AVAILABLE);
-        room.setRoomType(roomType);
+    Room room = roomMapper.toRoom(roomCrtRequest);
+    room.setActive(true);
+    room.setStatus(RoomStatus.AVAILABLE);
+    room.setRoomType(roomType);
 
-        RoomCrtResponse roomCrtResponse = generateRoomCrtResponse(roomRepository.save(room), roomType);
-        return responseGenerator.generateSuccessResponse("Create room successfully", roomCrtResponse);
-    }
+    RoomCrtResponse roomCrtResponse = generateRoomCrtResponse(roomRepository.save(room), roomType);
+    return responseGenerator.generateSuccessResponse("Create room successfully", roomCrtResponse);
+  }
 
-    private RoomCrtResponse generateRoomCrtResponse(Room room, RoomType roomType) {
-        RoomCrtResponse roomCrtResponse = roomMapper.toRoomCrtResponse(room);
-        roomCrtResponse.setRoomTypeName(roomType.getName());
+  private RoomCrtResponse generateRoomCrtResponse(Room room, RoomType roomType) {
+    RoomCrtResponse roomCrtResponse = roomMapper.toRoomCrtResponse(room);
+    roomCrtResponse.setRoomTypeName(roomType.getName());
 
-        return roomCrtResponse;
-    }
+    return roomCrtResponse;
+  }
 }

@@ -5,5 +5,4 @@ import org.springframework.stereotype.Repository;
 import vn.dangthehao.hotel_booking_management.model.Permission;
 
 @Repository
-public interface PermissionRepository extends JpaRepository<Permission,Long> {
-}
+public interface PermissionRepository extends JpaRepository<Permission, Long> {}

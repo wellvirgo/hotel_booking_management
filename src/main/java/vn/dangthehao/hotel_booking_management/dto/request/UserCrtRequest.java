@@ -19,22 +19,22 @@ import vn.dangthehao.hotel_booking_management.dto.PasswordConfirm;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @PasswordMatches(message = "PASSWORD_NOT_MATCH")
 public class UserCrtRequest implements PasswordConfirm {
-    @Size(min = 5, message = "INVALID_USERNAME")
-    @UsernameNotExists
-    String username;
+  @Size(min = 5, message = "INVALID_USERNAME")
+  @UsernameNotExists
+  String username;
 
-    @PasswordStrength
-    String password;
-    String confirmPassword;
+  @PasswordStrength String password;
+  String confirmPassword;
 
-    @NotBlank(message = "INVALID_FULL_NAME")
-    String fullName;
+  @NotBlank(message = "INVALID_FULL_NAME")
+  String fullName;
 
-    @Email(message = "INVALID_EMAIL")
-    @EmailNotExists
-    String email;
+  @Email(message = "INVALID_EMAIL")
+  @EmailNotExists
+  String email;
 
-    @Size(min = 10, message = "INVALID_PHONE")
-    String phone;
-    Long roleId;
+  @Size(min = 10, message = "INVALID_PHONE")
+  String phone;
+
+  Long roleId;
 }

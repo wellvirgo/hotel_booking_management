@@ -16,27 +16,28 @@ import vn.dangthehao.hotel_booking_management.service.HotelService;
 @RestController
 @RequestMapping("/api/v1/admin/hotels")
 public class AdminHotelController {
-    HotelService hotelService;
+  HotelService hotelService;
 
-    @GetMapping("/pending-approval")
-    public ResponseEntity<ApiResponse<UnapprovedHotelsResponse>> listUnapprovedHotels(
-            @RequestParam(name = "page", defaultValue = "1") int page,
-            @RequestParam(name = "size", defaultValue = "5") int size) {
-        return ResponseEntity.status(HttpStatus.OK).body(hotelService.findUnapprovedHotels(page, size));
-    }
+  @GetMapping("/pending-approval")
+  public ResponseEntity<ApiResponse<UnapprovedHotelsResponse>> listUnapprovedHotels(
+      @RequestParam(name = "page", defaultValue = "1") int page,
+      @RequestParam(name = "size", defaultValue = "5") int size) {
+    return ResponseEntity.status(HttpStatus.OK).body(hotelService.findUnapprovedHotels(page, size));
+  }
 
-    @GetMapping("/pending-approval/{id}")
-    public ResponseEntity<ApiResponse<DetailHotelResponse>> getUnapprovedHotel(@PathVariable(name = "id") long id) {
-        return ResponseEntity.status(HttpStatus.OK).body(hotelService.getDetailHotel(id));
-    }
+  @GetMapping("/pending-approval/{id}")
+  public ResponseEntity<ApiResponse<DetailHotelResponse>> getUnapprovedHotel(
+      @PathVariable(name = "id") long id) {
+    return ResponseEntity.status(HttpStatus.OK).body(hotelService.getDetailHotel(id));
+  }
 
-    @PostMapping("/{id}/approve")
-    public ResponseEntity<ApiResponse<Void>> approveHotel(@PathVariable(name = "id") long id) {
-        return ResponseEntity.status(HttpStatus.OK).body(hotelService.approveHotel(id));
-    }
+  @PostMapping("/{id}/approve")
+  public ResponseEntity<ApiResponse<Void>> approveHotel(@PathVariable(name = "id") long id) {
+    return ResponseEntity.status(HttpStatus.OK).body(hotelService.approveHotel(id));
+  }
 
-    @PostMapping("/{id}/reject")
-    public ResponseEntity<ApiResponse<Void>> rejectHotel(@PathVariable(name = "id") long id) {
-        return ResponseEntity.status(HttpStatus.OK).body(hotelService.rejectHotel(id));
-    }
+  @PostMapping("/{id}/reject")
+  public ResponseEntity<ApiResponse<Void>> rejectHotel(@PathVariable(name = "id") long id) {
+    return ResponseEntity.status(HttpStatus.OK).body(hotelService.rejectHotel(id));
+  }
 }

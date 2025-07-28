@@ -9,10 +9,12 @@ import vn.dangthehao.hotel_booking_management.model.RoomInventory;
 
 @Repository
 public interface RoomInventoryRepository extends JpaRepository<RoomInventory, Long> {
-    @Query("""
+  @Query(
+      """
                     select ri from RoomInventory ri
                     where ri.roomType.id in :roomTypeIds
                     and ri.inventoryDate between :checkIn and :checkOut
             """)
-    List<RoomInventory> findByRoomTypeIdAndDateRange(List<Long> roomTypeIds, LocalDate checkIn, LocalDate checkOut);
+  List<RoomInventory> findByRoomTypeIdAndDateRange(
+      List<Long> roomTypeIds, LocalDate checkIn, LocalDate checkOut);
 }

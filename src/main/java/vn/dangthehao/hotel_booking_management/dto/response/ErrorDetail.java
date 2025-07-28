@@ -12,7 +12,7 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class ErrorDetail {
-    String objectName;
-    String field;
-    String message;
+  String objectName;
+  String field;
+  String message;
 }

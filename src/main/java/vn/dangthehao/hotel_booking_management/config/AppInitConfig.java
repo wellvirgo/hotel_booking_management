@@ -15,14 +15,14 @@ import vn.dangthehao.hotel_booking_management.service.DataInitializerService;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @Slf4j
 public class AppInitConfig {
-    InvalidTokenRepository invalidTokenRepository;
-    DataInitializerService dataInitializerService;
+  InvalidTokenRepository invalidTokenRepository;
+  DataInitializerService dataInitializerService;
 
-    @Bean
-    ApplicationRunner applicationRunner() {
-        return args -> {
-            invalidTokenRepository.deleteByExpiredTime();
-            dataInitializerService.initializeDefaultData();
-        };
-    }
+  @Bean
+  ApplicationRunner applicationRunner() {
+    return args -> {
+      invalidTokenRepository.deleteByExpiredTime();
+      dataInitializerService.initializeDefaultData();
+    };
+  }
 }

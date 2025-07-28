@@ -11,6 +11,6 @@ import lombok.experimental.FieldDefaults;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class AmenityCrtRequest {
-    @NotBlank(message = "INVALID_AMENITY_NAME")
-    String name;
+  @NotBlank(message = "INVALID_AMENITY_NAME")
+  String name;
 }

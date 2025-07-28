@@ -1,5 +1,10 @@
 package vn.dangthehao.hotel_booking_management.service;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -11,57 +16,47 @@ import org.springframework.web.multipart.MultipartFile;
 import vn.dangthehao.hotel_booking_management.enums.ErrorCode;
 import vn.dangthehao.hotel_booking_management.exception.AppException;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-
 @Slf4j
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @Service
 public class UploadFileService {
-    @NonFinal
-    @Value("${file.upload_folder}")
-    String baseUploadFolder;
+  @NonFinal
+  @Value("${file.upload_folder}")
+  String baseUploadFolder;
 
-    @NonFinal
-    @Value("${base_url}")
-    String baseUrl;
+  @NonFinal
+  @Value("${base_url}")
+  String baseUrl;
 
-    private String createFolderIfNotExists(String targetFolderName) {
-        String targetFolderPath = baseUploadFolder + targetFolderName;
-        File targetFolder = new File(targetFolderPath);
-        if (!targetFolder.exists()) {
-            targetFolder.mkdirs();
-        }
-
-        return targetFolder.getPath();
+  private String createFolderIfNotExists(String targetFolderName) {
+    String targetFolderPath = baseUploadFolder + targetFolderName;
+    File targetFolder = new File(targetFolderPath);
+    if (!targetFolder.exists()) {
+      targetFolder.mkdirs();
     }
 
-    public String saveFile(String targetFolderName, MultipartFile uploadFile) {
-        if (uploadFile.isEmpty())
-            return "";
-        String targetFolderPath = createFolderIfNotExists(targetFolderName);
-        String uploadFileName = System.currentTimeMillis() + "_" + uploadFile.getOriginalFilename();
-        Path uploadFilePath = Paths.get(targetFolderPath, uploadFileName);
-        try {
-            Files.write(uploadFilePath, uploadFile.getBytes());
-        } catch (IOException e) {
-            throw new AppException(ErrorCode.FAILED_UPLOAD_FILE);
-        }
+    return targetFolder.getPath();
+  }
 
-        return normalizeFilePath(uploadFilePath.toString());
+  public String saveFile(String targetFolderName, MultipartFile uploadFile) {
+    if (uploadFile.isEmpty()) return "";
+    String targetFolderPath = createFolderIfNotExists(targetFolderName);
+    String uploadFileName = System.currentTimeMillis() + "_" + uploadFile.getOriginalFilename();
+    Path uploadFilePath = Paths.get(targetFolderPath, uploadFileName);
+    try {
+      Files.write(uploadFilePath, uploadFile.getBytes());
+    } catch (IOException e) {
+      throw new AppException(ErrorCode.FAILED_UPLOAD_FILE);
     }
 
-    private String normalizeFilePath(String filePath) {
-        filePath = filePath
-                .replace("\\", "/")
-                .replace(baseUploadFolder, "");
+    return normalizeFilePath(uploadFilePath.toString());
+  }
 
-        if (!filePath.startsWith("/"))
-            filePath = "/" + filePath;
-        return baseUrl + filePath;
-    }
+  private String normalizeFilePath(String filePath) {
+    filePath = filePath.replace("\\", "/").replace(baseUploadFolder, "");
+
+    if (!filePath.startsWith("/")) filePath = "/" + filePath;
+    return baseUrl + filePath;
+  }
 }
