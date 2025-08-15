@@ -43,7 +43,7 @@ public class Hotel extends BaseEntity {
   boolean isDeleted;
 
   Float depositRate;
-  Float depositDeadlineHours;
+  long depositDeadlineMinutes;
 
   @OneToMany(mappedBy = "hotel")
   Set<RoomType> roomTypes;
@@ -63,7 +63,7 @@ public class Hotel extends BaseEntity {
         && Objects.equals(thumbnail, hotel.thumbnail)
         && status == hotel.status
         && Objects.equals(depositRate, hotel.depositRate)
-        && Objects.equals(depositDeadlineHours, hotel.depositDeadlineHours);
+        && Objects.equals(depositDeadlineMinutes, hotel.depositDeadlineMinutes);
   }
 
   @Override
@@ -80,6 +80,6 @@ public class Hotel extends BaseEntity {
         isApproved,
         isDeleted,
         depositRate,
-        depositDeadlineHours);
+        depositDeadlineMinutes);
   }
 }

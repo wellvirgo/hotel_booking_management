@@ -19,7 +19,7 @@ public class HotelRegistrationResponse {
   String description;
   String thumbnailUrl;
   Float depositRate;
-  Float depositDeadlineHours;
+  long depositDeadlineMinutes;
   String status;
   boolean isApproved;
   float rating;

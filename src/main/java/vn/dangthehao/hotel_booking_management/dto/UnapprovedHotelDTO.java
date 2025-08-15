@@ -15,5 +15,5 @@ public class UnapprovedHotelDTO {
   String address;
   String location;
   Float depositRate;
-  Float depositDeadlineHours;
+  long depositDeadlineMinutes;
 }

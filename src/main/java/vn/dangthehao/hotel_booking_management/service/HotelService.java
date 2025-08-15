@@ -223,7 +223,7 @@ public class HotelService {
   }
 
   private HotelRegistrationResponse buildHotelRegistrationResponse(Hotel hotel, Long ownerId) {
-    HotelRegistrationResponse response = hotelMapper.toHotelRegistrationRequest(hotel);
+    HotelRegistrationResponse response = hotelMapper.toHotelRegistrationResponse(hotel);
     response.setOwnerId(ownerId);
     response.setApproved(hotel.isApproved());
     response.setThumbnailUrl(

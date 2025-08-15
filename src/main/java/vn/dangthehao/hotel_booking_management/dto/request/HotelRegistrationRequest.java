@@ -29,5 +29,5 @@ public class HotelRegistrationRequest {
   Float depositRate;
 
   @DecimalMin(value = "0", inclusive = false)
-  Float depositDeadlineHours;
+  long depositDeadlineMinutes;
 }

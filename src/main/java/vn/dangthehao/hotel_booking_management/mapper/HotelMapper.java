@@ -15,7 +15,7 @@ public interface HotelMapper {
 
   DetailHotelResponse toDetailHotelResponse(Hotel hotel);
 
-  HotelRegistrationResponse toHotelRegistrationRequest(Hotel hotel);
+  HotelRegistrationResponse toHotelRegistrationResponse(Hotel hotel);
 
   HotelInSearchResult toHotelInSearchResult(Hotel hotel);
 }
