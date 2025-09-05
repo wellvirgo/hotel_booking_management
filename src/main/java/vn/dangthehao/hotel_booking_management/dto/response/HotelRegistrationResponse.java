@@ -1,5 +1,6 @@
 package vn.dangthehao.hotel_booking_management.dto.response;
 
+import java.time.LocalTime;
 import java.util.List;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -19,7 +20,9 @@ public class HotelRegistrationResponse {
   String description;
   String thumbnailUrl;
   Float depositRate;
-  long depositDeadlineMinutes;
+  Long depositDeadlineMinutes;
+  LocalTime checkInTime;
+  LocalTime checkOutTime;
   String status;
   boolean isApproved;
   float rating;

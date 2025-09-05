@@ -16,12 +16,14 @@ import vn.dangthehao.hotel_booking_management.model.Hotel;
 public interface HotelRepository extends JpaRepository<Hotel, Long> {
   @Query(
       "select new vn.dangthehao.hotel_booking_management.dto.UnapprovedHotelDTO("
-          + "h.hotelName, ow.fullName, h.address, h.location, h.depositRate, h.depositDeadlineHours) "
+          + "h.hotelName, ow.fullName, h.address, h.location, h.depositRate, h.depositDeadlineMinutes) "
           + "from Hotel h join h.owner ow "
           + "where h.isApproved=false and h.isDeleted=false and h.status=:status")
   Page<UnapprovedHotelDTO> findUnapprovedHotels(Pageable pageable, HotelStatus status);
 
   Optional<Hotel> findByIdAndIsDeletedFalse(Long id);
+
+  Optional<Hotel> findByIdAndIsDeletedFalseAndIsApprovedTrue(Long id);
 
   @Query(
       "select new vn.dangthehao.hotel_booking_management.dto.OwnerHotelItemDTO("

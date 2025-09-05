@@ -1,9 +1,13 @@
 package vn.dangthehao.hotel_booking_management.service;
 
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import vn.dangthehao.hotel_booking_management.dto.request.BookingRequest;
 import vn.dangthehao.hotel_booking_management.dto.request.RoomCrtRequest;
 import vn.dangthehao.hotel_booking_management.dto.response.ApiResponse;
 import vn.dangthehao.hotel_booking_management.dto.response.RoomCrtResponse;
@@ -38,6 +42,12 @@ public class RoomService {
 
     RoomCrtResponse roomCrtResponse = generateRoomCrtResponse(roomRepository.save(room), roomType);
     return responseGenerator.generateSuccessResponse("Create room successfully", roomCrtResponse);
+  }
+
+  public List<Room> getAvailableRoomsForBooking(BookingRequest bookingRequest) {
+    Pageable limitRoom = PageRequest.of(0, bookingRequest.getNumRooms());
+    return roomRepository.findByRoomTypeIdAndStatusOrderByRoomNumberAsc(
+        bookingRequest.getRoomTypeId(), RoomStatus.AVAILABLE, limitRoom);
   }
 
   private RoomCrtResponse generateRoomCrtResponse(Room room, RoomType roomType) {

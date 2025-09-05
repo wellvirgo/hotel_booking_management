@@ -38,6 +38,10 @@ public enum ErrorCode {
   HOTEL_NOT_APPROVED(1023, HttpStatus.BAD_REQUEST, "Hotel is not approved"),
   ROOM_TYPE_NOT_FOUND(1024, HttpStatus.NOT_FOUND, "Room type with id %s not found"),
   QUANTITY_ROOM_EXCEEDED(1025, HttpStatus.BAD_REQUEST, "The number of rooms has reached maximum"),
+  ILLEGAL_LOCK_TYPE(1026, HttpStatus.BAD_REQUEST, "Lock type %s is not supported"),
+  NOT_ENOUGH_ROOMS(1027, HttpStatus.BAD_REQUEST, "Not enough rooms in room type %s"),
+  UNSUPPORTED_HASH_ALGORITHM(
+      1028, HttpStatus.INTERNAL_SERVER_ERROR, "Hash algorithm %s is not supported"),
   UNCATEGORIZED_EXCEPTION(9999, HttpStatus.INTERNAL_SERVER_ERROR, "Internal server error");
 
   int code;
@@ -48,9 +52,5 @@ public enum ErrorCode {
     this.code = code;
     this.httpStatus = httpStatus;
     this.message = message;
-  }
-
-  public String formatMessage(Object... args) {
-    return String.format(message, args);
   }
 }

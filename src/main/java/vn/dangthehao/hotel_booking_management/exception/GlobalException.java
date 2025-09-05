@@ -20,17 +20,14 @@ import vn.dangthehao.hotel_booking_management.enums.ErrorCode;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @RestControllerAdvice
 public class GlobalException {
-  String errorStatus = "Error";
+  static String errorStatus = "Error";
 
   @ExceptionHandler(AppException.class)
   public ResponseEntity<ApiResponse<Void>> handleAppException(AppException exception) {
     ErrorCode errorCode = exception.getErrorCode();
     ApiResponse<Void> response =
-        ApiResponse.<Void>builder()
-            .status(errorStatus)
-            .code(exception.getErrorCode().getCode())
-            .message(exception.getErrorMessage())
-            .build();
+        buildGeneralErrorResponse(
+            exception.getErrorCode().getCode(), exception.getErrorMessage(), null);
 
     return ResponseEntity.status(errorCode.getHttpStatus()).body(response);
   }
@@ -39,11 +36,7 @@ public class GlobalException {
   public ResponseEntity<ApiResponse<Void>> handleUncategorizedException() {
     ErrorCode errorCode = ErrorCode.UNCATEGORIZED_EXCEPTION;
     ApiResponse<Void> response =
-        ApiResponse.<Void>builder()
-            .status(errorStatus)
-            .code(errorCode.getCode())
-            .message(errorCode.getMessage())
-            .build();
+        buildGeneralErrorResponse(errorCode.getCode(), errorCode.getMessage(), null);
 
     return ResponseEntity.status(errorCode.getHttpStatus()).body(response);
   }
@@ -54,12 +47,7 @@ public class GlobalException {
     ErrorCode errorCode = ErrorCode.VALIDATION_FAILED;
     List<ErrorDetail> errors = extractErrors(exception);
     ApiResponse<Void> response =
-        ApiResponse.<Void>builder()
-            .status(errorStatus)
-            .code(errorCode.getCode())
-            .message(errorCode.getMessage())
-            .errors(errors)
-            .build();
+        buildGeneralErrorResponse(errorCode.getCode(), errorCode.getMessage(), errors);
 
     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
   }
@@ -69,11 +57,7 @@ public class GlobalException {
       DataIntegrityViolationException exception) {
     String message = getConstraintViolationMessage(exception);
     ApiResponse<Void> response =
-        ApiResponse.<Void>builder()
-            .status(errorStatus)
-            .code(ErrorCode.DUPLICATE_DATA.getCode())
-            .message(message)
-            .build();
+        buildGeneralErrorResponse(ErrorCode.DUPLICATE_DATA.getCode(), message, null);
 
     return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
   }
@@ -82,11 +66,7 @@ public class GlobalException {
   public ResponseEntity<ApiResponse<Void>> handleAccessDeniedException() {
     ErrorCode errorCode = ErrorCode.UNAUTHORIZED;
     ApiResponse<Void> response =
-        ApiResponse.<Void>builder()
-            .status(errorStatus)
-            .code(errorCode.getCode())
-            .message(errorCode.getMessage())
-            .build();
+        buildGeneralErrorResponse(errorCode.getCode(), errorCode.getMessage(), null);
 
     return ResponseEntity.status(errorCode.getHttpStatus()).body(response);
   }
@@ -119,5 +99,16 @@ public class GlobalException {
                   .build();
             })
         .toList();
+  }
+
+  private ApiResponse<Void> buildGeneralErrorResponse(
+      int code, String message, List<ErrorDetail> errors) {
+
+    return ApiResponse.<Void>builder()
+        .status(errorStatus)
+        .code(code)
+        .message(message)
+        .errors(errors)
+        .build();
   }
 }

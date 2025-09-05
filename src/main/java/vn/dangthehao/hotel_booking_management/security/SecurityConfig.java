@@ -37,7 +37,8 @@ public class SecurityConfig {
     "/api/v1/auth/sessions",
     "/api/v1/auth/tokens",
     "/api/v1/users",
-    "/api/v1/auth/passwords/resets/**"
+    "/api/v1/auth/passwords/resets/**",
+    "/api/v1/hotels/{hotelId}/room-types/{roomTypeId}/bookings"
   };
   String[] PUBLIC_GET_ENDPOINT = {
     "/avatars/**", "/roomTypeImages/**", "/hotelImages/**", "/api/v1/hotels/**"

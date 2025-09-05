@@ -1,0 +1,97 @@
+package vn.dangthehao.hotel_booking_management.util;
+
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.text.SimpleDateFormat;
+import java.util.*;
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
+import lombok.AccessLevel;
+import lombok.experimental.FieldDefaults;
+import vn.dangthehao.hotel_booking_management.dto.VNPParamsDTO;
+import vn.dangthehao.hotel_booking_management.enums.ErrorCode;
+import vn.dangthehao.hotel_booking_management.exception.AppException;
+
+@FieldDefaults(level = AccessLevel.PRIVATE)
+public class VNPUtil {
+
+  public static String buildPaymentUrl(VNPParamsDTO params) {
+    Map<String, String> vnpParams = new HashMap<>();
+    vnpParams.put("vnp_Version", params.getVersion());
+    vnpParams.put("vnp_Command", params.getCommand());
+    vnpParams.put("vnp_TmnCode", params.getTmnCode());
+    vnpParams.put("vnp_Amount", params.getAmount());
+    vnpParams.put("vnp_CurrCode", params.getCurrCode());
+    vnpParams.put("vnp_IpAddr", params.getClientIp());
+    vnpParams.put("vnp_Locale", params.getLocale());
+    vnpParams.put("vnp_TxnRef", params.getBookingId());
+    vnpParams.put("vnp_OrderInfo", params.getOrderInfo());
+    vnpParams.put("vnp_OrderType", params.getOrderType());
+    vnpParams.put("vnp_ReturnUrl", params.getReturnUrl());
+    vnpParams.put("vnp_ExpireDate", params.getExpireDate());
+
+    SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
+    Calendar cld = Calendar.getInstance(TimeZone.getTimeZone("Etc/GMT+7"));
+    String vnpCreateDate = sdf.format(cld.getTime());
+    vnpParams.put("vnp_CreateDate", vnpCreateDate);
+
+    List<String> fieldNames = new ArrayList<>(vnpParams.keySet());
+    Collections.sort(fieldNames);
+    StringBuilder hashData = new StringBuilder();
+    StringBuilder query = new StringBuilder();
+    Iterator<String> iterator = fieldNames.iterator();
+    while (iterator.hasNext()) {
+      String fieldName = iterator.next();
+      String fieldValue = vnpParams.get(fieldName);
+
+      // build hash data
+      hashData
+          .append(fieldName)
+          .append("=")
+          .append(URLEncoder.encode(fieldValue, StandardCharsets.UTF_8));
+
+      // build query
+      query
+          .append(URLEncoder.encode(fieldName, StandardCharsets.UTF_8))
+          .append("=")
+          .append(URLEncoder.encode(fieldValue, StandardCharsets.UTF_8));
+
+      if (iterator.hasNext()) {
+        hashData.append("&");
+        query.append("&");
+      }
+    }
+
+    query
+        .append("&vnp_SecureHash=")
+        .append(hmacSHA512(hashData.toString(), params.getHashSecret()));
+    String queryUrl = query.toString();
+
+    return params.getPayUrl() + "?" + queryUrl;
+  }
+
+  private static String hmacSHA512(String data, String key) {
+    Mac hmac512;
+    try {
+      hmac512 = Mac.getInstance("HmacSHA512");
+    } catch (NoSuchAlgorithmException e) {
+      throw new AppException(ErrorCode.UNSUPPORTED_HASH_ALGORITHM, "HmacSHA512");
+    }
+
+    SecretKeySpec secretKey = new SecretKeySpec(key.getBytes(StandardCharsets.UTF_8), "HmacSHA512");
+    try {
+      hmac512.init(secretKey);
+    } catch (InvalidKeyException e) {
+      throw new RuntimeException(e);
+    }
+    byte[] bytes = hmac512.doFinal(data.getBytes(StandardCharsets.UTF_8));
+    StringBuilder hash = new StringBuilder();
+    for (byte b : bytes) {
+      hash.append(String.format("%02x", b));
+    }
+
+    return hash.toString();
+  }
+}

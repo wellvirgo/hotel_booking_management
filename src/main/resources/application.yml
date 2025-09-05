@@ -66,3 +66,23 @@ file:
   user_avatar_folder_name: avatars
   room_type_img_folder_name: roomTypeImages
   hotel_img_folder_name: hotelImages
+
+#Lock strategy
+lock-strategy: pessimistic
+
+#Lenght of booking code
+booking-code:
+  length: 8
+
+#Config VNPay
+vnp:
+  version: 2.1.0
+  command: pay
+  tmnCode: ${vnp_TmnCode}
+  hashSecret: ${vnp_HashSecret}
+  payUrl: https://sandbox.vnpayment.vn/paymentv2/vpcpay.html
+  currCode: VND
+  locale: vn
+  orderType: 170000
+  returnUrl: http://127.0.0.1:5500
+  orderInfoPattern: "Thanh toán cho booking có Booking code: %s"
