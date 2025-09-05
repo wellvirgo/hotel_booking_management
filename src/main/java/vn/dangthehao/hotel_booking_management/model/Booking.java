@@ -17,7 +17,7 @@ import vn.dangthehao.hotel_booking_management.enums.BookingStatus;
 @Entity
 public class Booking extends BaseEntity {
   @ManyToOne
-  @JoinColumn(name = "user_id", nullable = false)
+  @JoinColumn(name = "user_id")
   User user;
 
   @ManyToOne
@@ -46,6 +46,13 @@ public class Booking extends BaseEntity {
 
   @Enumerated(value = EnumType.STRING)
   BookingStatus status = BookingStatus.PENDING;
+
+  String guestName;
+  String guestPhone;
+  String guestEmail;
+
+  @Column(unique = true)
+  String bookingCode;
 
   @OneToMany(mappedBy = "booking")
   Set<BookingRoom> bookingRooms;

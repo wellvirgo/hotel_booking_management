@@ -62,7 +62,7 @@ public class RoomTypeService {
   @PreAuthorize("@hotelService.isOwner(#hotelId, authentication.principal)")
   public ApiResponse<RoomTypeCrtResponse> create(
       Long hotelId, RoomTypeCrtRequest request, List<MultipartFile> imageFiles) {
-    Hotel hotel = validateAndGetHotel(hotelId);
+    Hotel hotel = hotelService.findApprovedHotelById(hotelId);
     RoomType roomType = buildRoomType(hotel, request, imageFiles);
     RoomType savedRoomType = roomTypeRepository.save(roomType);
     RoomTypeCrtResponse roomTypeCrtResponse = buildRoomTypeCrtResponse(savedRoomType, hotel);
@@ -77,6 +77,12 @@ public class RoomTypeService {
   public RoomType findById(Long id) {
     return roomTypeRepository
         .findById(id)
+        .orElseThrow(() -> new AppException(ErrorCode.ROOM_TYPE_NOT_FOUND, id));
+  }
+
+  public RoomType findActiveRoomTypeById(Long id) {
+    return roomTypeRepository
+        .findByIdAndIsActiveTrue(id)
         .orElseThrow(() -> new AppException(ErrorCode.ROOM_TYPE_NOT_FOUND, id));
   }
 
@@ -125,13 +131,6 @@ public class RoomTypeService {
 
     String message = String.format("Detail of information about room type %s", roomType.getName());
     return responseGenerator.generateSuccessResponse(message, response);
-  }
-
-  private Hotel validateAndGetHotel(Long hotelId) {
-    Hotel hotel = hotelService.findById(hotelId);
-    if (!hotel.isApproved()) throw new AppException(ErrorCode.HOTEL_NOT_APPROVED);
-
-    return hotel;
   }
 
   private RoomType buildRoomType(

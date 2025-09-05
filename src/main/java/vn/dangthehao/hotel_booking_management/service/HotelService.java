@@ -74,6 +74,16 @@ public class HotelService {
         .orElseThrow(() -> new AppException(ErrorCode.HOTEL_NOT_FOUND));
   }
 
+  public Hotel findApprovedHotelById(Long id) {
+    return hotelRepository
+        .findByIdAndIsDeletedFalseAndIsApprovedTrue(id)
+        .orElseThrow(() -> new AppException(ErrorCode.HOTEL_NOT_APPROVED));
+  }
+
+  public boolean isDepositRequired(Hotel hotel) {
+    return hotel.getDepositRate() != null;
+  }
+
   public ApiResponse<HotelRegistrationResponse> register(
       HotelRegistrationRequest request, MultipartFile thumbnailFile, Jwt jwt) {
     Hotel registeredHotel = createHotelFromRequest(request, thumbnailFile, jwt);
@@ -148,8 +158,8 @@ public class HotelService {
   public ApiResponse<OwnerHotelsResponse> findHotelsByOwner(
       Jwt jwt, String isApproved, int page, int size) {
     Pageable pageable = PageRequest.of(page - 1, size);
-    Page<OwnerHotelItemDTO> ownerHotelItemDTOPage = null;
-    OwnerHotelsResponse ownerHotelsResponse = null;
+    Page<OwnerHotelItemDTO> ownerHotelItemDTOPage;
+    OwnerHotelsResponse ownerHotelsResponse;
     if ("false".equals(isApproved)) {
       ownerHotelItemDTOPage =
           hotelRepository.findUnApprovedHotelsByOwner(pageable, jwtUtil.getUserID(jwt));
@@ -264,7 +274,7 @@ public class HotelService {
     List<Long> roomTypeIds = roomTypes.stream().map(RoomType::getId).toList();
 
     return roomInventoryRepository
-        .findByRoomTypeIdAndDateRange(roomTypeIds, checkIn, checkOut.minusDays(1))
+        .findByRoomTypeIdsAndDateRange(roomTypeIds, checkIn, checkOut.minusDays(1))
         .stream()
         .collect(Collectors.groupingBy(ri -> ri.getRoomType().getId()));
   }

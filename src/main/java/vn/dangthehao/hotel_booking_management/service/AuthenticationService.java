@@ -9,6 +9,8 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.oauth2.jwt.Jwt;
@@ -21,6 +23,7 @@ import vn.dangthehao.hotel_booking_management.enums.ErrorCode;
 import vn.dangthehao.hotel_booking_management.exception.AppException;
 import vn.dangthehao.hotel_booking_management.model.RefreshToken;
 import vn.dangthehao.hotel_booking_management.model.User;
+import vn.dangthehao.hotel_booking_management.security.AuthenticationFacade;
 import vn.dangthehao.hotel_booking_management.security.CustomDecoder;
 import vn.dangthehao.hotel_booking_management.security.TokenGenerator;
 import vn.dangthehao.hotel_booking_management.util.JwtUtil;
@@ -43,6 +46,7 @@ public class AuthenticationService {
   ResponseGenerator responseGenerator;
   JwtUtil jwtUtil;
   RedisService redisService;
+  AuthenticationFacade authenticationFacade;
 
   public ApiResponse<AuthResponse> authenticate(AuthRequest request) {
     User user = checkUsernameAndPassword(request);
@@ -162,6 +166,17 @@ public class AuthenticationService {
     LocalDateTime expiredTime =
         TimeConverter.instantToLocalDateTime(Objects.requireNonNull(jwtToken.getExpiresAt()));
     return expiredTime.isBefore(TimeConverter.instantToLocalDateTime(Instant.now()));
+  }
+
+  public boolean isLoggedIn() {
+    Authentication auth = authenticationFacade.getAuthentication();
+    return auth != null
+        && auth.isAuthenticated()
+        && !(auth instanceof AnonymousAuthenticationToken);
+  }
+
+  public Jwt getJwt() {
+    return (Jwt) authenticationFacade.getAuthentication().getPrincipal();
   }
 
   private User validatePasswordAndGetUser(ChangePasswordRequest request, Jwt jwt) {

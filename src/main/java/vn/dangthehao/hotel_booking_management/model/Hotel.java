@@ -1,6 +1,7 @@
 package vn.dangthehao.hotel_booking_management.model;
 
 import jakarta.persistence.*;
+import java.time.LocalTime;
 import java.util.Objects;
 import java.util.Set;
 import lombok.*;
@@ -43,7 +44,13 @@ public class Hotel extends BaseEntity {
   boolean isDeleted;
 
   Float depositRate;
-  long depositDeadlineMinutes;
+  Long depositDeadlineMinutes;
+
+  @Column(nullable = false)
+  LocalTime checkInTime;
+
+  @Column(nullable = false)
+  LocalTime checkOutTime;
 
   @OneToMany(mappedBy = "hotel")
   Set<RoomType> roomTypes;
