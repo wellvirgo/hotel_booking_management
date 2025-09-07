@@ -36,18 +36,14 @@ public class Room extends BaseEntity {
 
   @Override
   public boolean equals(Object object) {
+    if (this == object) return true;
     if (object == null || getClass() != object.getClass()) return false;
     Room room = (Room) object;
-    return isActive == room.isActive
-        && Objects.equals(roomType, room.roomType)
-        && Objects.equals(roomNumber, room.roomNumber)
-        && Objects.equals(description, room.description)
-        && status == room.status
-        && Objects.equals(bookingRooms, room.bookingRooms);
+    return Objects.equals(roomNumber, room.roomNumber);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(roomType, roomNumber, description, isActive, status, bookingRooms);
+    return Objects.hashCode(roomNumber);
   }
 }

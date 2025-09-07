@@ -28,24 +28,21 @@ public class Payment extends BaseEntity {
   PaymentMethod paymentMethod;
 
   @Column(nullable = false, unique = true)
-  String transaction_id;
+  String transactionId;
 
   @Enumerated(value = EnumType.STRING)
   PaymentStatus status = PaymentStatus.DEPOSIT_PENDING;
 
   @Override
-  public boolean equals(Object o) {
-    if (o == null || getClass() != o.getClass()) return false;
-    Payment payment = (Payment) o;
-    return Objects.equals(booking, payment.booking)
-        && Objects.equals(amount, payment.amount)
-        && paymentMethod == payment.paymentMethod
-        && Objects.equals(transaction_id, payment.transaction_id)
-        && status == payment.status;
+  public boolean equals(Object object) {
+    if (this == object) return true;
+    if (object == null || getClass() != object.getClass()) return false;
+    Payment payment = (Payment) object;
+    return Objects.equals(transactionId, payment.transactionId);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(booking, amount, paymentMethod, transaction_id, status);
+    return Objects.hashCode(transactionId);
   }
 }

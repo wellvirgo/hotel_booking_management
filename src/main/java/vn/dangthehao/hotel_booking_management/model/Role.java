@@ -30,15 +30,14 @@ public class Role extends BaseEntity {
 
   @Override
   public boolean equals(Object o) {
+    if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
     Role role = (Role) o;
-    return Objects.equals(roleName, role.roleName)
-        && Objects.equals(description, role.description)
-        && Objects.equals(permissions, role.permissions);
+    return Objects.equals(roleName, role.roleName);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(roleName, description, permissions);
+    return Objects.hash(roleName);
   }
 }

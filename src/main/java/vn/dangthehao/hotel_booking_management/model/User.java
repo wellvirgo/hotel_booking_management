@@ -37,18 +37,15 @@ public class User extends BaseEntity {
   String avatar;
 
   @Override
-  public boolean equals(Object o) {
-    if (o == null || getClass() != o.getClass()) return false;
-    User user = (User) o;
-    return Objects.equals(username, user.username)
-        && Objects.equals(password, user.password)
-        && Objects.equals(fullName, user.fullName)
-        && Objects.equals(email, user.email)
-        && Objects.equals(phone, user.phone);
+  public boolean equals(Object object) {
+    if (this == object) return true;
+    if (object == null || getClass() != object.getClass()) return false;
+    User user = (User) object;
+    return Objects.equals(username, user.username) && Objects.equals(email, user.email);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(username, password, fullName, email, phone);
+    return Objects.hash(username, email);
   }
 }

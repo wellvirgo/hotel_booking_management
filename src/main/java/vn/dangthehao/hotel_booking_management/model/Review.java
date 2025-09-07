@@ -31,17 +31,15 @@ public class Review extends BaseEntity {
   String comment;
 
   @Override
-  public boolean equals(Object o) {
-    if (o == null || getClass() != o.getClass()) return false;
-    Review review = (Review) o;
-    return rating == review.rating
-        && Objects.equals(user, review.user)
-        && Objects.equals(hotel, review.hotel)
-        && Objects.equals(comment, review.comment);
+  public boolean equals(Object object) {
+    if (this == object) return true;
+    if (object == null || getClass() != object.getClass()) return false;
+    Review review = (Review) object;
+    return Objects.equals(getId(), review.getId());
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(user, hotel, rating, comment);
+    return Objects.hashCode(getClass().hashCode());
   }
 }

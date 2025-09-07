@@ -2,6 +2,7 @@ package vn.dangthehao.hotel_booking_management.model;
 
 import jakarta.persistence.*;
 import java.time.LocalDate;
+import java.util.Objects;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -27,4 +28,17 @@ public class RoomInventory extends BaseEntity {
   int totalRooms;
 
   int availableRooms;
+
+  @Override
+  public boolean equals(Object object) {
+    if (this == object) return true;
+    if (object == null || getClass() != object.getClass()) return false;
+    RoomInventory that = (RoomInventory) object;
+    return Objects.equals(getId(), that.getId());
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hashCode(getClass().hashCode());
+  }
 }

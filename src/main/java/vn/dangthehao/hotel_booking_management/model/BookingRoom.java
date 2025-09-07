@@ -29,15 +29,14 @@ public class BookingRoom extends BaseEntity {
 
   @Override
   public boolean equals(Object object) {
+    if (this == object) return true;
     if (object == null || getClass() != object.getClass()) return false;
     BookingRoom that = (BookingRoom) object;
-    return Objects.equals(booking, that.booking)
-        && Objects.equals(room, that.room)
-        && Objects.equals(note, that.note);
+    return getId() != null && Objects.equals(getId(), that.getId());
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(booking, room, note);
+    return getClass().hashCode();
   }
 }

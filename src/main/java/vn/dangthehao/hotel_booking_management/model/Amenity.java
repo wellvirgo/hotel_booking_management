@@ -22,13 +22,14 @@ public class Amenity extends BaseEntity {
 
   @Override
   public boolean equals(Object object) {
+    if (this == object) return true;
     if (object == null || getClass() != object.getClass()) return false;
     Amenity amenity = (Amenity) object;
-    return isActive == amenity.isActive && Objects.equals(name, amenity.name);
+    return Objects.equals(name, amenity.name);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(name, isActive);
+    return Objects.hash(name);
   }
 }

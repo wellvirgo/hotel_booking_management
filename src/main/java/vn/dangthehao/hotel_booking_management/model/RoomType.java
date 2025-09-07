@@ -52,33 +52,15 @@ public class RoomType extends BaseEntity {
 
   @Override
   public boolean equals(Object object) {
+    if (this == object) return true;
     if (object == null || getClass() != object.getClass()) return false;
     RoomType roomType = (RoomType) object;
-    return capacity == roomType.capacity
-        && numOfBeds == roomType.numOfBeds
-        && totalRooms == roomType.totalRooms
-        && isActive == roomType.isActive
-        && Objects.equals(hotel, roomType.hotel)
-        && Objects.equals(name, roomType.name)
-        && Objects.equals(description, roomType.description)
-        && Objects.equals(pricePerNight, roomType.pricePerNight)
-        && Objects.equals(bedType, roomType.bedType)
-        && Objects.equals(amenities, roomType.amenities);
+    return Objects.equals(getId(), roomType.getId());
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(
-        hotel,
-        name,
-        description,
-        pricePerNight,
-        capacity,
-        numOfBeds,
-        bedType,
-        totalRooms,
-        isActive,
-        amenities);
+    return Objects.hashCode(getClass().hashCode());
   }
 
   public Long getIdOfHotel() {

@@ -3,6 +3,7 @@ package vn.dangthehao.hotel_booking_management.model;
 import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Objects;
 import java.util.Set;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -51,9 +52,21 @@ public class Booking extends BaseEntity {
   String guestPhone;
   String guestEmail;
 
-  @Column(unique = true)
+  @Column(nullable = false, unique = true)
   String bookingCode;
 
   @OneToMany(mappedBy = "booking")
   Set<BookingRoom> bookingRooms;
+
+  @Override
+  public boolean equals(Object object) {
+    if (object == null || getClass() != object.getClass()) return false;
+    Booking booking = (Booking) object;
+    return Objects.equals(bookingCode, booking.bookingCode);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hashCode(bookingCode);
+  }
 }
