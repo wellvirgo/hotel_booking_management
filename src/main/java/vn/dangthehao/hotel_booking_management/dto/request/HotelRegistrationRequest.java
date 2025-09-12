@@ -26,12 +26,12 @@ public class HotelRegistrationRequest {
 
   String description;
 
-  @DecimalMin(value = "0", inclusive = false)
+  @DecimalMin(value = "0")
   @DecimalMax(value = "1")
-  Float depositRate;
+  float depositRate;
 
-  @DecimalMin(value = "0", inclusive = false)
-  Long depositDeadlineMinutes;
+  @DecimalMin(value = "0")
+  long depositDeadlineMinutes;
 
   @NotNull(message = "Check-in time is required")
   LocalTime checkInTime;

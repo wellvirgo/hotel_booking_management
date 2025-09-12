@@ -81,7 +81,7 @@ public class HotelService {
   }
 
   public boolean isDepositRequired(Hotel hotel) {
-    return hotel.getDepositRate() != null;
+    return hotel.getDepositRate() > 0;
   }
 
   public ApiResponse<HotelRegistrationResponse> register(

@@ -19,8 +19,8 @@ public class HotelRegistrationResponse {
   String location;
   String description;
   String thumbnailUrl;
-  Float depositRate;
-  Long depositDeadlineMinutes;
+  float depositRate;
+  long depositDeadlineMinutes;
   LocalTime checkInTime;
   LocalTime checkOutTime;
   String status;

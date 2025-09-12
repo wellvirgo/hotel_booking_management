@@ -17,8 +17,8 @@ public class DetailHotelResponse {
   String description;
   float rating;
   String status;
-  Float depositRate;
-  Float depositDeadlineHours;
+  float depositRate;
+  long depositDeadlineMinutes;
   LocalTime checkInTime;
   LocalTime checkOutTime;
   String ownerFullName;

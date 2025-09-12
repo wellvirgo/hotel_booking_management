@@ -6,6 +6,7 @@ import java.util.Objects;
 import java.util.Set;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import org.hibernate.annotations.Check;
 import vn.dangthehao.hotel_booking_management.enums.HotelStatus;
 
 @Getter
@@ -15,6 +16,14 @@ import vn.dangthehao.hotel_booking_management.enums.HotelStatus;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Entity
+@Check(
+    constraints =
+        "deposit_rate = 0 AND deposit_deadline_minutes = 0"
+            + " OR"
+            + " deposit_rate >0 AND deposit_deadline_minutes > 0")
+/* deposit_rate = 0 && deposit_deadline_minutes = 0 -> not deposit required
+* deposit_rate >0 AND deposit_deadline_minutes > 0 -> deposit required
+* */
 public class Hotel extends BaseEntity {
   @Column(nullable = false)
   String hotelName;
@@ -43,8 +52,11 @@ public class Hotel extends BaseEntity {
   @Column(columnDefinition = "boolean default false", nullable = false)
   boolean isDeleted;
 
-  Float depositRate;
-  Long depositDeadlineMinutes;
+  @Column(nullable = false)
+  float depositRate;
+
+  @Column(nullable = false)
+  long depositDeadlineMinutes;
 
   @Column(nullable = false)
   LocalTime checkInTime;
