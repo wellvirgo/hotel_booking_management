@@ -16,8 +16,12 @@ public class BookingResponse {
   Long id;
   String bookingCode;
   BookingStatus status;
+  LocalDateTime checkIn;
+  LocalDateTime checkOut;
   BigDecimal totalPrice;
   BigDecimal depositAmount;
+  boolean depositRequired;
   LocalDateTime expiresAt;
   String depositPaymentUrl;
+  LocalDateTime createdAt;
 }

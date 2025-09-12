@@ -22,8 +22,8 @@ import vn.dangthehao.hotel_booking_management.enums.HotelStatus;
             + " OR"
             + " deposit_rate >0 AND deposit_deadline_minutes > 0")
 /* deposit_rate = 0 && deposit_deadline_minutes = 0 -> not deposit required
-* deposit_rate >0 AND deposit_deadline_minutes > 0 -> deposit required
-* */
+ * deposit_rate >0 AND deposit_deadline_minutes > 0 -> deposit required
+ * */
 public class Hotel extends BaseEntity {
   @Column(nullable = false)
   String hotelName;

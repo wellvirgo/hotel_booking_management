@@ -16,6 +16,7 @@ import vn.dangthehao.hotel_booking_management.dto.request.BookingRequest;
 import vn.dangthehao.hotel_booking_management.dto.request.PaymentRequest;
 import vn.dangthehao.hotel_booking_management.dto.response.ApiResponse;
 import vn.dangthehao.hotel_booking_management.dto.response.BookingResponse;
+import vn.dangthehao.hotel_booking_management.enums.BookingPaymentStatus;
 import vn.dangthehao.hotel_booking_management.enums.BookingStatus;
 import vn.dangthehao.hotel_booking_management.enums.ErrorCode;
 import vn.dangthehao.hotel_booking_management.exception.AppException;
@@ -135,6 +136,7 @@ public class BookingService {
             .depositAmount(depositAmount)
             .depositDeadline(depositDeadline)
             .status(status)
+            .paymentStatus(BookingPaymentStatus.PENDING)
             .build();
     setGuestInfo(booking, bookingRequest);
 
@@ -170,7 +172,7 @@ public class BookingService {
   }
 
   private LocalDateTime calculateDepositDeadline(Hotel hotel) {
-    if (hotel.getDepositDeadlineMinutes() == null) return null;
+    if (!hotelService.isDepositRequired(hotel)) return null;
     return LocalDateTime.now().plusMinutes(hotel.getDepositDeadlineMinutes());
   }
 
@@ -178,13 +180,17 @@ public class BookingService {
       BookingRequest bookingRequest, Booking booking, Hotel hotel) {
     PaymentRequest paymentRequest =
         PaymentRequest.builder().booking(booking).clientIp(bookingRequest.getClientIp()).build();
-    String depositPaymentUrl = paymentService.createPaymentUrl(paymentRequest);
+
     BookingResponse bookingResponse = bookingMapper.toBookingResponse(booking);
+
+    boolean depositRequired = hotelService.isDepositRequired(hotel);
+    String depositPaymentUrl =
+        depositRequired ? paymentService.createDepositPaymentUrl(paymentRequest) : null;
+    bookingResponse.setDepositRequired(depositRequired);
     bookingResponse.setDepositPaymentUrl(depositPaymentUrl);
-    String message =
-        hotelService.isDepositRequired(hotel)
-            ? DEPOSIT_REQUIREMENT_MESS
-            : NOT_DEPOSIT_REQUIREMENT_MESS;
+
+    // Message for api booking response
+    String message = depositRequired ? DEPOSIT_REQUIREMENT_MESS : NOT_DEPOSIT_REQUIREMENT_MESS;
 
     return responseGenerator.generateSuccessResponse(message, bookingResponse);
   }

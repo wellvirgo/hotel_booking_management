@@ -6,7 +6,7 @@ import java.util.Objects;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import vn.dangthehao.hotel_booking_management.enums.PaymentMethod;
-import vn.dangthehao.hotel_booking_management.enums.PaymentStatus;
+import vn.dangthehao.hotel_booking_management.enums.PaymentRecordStatus;
 
 @Getter
 @Setter
@@ -30,8 +30,11 @@ public class Payment extends BaseEntity {
   @Column(nullable = false, unique = true)
   String transactionId;
 
+  String gatewayTransactionId;
+
+  @Column(nullable = false)
   @Enumerated(value = EnumType.STRING)
-  PaymentStatus status = PaymentStatus.DEPOSIT_PENDING;
+  PaymentRecordStatus status;
 
   @Override
   public boolean equals(Object object) {

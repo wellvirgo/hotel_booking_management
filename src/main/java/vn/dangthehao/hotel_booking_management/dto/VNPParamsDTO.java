@@ -19,7 +19,7 @@ public class VNPParamsDTO {
   String returnUrl;
   String clientIp;
   String expireDate;
-  String bookingId;
+  String txnRef;
   String orderInfo;
   String amount;
 }

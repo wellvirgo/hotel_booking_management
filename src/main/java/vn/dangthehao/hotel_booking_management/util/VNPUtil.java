@@ -1,10 +1,14 @@
 package vn.dangthehao.hotel_booking_management.util;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
@@ -26,7 +30,7 @@ public class VNPUtil {
     vnpParams.put("vnp_CurrCode", params.getCurrCode());
     vnpParams.put("vnp_IpAddr", params.getClientIp());
     vnpParams.put("vnp_Locale", params.getLocale());
-    vnpParams.put("vnp_TxnRef", params.getBookingId());
+    vnpParams.put("vnp_TxnRef", params.getTxnRef());
     vnpParams.put("vnp_OrderInfo", params.getOrderInfo());
     vnpParams.put("vnp_OrderType", params.getOrderType());
     vnpParams.put("vnp_ReturnUrl", params.getReturnUrl());
@@ -70,6 +74,17 @@ public class VNPUtil {
     String queryUrl = query.toString();
 
     return params.getPayUrl() + "?" + queryUrl;
+  }
+
+  public static String formatAmount(BigDecimal amount) {
+    BigDecimal amount100x = amount.multiply(new BigDecimal(100)).setScale(0, RoundingMode.HALF_UP);
+
+    return String.valueOf(amount100x);
+  }
+
+  public static String formatDate(LocalDateTime dateTime) {
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
+    return dateTime.format(formatter);
   }
 
   private static String hmacSHA512(String data, String key) {

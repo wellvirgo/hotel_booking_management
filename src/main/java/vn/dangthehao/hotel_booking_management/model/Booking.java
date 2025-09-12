@@ -7,6 +7,7 @@ import java.util.Objects;
 import java.util.Set;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import vn.dangthehao.hotel_booking_management.enums.BookingPaymentStatus;
 import vn.dangthehao.hotel_booking_management.enums.BookingStatus;
 
 @Getter
@@ -45,6 +46,7 @@ public class Booking extends BaseEntity {
 
   LocalDateTime depositDeadline;
 
+  @Column(nullable = false)
   @Enumerated(value = EnumType.STRING)
   BookingStatus status = BookingStatus.PENDING;
 
@@ -57,6 +59,10 @@ public class Booking extends BaseEntity {
 
   @OneToMany(mappedBy = "booking")
   Set<BookingRoom> bookingRooms;
+
+  @Column(nullable = false)
+  @Enumerated(value = EnumType.STRING)
+  BookingPaymentStatus paymentStatus; // shows payment status of booking for easy query
 
   @Override
   public boolean equals(Object object) {
