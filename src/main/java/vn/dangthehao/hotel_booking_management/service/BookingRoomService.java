@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.stereotype.Service;
 import vn.dangthehao.hotel_booking_management.dto.request.BookingRequest;
+import vn.dangthehao.hotel_booking_management.enums.RoomStatus;
 import vn.dangthehao.hotel_booking_management.model.Booking;
 import vn.dangthehao.hotel_booking_management.model.BookingRoom;
 import vn.dangthehao.hotel_booking_management.model.Room;
@@ -23,14 +24,17 @@ public class BookingRoomService {
   public void createBookingRoom(BookingRequest bookingRequest, Booking booking) {
 
     List<Room> availableRooms = roomService.getAvailableRoomsForBooking(bookingRequest);
-    for (Room room : availableRooms) {
-      BookingRoom bookingRoom =
-          BookingRoom.builder()
-              .booking(booking)
-              .room(room)
-              .note(String.format(NOTE_PATTERN, booking.getBookingCode()))
-              .build();
-      bookingRoomRepository.save(bookingRoom);
-    }
+    List<BookingRoom> bookingRooms =
+        availableRooms.stream()
+            .map(
+                room ->
+                    BookingRoom.builder()
+                        .booking(booking)
+                        .room(room)
+                        .note(String.format(NOTE_PATTERN, booking.getBookingCode()))
+                        .build())
+            .toList();
+    bookingRoomRepository.saveAll(bookingRooms);
+    roomService.updateRoomsWithStatus(availableRooms, RoomStatus.BOOKED);
   }
 }

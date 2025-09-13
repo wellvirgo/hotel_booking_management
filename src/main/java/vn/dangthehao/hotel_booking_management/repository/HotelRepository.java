@@ -23,6 +23,7 @@ public interface HotelRepository extends JpaRepository<Hotel, Long> {
 
   Optional<Hotel> findByIdAndIsDeletedFalse(Long id);
 
+  @EntityGraph(attributePaths = {})
   Optional<Hotel> findByIdAndIsDeletedFalseAndIsApprovedTrue(Long id);
 
   @Query(

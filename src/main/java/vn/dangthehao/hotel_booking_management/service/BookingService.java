@@ -68,7 +68,7 @@ public class BookingService {
             status -> {
               // Lock to avoid overbooking
               lockAndValidateInventory(bookingLockStrategy, bookingRequest);
-              // Create a temporal booking
+              // Create a booking
               Booking booking = createBooking(hotel, roomType, bookingRequest);
               // Map room with booking
               bookingRoomService.createBookingRoom(bookingRequest, booking);
@@ -160,7 +160,10 @@ public class BookingService {
   private BigDecimal calculateTotalPrice(RoomType roomType, BookingRequest bookingRequest) {
     long nights =
         ChronoUnit.DAYS.between(bookingRequest.getCheckIn(), bookingRequest.getCheckOut());
-    return roomType.getPricePerNight().multiply(BigDecimal.valueOf(nights));
+    return roomType
+        .getPricePerNight()
+        .multiply(BigDecimal.valueOf(nights))
+        .multiply(BigDecimal.valueOf(bookingRequest.getNumRooms()));
   }
 
   private BigDecimal calculateDepositAmount(Hotel hotel, BigDecimal totalPrice) {

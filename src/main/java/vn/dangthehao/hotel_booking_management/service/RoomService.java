@@ -45,9 +45,14 @@ public class RoomService {
   }
 
   public List<Room> getAvailableRoomsForBooking(BookingRequest bookingRequest) {
-    Pageable limitRoom = PageRequest.of(0, bookingRequest.getNumRooms());
+    Pageable limit = PageRequest.of(0, bookingRequest.getNumRooms());
     return roomRepository.findByRoomTypeIdAndStatusOrderByRoomNumberAsc(
-        bookingRequest.getRoomTypeId(), RoomStatus.AVAILABLE, limitRoom);
+        bookingRequest.getRoomTypeId(), RoomStatus.AVAILABLE, limit);
+  }
+
+  public void updateRoomsWithStatus(List<Room> oldListRoom, RoomStatus status) {
+    oldListRoom.forEach(room -> room.setStatus(status));
+    roomRepository.saveAll(oldListRoom);
   }
 
   private RoomCrtResponse generateRoomCrtResponse(Room room, RoomType roomType) {
