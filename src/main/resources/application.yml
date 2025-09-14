@@ -84,5 +84,5 @@ vnp:
   currCode: VND
   locale: vn
   orderType: 170000
-  returnUrl: http://127.0.0.1:5500
+  returnUrl: https://wellvirgo.github.io/Booking_UI
   orderInfoPattern: "Thanh toán cho booking có Booking code: %s"

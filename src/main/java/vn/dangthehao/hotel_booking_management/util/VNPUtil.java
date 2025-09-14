@@ -20,6 +20,7 @@ import vn.dangthehao.hotel_booking_management.exception.AppException;
 
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class VNPUtil {
+  static final long DEFAULT_PAYMENT_LINK_VALID_MINUTES = 15;
 
   public static String buildPaymentUrl(VNPParamsDTO params) {
     Map<String, String> vnpParams = new HashMap<>();
@@ -80,9 +81,18 @@ public class VNPUtil {
     return String.valueOf(amount100x);
   }
 
-  public static String formatDate(LocalDateTime dateTime) {
+  public static String generateExpTime(Long deadLineMinutes) {
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
-    return dateTime.format(formatter);
+
+    if (deadLineMinutes < DEFAULT_PAYMENT_LINK_VALID_MINUTES) {
+      long paymentLinkValidMinutes = deadLineMinutes / 2;
+      LocalDateTime expTime = LocalDateTime.now().plusMinutes(paymentLinkValidMinutes);
+      return expTime.format(formatter);
+    }
+
+    LocalDateTime defaultExpTime =
+        LocalDateTime.now().plusMinutes(DEFAULT_PAYMENT_LINK_VALID_MINUTES);
+    return defaultExpTime.format(formatter);
   }
 
   public static String hmacSHA512(String data, String key) {

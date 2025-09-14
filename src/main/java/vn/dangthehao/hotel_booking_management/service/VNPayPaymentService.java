@@ -56,7 +56,7 @@ public class VNPayPaymentService implements PaymentService {
     String clientIp = paymentRequest.getClientIp();
     String amountString = VNPUtil.formatAmount(booking.getDepositAmount());
     String orderInfo = String.format(orderInfoPattern, booking.getBookingCode());
-    String expireDate = VNPUtil.formatDate(booking.getDepositDeadline());
+    String expireDate = VNPUtil.generateExpTime(booking.getHotel().getDepositDeadlineMinutes());
     Payment payment = createPayment(booking, booking.getDepositAmount());
 
     VNPParamsDTO vnpParamsDTO =
