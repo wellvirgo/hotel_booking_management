@@ -41,7 +41,7 @@ public class SecurityConfig {
     "/api/v1/hotels/{hotelId}/room-types/{roomTypeId}/bookings"
   };
   String[] PUBLIC_GET_ENDPOINT = {
-    "/avatars/**", "/roomTypeImages/**", "/hotelImages/**", "/api/v1/hotels/**"
+    "/avatars/**", "/roomTypeImages/**", "/hotelImages/**", "/api/v1/hotels/**", "/api/v1/vnpay/**"
   };
   String[] PUBLIC_PUT_ENDPOINT = {"/api/v1/auth/passwords/resets"};
 

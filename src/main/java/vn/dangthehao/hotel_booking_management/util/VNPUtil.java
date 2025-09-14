@@ -41,11 +41,9 @@ public class VNPUtil {
     String vnpCreateDate = sdf.format(cld.getTime());
     vnpParams.put("vnp_CreateDate", vnpCreateDate);
 
-    List<String> fieldNames = new ArrayList<>(vnpParams.keySet());
-    Collections.sort(fieldNames);
     StringBuilder hashData = new StringBuilder();
     StringBuilder query = new StringBuilder();
-    Iterator<String> iterator = fieldNames.iterator();
+    Iterator<String> iterator = sortFieldNames(vnpParams);
     while (iterator.hasNext()) {
       String fieldName = iterator.next();
       String fieldValue = vnpParams.get(fieldName);
@@ -87,7 +85,7 @@ public class VNPUtil {
     return dateTime.format(formatter);
   }
 
-  private static String hmacSHA512(String data, String key) {
+  public static String hmacSHA512(String data, String key) {
     Mac hmac512;
     try {
       hmac512 = Mac.getInstance("HmacSHA512");
@@ -108,5 +106,36 @@ public class VNPUtil {
     }
 
     return hash.toString();
+  }
+
+  public static boolean validateCheckSum(Map<String, String> params, String hashSecret) {
+    String vnpSecureHash = params.remove("vnp_SecureHash");
+    params.remove("vnp_SecureHashType");
+
+    StringBuilder hashData = new StringBuilder();
+    Iterator<String> sortedFieldNamesIterator = sortFieldNames(params);
+    while (sortedFieldNamesIterator.hasNext()) {
+      String fieldName = sortedFieldNamesIterator.next();
+      String fieldValue = params.get(fieldName);
+
+      if (fieldValue != null && !fieldValue.isBlank()) {
+        hashData
+            .append(fieldName)
+            .append("=")
+            .append(URLEncoder.encode(fieldValue, StandardCharsets.UTF_8));
+      }
+
+      if (sortedFieldNamesIterator.hasNext()) {
+        hashData.append("&");
+      }
+    }
+
+    return hmacSHA512(hashData.toString(), hashSecret).equals(vnpSecureHash);
+  }
+
+  private static Iterator<String> sortFieldNames(Map<String, String> params) {
+    List<String> fieldNames = new ArrayList<>(params.keySet());
+    Collections.sort(fieldNames);
+    return fieldNames.iterator();
   }
 }
