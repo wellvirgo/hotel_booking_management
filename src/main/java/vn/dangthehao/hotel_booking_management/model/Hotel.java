@@ -44,7 +44,7 @@ public class Hotel extends BaseEntity {
 
   @Column(nullable = false)
   @Enumerated(value = EnumType.STRING)
-  HotelStatus status = HotelStatus.INACTIVE;
+  HotelStatus status;
 
   @Column(columnDefinition = "boolean default false", nullable = false)
   boolean approved;

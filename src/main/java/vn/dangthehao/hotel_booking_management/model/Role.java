@@ -1,7 +1,6 @@
 package vn.dangthehao.hotel_booking_management.model;
 
 import jakarta.persistence.*;
-import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 import lombok.*;
@@ -26,7 +25,7 @@ public class Role extends BaseEntity {
       name = "role_permission",
       joinColumns = @JoinColumn(name = "role_id"),
       inverseJoinColumns = @JoinColumn(name = "permission_id"))
-  Set<Permission> permissions = new HashSet<>();
+  Set<Permission> permissions;
 
   @Override
   public boolean equals(Object o) {

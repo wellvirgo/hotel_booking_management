@@ -29,7 +29,7 @@ public class Room extends BaseEntity {
 
   @Enumerated(value = EnumType.STRING)
   @Column(nullable = false)
-  RoomStatus status = RoomStatus.AVAILABLE;
+  RoomStatus status;
 
   @OneToMany(mappedBy = "room")
   Set<BookingRoom> bookingRooms;

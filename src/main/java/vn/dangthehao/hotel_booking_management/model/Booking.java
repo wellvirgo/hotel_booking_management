@@ -51,7 +51,7 @@ public class Booking extends BaseEntity {
 
   @Column(nullable = false)
   @Enumerated(value = EnumType.STRING)
-  BookingStatus status = BookingStatus.PENDING;
+  BookingStatus status;
 
   String guestName;
   String guestPhone;
