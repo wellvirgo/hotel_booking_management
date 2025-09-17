@@ -6,15 +6,15 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import vn.dangthehao.hotel_booking_management.model.User;
 
 public interface UserRepository extends JpaRepository<User, Long> {
-  Optional<User> findByIdAndIsDeletedFalse(Long id);
+  Optional<User> findByIdAndDeletedFalse(Long id);
 
-  Optional<User> findByUsernameAndIsDeletedFalse(String username);
+  Optional<User> findByUsernameAndDeletedFalse(String username);
 
-  Optional<User> findByEmailAndIsDeletedFalse(String email);
+  Optional<User> findByEmailAndDeletedFalse(String email);
 
-  List<User> findAllByIsDeletedFalse();
+  List<User> findAllByDeletedFalse();
 
-  boolean existsByUsernameAndIsDeletedFalse(String username);
+  boolean existsByUsernameAndDeletedFalse(String username);
 
-  boolean existsByEmailAndIsDeletedFalse(String email);
+  boolean existsByEmailAndDeletedFalse(String email);
 }

@@ -82,7 +82,7 @@ public class RoomTypeService {
 
   public RoomType findActiveRoomTypeById(Long id) {
     return roomTypeRepository
-        .findByIdAndIsActiveTrue(id)
+        .findByIdAndActiveTrue(id)
         .orElseThrow(() -> new AppException(ErrorCode.ROOM_TYPE_NOT_FOUND, id));
   }
 

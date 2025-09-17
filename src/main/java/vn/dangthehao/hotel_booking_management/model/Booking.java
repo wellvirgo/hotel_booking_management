@@ -32,6 +32,9 @@ public class Booking extends BaseEntity {
 
   int numRooms;
 
+  @Column(columnDefinition = "boolean default false", nullable = false)
+  boolean deleted;
+
   @Column(nullable = false)
   LocalDateTime checkIn;
 

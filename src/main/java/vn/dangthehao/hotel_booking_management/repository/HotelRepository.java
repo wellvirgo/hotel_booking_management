@@ -18,30 +18,30 @@ public interface HotelRepository extends JpaRepository<Hotel, Long> {
       "select new vn.dangthehao.hotel_booking_management.dto.UnapprovedHotelDTO("
           + "h.hotelName, ow.fullName, h.address, h.location, h.depositRate, h.depositDeadlineMinutes) "
           + "from Hotel h join h.owner ow "
-          + "where h.isApproved=false and h.isDeleted=false and h.status=:status")
+          + "where h.approved=false and h.deleted=false and h.status=:status")
   Page<UnapprovedHotelDTO> findUnapprovedHotels(Pageable pageable, HotelStatus status);
 
-  Optional<Hotel> findByIdAndIsDeletedFalse(Long id);
+  Optional<Hotel> findByIdAndDeletedFalse(Long id);
 
   @EntityGraph(attributePaths = {})
-  Optional<Hotel> findByIdAndIsDeletedFalseAndIsApprovedTrue(Long id);
+  Optional<Hotel> findByIdAndDeletedFalseAndApprovedTrue(Long id);
 
   @Query(
       "select new vn.dangthehao.hotel_booking_management.dto.OwnerHotelItemDTO("
           + "h.id, h.hotelName, h.address, h.createdAt, h.status, h.rating) "
           + "from Hotel h join h.owner ow "
-          + "where ow.id=:id and h.isApproved=true and h.isDeleted=false ")
+          + "where ow.id=:id and h.approved=true and h.deleted=false ")
   Page<OwnerHotelItemDTO> findApprovedHotelsByOwner(Pageable pageable, Long id);
 
   @Query(
       "select new vn.dangthehao.hotel_booking_management.dto.OwnerHotelItemDTO("
           + "h.id, h.hotelName, h.address, h.createdAt, h.status, h.rating) "
           + "from Hotel h join h.owner ow "
-          + "where ow.id=:id and h.isApproved=false and h.isDeleted=false ")
+          + "where ow.id=:id and h.approved=false and h.deleted=false ")
   Page<OwnerHotelItemDTO> findUnApprovedHotelsByOwner(Pageable pageable, Long id);
 
   @EntityGraph(attributePaths = {})
-  Page<Hotel> findByLocationAndIsApprovedTrueAndIsDeletedFalse(String location, Pageable pageable);
+  Page<Hotel> findByLocationAndApprovedTrueAndDeletedFalse(String location, Pageable pageable);
 
   @EntityGraph(attributePaths = {})
   Page<Hotel> findByLocation(String location, Pageable pageable);

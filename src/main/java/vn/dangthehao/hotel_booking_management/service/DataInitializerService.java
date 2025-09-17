@@ -33,7 +33,7 @@ public class DataInitializerService {
 
   @Transactional
   public void initializeDefaultData() {
-    if (userRepository.existsByUsernameAndIsDeletedFalse("admin")) return;
+    if (userRepository.existsByUsernameAndDeletedFalse("admin")) return;
 
     List<Permission> permissions = createPermissions();
     createRoles(permissions);

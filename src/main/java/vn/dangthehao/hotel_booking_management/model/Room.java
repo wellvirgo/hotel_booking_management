@@ -25,7 +25,7 @@ public class Room extends BaseEntity {
   String description;
 
   @Column(columnDefinition = "boolean default true", nullable = false)
-  boolean isActive;
+  boolean active;
 
   @Enumerated(value = EnumType.STRING)
   @Column(nullable = false)

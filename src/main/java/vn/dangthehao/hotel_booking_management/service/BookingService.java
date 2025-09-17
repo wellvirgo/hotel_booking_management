@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.Optional;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -23,6 +24,7 @@ import vn.dangthehao.hotel_booking_management.exception.AppException;
 import vn.dangthehao.hotel_booking_management.locking.BookingLockStrategy;
 import vn.dangthehao.hotel_booking_management.locking.LockStrategyFactory;
 import vn.dangthehao.hotel_booking_management.mapper.BookingMapper;
+import vn.dangthehao.hotel_booking_management.messaging.BookingProducer;
 import vn.dangthehao.hotel_booking_management.model.*;
 import vn.dangthehao.hotel_booking_management.repository.BookingRepository;
 import vn.dangthehao.hotel_booking_management.util.BookingCodeGenerator;
@@ -49,6 +51,7 @@ public class BookingService {
   ResponseGenerator responseGenerator;
   BookingMapper bookingMapper;
   TransactionTemplate transactionTemplate;
+  BookingProducer bookingProducer;
 
   @NonFinal
   @Value("${booking-code.length}")
@@ -76,7 +79,25 @@ public class BookingService {
               return booking;
             });
 
+    if (savedBooking != null && hotelService.isDepositRequired(hotel)) {
+      bookingProducer.sendBookingExpiration(
+          savedBooking.getId(), savedBooking.getDepositDeadline());
+    }
     return buildBookingResponse(bookingRequest, savedBooking, hotel);
+  }
+
+  public void cancelExpiredBooking(Long bookingId) {
+    Optional<Booking> optBooking = bookingRepository.findById(bookingId);
+    if (optBooking.isEmpty()) {
+      log.error("Booking with id {} not found", bookingId);
+      return;
+    }
+
+    Booking booking = optBooking.get();
+    if (booking.getStatus() == BookingStatus.PENDING) {
+      booking.setStatus(BookingStatus.CANCELLED);
+      bookingRepository.save(booking);
+    }
   }
 
   private void lockAndValidateInventory(

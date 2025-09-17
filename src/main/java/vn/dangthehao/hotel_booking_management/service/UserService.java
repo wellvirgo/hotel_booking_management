@@ -45,24 +45,24 @@ public class UserService {
 
   public User findByID(Long id) {
     return userRepository
-        .findByIdAndIsDeletedFalse(id)
+        .findByIdAndDeletedFalse(id)
         .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
   }
 
   public User findByUsername(String username) {
     return userRepository
-        .findByUsernameAndIsDeletedFalse(username)
+        .findByUsernameAndDeletedFalse(username)
         .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
   }
 
   public User findByEmail(String email) {
     return userRepository
-        .findByEmailAndIsDeletedFalse(email)
+        .findByEmailAndDeletedFalse(email)
         .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
   }
 
   public boolean checkEmailExist(String email) {
-    return userRepository.existsByEmailAndIsDeletedFalse(email);
+    return userRepository.existsByEmailAndDeletedFalse(email);
   }
 
   public ApiResponse<UserCrtResponse> create(UserCrtRequest request) {
@@ -111,7 +111,7 @@ public class UserService {
   }
 
   public ApiResponse<List<UserListResponse>> listUsers() {
-    List<User> userList = userRepository.findAllByIsDeletedFalse();
+    List<User> userList = userRepository.findAllByDeletedFalse();
     List<UserListResponse> userListResponse =
         userList.stream().map(this::addAvatarAndRoleName).toList();
 

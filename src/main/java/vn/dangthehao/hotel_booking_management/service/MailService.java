@@ -11,7 +11,7 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-import vn.dangthehao.hotel_booking_management.model.Mail;
+import vn.dangthehao.hotel_booking_management.dto.Mail;
 
 @Slf4j
 @RequiredArgsConstructor

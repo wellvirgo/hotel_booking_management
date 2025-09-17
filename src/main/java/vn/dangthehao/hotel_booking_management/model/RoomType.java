@@ -37,7 +37,7 @@ public class RoomType extends BaseEntity {
   int totalRooms;
 
   @Column(columnDefinition = "boolean default true", nullable = false)
-  boolean isActive;
+  boolean active;
 
   @ElementCollection
   @CollectionTable(name = "room_type_img", joinColumns = @JoinColumn(name = "room_type_id"))

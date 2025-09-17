@@ -25,7 +25,7 @@ public class Review extends BaseEntity {
   Hotel hotel;
 
   @Column(nullable = false, columnDefinition = "int default 0")
-  int rating = 0;
+  int rating;
 
   @Column(columnDefinition = "TEXT")
   String comment;

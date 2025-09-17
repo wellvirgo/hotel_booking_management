@@ -18,7 +18,7 @@ public class Amenity extends BaseEntity {
   String name;
 
   @Column(columnDefinition = "boolean default true")
-  boolean isActive = true;
+  boolean active;
 
   @Override
   public boolean equals(Object object) {

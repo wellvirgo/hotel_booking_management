@@ -28,7 +28,7 @@ public class User extends BaseEntity {
   String phone;
 
   @Column(columnDefinition = "boolean default false", nullable = false)
-  boolean isDeleted;
+  boolean deleted;
 
   @ManyToOne(cascade = CascadeType.ALL)
   @JoinColumn(name = "role_id", nullable = false)

@@ -24,7 +24,7 @@ public class HotelRegistrationResponse {
   LocalTime checkInTime;
   LocalTime checkOutTime;
   String status;
-  boolean isApproved;
+  boolean approved;
   float rating;
   Long ownerId;
   List<OwnerRoomTypeDTO> roomTypes;

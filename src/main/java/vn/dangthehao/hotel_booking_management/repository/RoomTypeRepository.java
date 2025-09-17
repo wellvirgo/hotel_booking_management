@@ -15,12 +15,12 @@ public interface RoomTypeRepository extends JpaRepository<RoomType, Long> {
 
   @Query(
       "select new vn.dangthehao.hotel_booking_management.dto.OwnerRoomTypeDTO("
-          + "rt.name, rt.description, rt.pricePerNight, rt.isActive) "
+          + "rt.name, rt.description, rt.pricePerNight, rt.active) "
           + "from RoomType rt "
           + "where rt.hotel.id=:hotelId")
   Page<OwnerRoomTypeDTO> findByHotelId(Long hotelId, Pageable pageable);
 
   List<RoomType> findByHotelIdInAndCapacityGreaterThanEqual(List<Long> hotelIds, int numGuests);
 
-  Optional<RoomType> findByIdAndIsActiveTrue(Long id);
+  Optional<RoomType> findByIdAndActiveTrue(Long id);
 }

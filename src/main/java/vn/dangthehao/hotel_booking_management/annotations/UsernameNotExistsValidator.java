@@ -14,6 +14,6 @@ public class UsernameNotExistsValidator implements ConstraintValidator<UsernameN
 
   @Override
   public boolean isValid(String username, ConstraintValidatorContext constraintValidatorContext) {
-    return !userRepository.existsByUsernameAndIsDeletedFalse(username);
+    return !userRepository.existsByUsernameAndDeletedFalse(username);
   }
 }

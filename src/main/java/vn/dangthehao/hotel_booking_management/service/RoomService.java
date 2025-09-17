@@ -37,7 +37,6 @@ public class RoomService {
 
     Room room = roomMapper.toRoom(roomCrtRequest);
     room.setActive(true);
-    room.setStatus(RoomStatus.AVAILABLE);
     room.setRoomType(roomType);
 
     RoomCrtResponse roomCrtResponse = generateRoomCrtResponse(roomRepository.save(room), roomType);

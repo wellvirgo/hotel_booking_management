@@ -70,13 +70,13 @@ public class HotelService {
 
   public Hotel findById(Long id) {
     return hotelRepository
-        .findByIdAndIsDeletedFalse(id)
+        .findByIdAndDeletedFalse(id)
         .orElseThrow(() -> new AppException(ErrorCode.HOTEL_NOT_FOUND));
   }
 
   public Hotel findApprovedHotelById(Long id) {
     return hotelRepository
-        .findByIdAndIsDeletedFalseAndIsApprovedTrue(id)
+        .findByIdAndDeletedFalseAndApprovedTrue(id)
         .orElseThrow(() -> new AppException(ErrorCode.HOTEL_NOT_APPROVED));
   }
 
@@ -196,7 +196,7 @@ public class HotelService {
       SearchHotelRequest request, int page, int size) {
     Pageable pageable = PageRequest.of(page - 1, size);
     Page<Hotel> hotelPageByLocation =
-        hotelRepository.findByLocationAndIsApprovedTrueAndIsDeletedFalse(
+        hotelRepository.findByLocationAndApprovedTrueAndDeletedFalse(
             request.getLocation(), pageable);
     List<Hotel> hotelsByLocation = hotelPageByLocation.getContent();
 
@@ -235,7 +235,6 @@ public class HotelService {
   private HotelRegistrationResponse buildHotelRegistrationResponse(Hotel hotel, Long ownerId) {
     HotelRegistrationResponse response = hotelMapper.toHotelRegistrationResponse(hotel);
     response.setOwnerId(ownerId);
-    response.setApproved(hotel.isApproved());
     response.setThumbnailUrl(
         imageNameToUrlMapper.toUrl(hotel.getThumbnail(), this.hotelImgFolderName));
     response.setRoomTypes(Collections.emptyList());

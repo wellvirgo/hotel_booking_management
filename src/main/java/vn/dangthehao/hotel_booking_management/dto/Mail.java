@@ -1,6 +1,5 @@
-package vn.dangthehao.hotel_booking_management.model;
+package vn.dangthehao.hotel_booking_management.dto;
 
-import java.util.Date;
 import java.util.List;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -20,8 +19,4 @@ public class Mail {
   String content;
   String contentType;
   List<Object> attachments;
-
-  public Date getMailSendDate() {
-    return new Date();
-  }
 }

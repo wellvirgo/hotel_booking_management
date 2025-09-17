@@ -40,17 +40,17 @@ public class Hotel extends BaseEntity {
 
   String description;
   String thumbnail;
-  float rating = 0;
+  float rating;
 
   @Column(nullable = false)
   @Enumerated(value = EnumType.STRING)
   HotelStatus status = HotelStatus.INACTIVE;
 
   @Column(columnDefinition = "boolean default false", nullable = false)
-  boolean isApproved;
+  boolean approved;
 
   @Column(columnDefinition = "boolean default false", nullable = false)
-  boolean isDeleted;
+  boolean deleted;
 
   @Column(nullable = false)
   float depositRate;
