@@ -42,6 +42,7 @@ public enum ErrorCode {
   NOT_ENOUGH_ROOMS(1027, HttpStatus.BAD_REQUEST, "Not enough rooms in room type %s"),
   UNSUPPORTED_HASH_ALGORITHM(
       1028, HttpStatus.INTERNAL_SERVER_ERROR, "Hash algorithm %s is not supported"),
+  PAYMENT_NOT_FOUND(1029, HttpStatus.NOT_FOUND, "Payment with %s not found"),
   UNCATEGORIZED_EXCEPTION(9999, HttpStatus.INTERNAL_SERVER_ERROR, "Internal server error");
 
   int code;

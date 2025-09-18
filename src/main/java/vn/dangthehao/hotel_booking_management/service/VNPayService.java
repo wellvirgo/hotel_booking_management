@@ -1,9 +1,6 @@
 package vn.dangthehao.hotel_booking_management.service;
 
-import java.math.BigDecimal;
 import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -15,40 +12,26 @@ import org.springframework.transaction.annotation.Transactional;
 import vn.dangthehao.hotel_booking_management.config.VNPConfig;
 import vn.dangthehao.hotel_booking_management.dto.VNPParamsDTO;
 import vn.dangthehao.hotel_booking_management.dto.request.PaymentRequest;
-import vn.dangthehao.hotel_booking_management.dto.response.ResponseForVNP;
+import vn.dangthehao.hotel_booking_management.dto.response.VNPResponse;
 import vn.dangthehao.hotel_booking_management.enums.*;
+import vn.dangthehao.hotel_booking_management.exception.AppException;
 import vn.dangthehao.hotel_booking_management.model.Booking;
 import vn.dangthehao.hotel_booking_management.model.Payment;
 import vn.dangthehao.hotel_booking_management.repository.BookingRepository;
-import vn.dangthehao.hotel_booking_management.repository.PaymentRepository;
 import vn.dangthehao.hotel_booking_management.util.VNPUtil;
 
 @Slf4j
 @Component("vnpPayment")
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-public class VNPayPaymentService implements PaymentService {
+public class VNPayService implements PaymentGatewayService {
   VNPConfig vnpConfig;
-  PaymentRepository paymentRepository;
+  PaymentService paymentService;
   BookingRepository bookingRepository;
 
   @NonFinal
   @Value("${vnp.orderInfoPattern}")
   String orderInfoPattern;
-
-  @Override
-  public Payment createPayment(Booking booking, BigDecimal amount) {
-    String transactionId = UUID.randomUUID().toString();
-    Payment payment =
-        Payment.builder()
-            .transactionId(transactionId)
-            .amount(amount)
-            .booking(booking)
-            .paymentMethod(PaymentMethod.VNPAY)
-            .status(PaymentRecordStatus.PENDING)
-            .build();
-    return paymentRepository.save(payment);
-  }
 
   @Override
   public String createDepositPaymentUrl(PaymentRequest paymentRequest) {
@@ -57,7 +40,7 @@ public class VNPayPaymentService implements PaymentService {
     String amountString = VNPUtil.formatAmount(booking.getDepositAmount());
     String orderInfo = String.format(orderInfoPattern, booking.getBookingCode());
     String expireDate = VNPUtil.generateExpTime(booking.getHotel().getDepositDeadlineMinutes());
-    Payment payment = createPayment(booking, booking.getDepositAmount());
+    Payment payment = paymentService.createPayment(booking, booking.getDepositAmount());
 
     VNPParamsDTO vnpParamsDTO =
         buildVNPParams(clientIp, amountString, expireDate, payment.getTransactionId(), orderInfo);
@@ -65,20 +48,15 @@ public class VNPayPaymentService implements PaymentService {
     return VNPUtil.buildPaymentUrl(vnpParamsDTO);
   }
 
+  @Override
   @Transactional
-  public ResponseForVNP handleIPN(Map<String, String> params) {
+  public VNPResponse handleIPN(Map<String, String> params) {
     try {
       if (!VNPUtil.validateCheckSum(params, vnpConfig.getHashSecret())) {
         return buildResForVNP(RspForVNP.INVALID_CHECKSUM);
       }
 
-      Optional<Payment> otpPayment =
-          paymentRepository.findByTransactionId(params.get("vnp_TxnRef"));
-      if (otpPayment.isEmpty()) {
-        return buildResForVNP(RspForVNP.PAYMENT_NOT_FOUND);
-      }
-
-      Payment payment = otpPayment.get();
+      Payment payment = paymentService.findByTransactionId(params.get("vnp_TxnRef"));
       String expectedAmount = VNPUtil.formatAmount(payment.getAmount());
       String receivedAmount = params.get("vnp_Amount");
       if (!expectedAmount.equals(receivedAmount)) {
@@ -101,10 +79,16 @@ public class VNPayPaymentService implements PaymentService {
       } else {
         payment.setStatus(PaymentRecordStatus.FAILED);
       }
-      paymentRepository.save(payment);
+      paymentService.updatePayment(payment);
 
       return buildResForVNP(RspForVNP.CONFIRM_SUCCESS);
 
+    } catch (AppException appEx) {
+      if (appEx.getErrorCode() == ErrorCode.PAYMENT_NOT_FOUND) {
+        log.error(appEx.getErrorMessage(), appEx);
+        return buildResForVNP(RspForVNP.PAYMENT_NOT_FOUND);
+      }
+      return buildResForVNP(RspForVNP.UNKNOWN_ERROR);
     } catch (Exception e) {
       log.error("Error handling VNPay IPN", e);
       return buildResForVNP(RspForVNP.UNKNOWN_ERROR);
@@ -131,8 +115,8 @@ public class VNPayPaymentService implements PaymentService {
         .build();
   }
 
-  private ResponseForVNP buildResForVNP(RspForVNP response) {
-    return ResponseForVNP.builder()
+  private VNPResponse buildResForVNP(RspForVNP response) {
+    return VNPResponse.builder()
         .RspCode(response.getRspCode())
         .Message(response.getMessage())
         .build();

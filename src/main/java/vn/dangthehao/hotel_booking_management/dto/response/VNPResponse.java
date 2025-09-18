@@ -8,7 +8,7 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Builder
-public class ResponseForVNP {
+public class VNPResponse implements PaymentGatewayResponse {
   String RspCode;
   String Message;
 }

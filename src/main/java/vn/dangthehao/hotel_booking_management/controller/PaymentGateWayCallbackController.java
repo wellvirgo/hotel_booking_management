@@ -9,18 +9,18 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import vn.dangthehao.hotel_booking_management.dto.response.ResponseForVNP;
-import vn.dangthehao.hotel_booking_management.service.VNPayPaymentService;
+import vn.dangthehao.hotel_booking_management.dto.response.PaymentGatewayResponse;
+import vn.dangthehao.hotel_booking_management.service.PaymentGatewayService;
 
 @RestController
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-@RequestMapping("/api/v1/vnpay")
-public class VNPayController {
-  VNPayPaymentService vnpService;
+@RequestMapping("/api/v1")
+public class PaymentGateWayCallbackController {
+  PaymentGatewayService paymentGatewayService;
 
-  @GetMapping("/IPN")
-  public ResponseEntity<ResponseForVNP> handleIPN(@RequestParam Map<String, String> params) {
-    return ResponseEntity.ok(vnpService.handleIPN(params));
+  @GetMapping("/vnpay/IPN")
+  public ResponseEntity<PaymentGatewayResponse> vnpIPN(@RequestParam Map<String, String> params) {
+    return ResponseEntity.ok(paymentGatewayService.handleIPN(params));
   }
 }

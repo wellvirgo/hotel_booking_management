@@ -44,7 +44,7 @@ public class BookingService {
   RoomTypeService roomTypeService;
   UserService userService;
   AuthenticationService authService;
-  PaymentService paymentService;
+  PaymentGatewayService paymentGatewayService;
   BookingRoomService bookingRoomService;
   BookingRepository bookingRepository;
   JwtUtil jwtUtil;
@@ -200,16 +200,20 @@ public class BookingService {
     return LocalDateTime.now().plusMinutes(hotel.getDepositDeadlineMinutes());
   }
 
+  private String createDepositPaymentUrlIfRequired(Booking booking, Hotel hotel, String clientIp) {
+    if (!hotelService.isDepositRequired(hotel)) return null;
+
+    var paymentRequest = PaymentRequest.builder().booking(booking).clientIp(clientIp).build();
+    return paymentGatewayService.createDepositPaymentUrl(paymentRequest);
+  }
+
   private ApiResponse<BookingResponse> buildBookingResponse(
       BookingRequest bookingRequest, Booking booking, Hotel hotel) {
-    PaymentRequest paymentRequest =
-        PaymentRequest.builder().booking(booking).clientIp(bookingRequest.getClientIp()).build();
+    String depositPaymentUrl =
+        createDepositPaymentUrlIfRequired(booking, hotel, bookingRequest.getClientIp());
 
     BookingResponse bookingResponse = bookingMapper.toBookingResponse(booking);
-
-    boolean depositRequired = hotelService.isDepositRequired(hotel);
-    String depositPaymentUrl =
-        depositRequired ? paymentService.createDepositPaymentUrl(paymentRequest) : null;
+    boolean depositRequired = depositPaymentUrl != null;
     bookingResponse.setDepositRequired(depositRequired);
     bookingResponse.setDepositPaymentUrl(depositPaymentUrl);
 
