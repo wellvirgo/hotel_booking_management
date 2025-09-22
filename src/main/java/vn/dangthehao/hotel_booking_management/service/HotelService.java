@@ -273,7 +273,7 @@ public class HotelService {
     List<Long> roomTypeIds = roomTypes.stream().map(RoomType::getId).toList();
 
     return roomInventoryRepository
-        .findByRoomTypeIdsAndDateRange(roomTypeIds, checkIn, checkOut.minusDays(1))
+        .findByRoomTypeIdsAndDateRange(roomTypeIds, checkIn, checkOut)
         .stream()
         .collect(Collectors.groupingBy(ri -> ri.getRoomType().getId()));
   }

@@ -1,10 +1,10 @@
 package vn.dangthehao.hotel_booking_management.service;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
-import java.util.Optional;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -20,6 +20,7 @@ import vn.dangthehao.hotel_booking_management.dto.response.BookingResponse;
 import vn.dangthehao.hotel_booking_management.enums.BookingPaymentStatus;
 import vn.dangthehao.hotel_booking_management.enums.BookingStatus;
 import vn.dangthehao.hotel_booking_management.enums.ErrorCode;
+import vn.dangthehao.hotel_booking_management.enums.PaymentRecordStatus;
 import vn.dangthehao.hotel_booking_management.exception.AppException;
 import vn.dangthehao.hotel_booking_management.locking.BookingLockStrategy;
 import vn.dangthehao.hotel_booking_management.locking.LockStrategyFactory;
@@ -44,8 +45,10 @@ public class BookingService {
   RoomTypeService roomTypeService;
   UserService userService;
   AuthenticationService authService;
+  PaymentService paymentService;
   PaymentGatewayService paymentGatewayService;
   BookingRoomService bookingRoomService;
+  RoomInventoryService roomInventoryService;
   BookingRepository bookingRepository;
   JwtUtil jwtUtil;
   ResponseGenerator responseGenerator;
@@ -80,24 +83,44 @@ public class BookingService {
             });
 
     if (savedBooking != null && hotelService.isDepositRequired(hotel)) {
-      bookingProducer.sendBookingExpiration(
+      bookingProducer.scheduleBookingCancellation(
           savedBooking.getId(), savedBooking.getDepositDeadline());
     }
     return buildBookingResponse(bookingRequest, savedBooking, hotel);
   }
 
   public void cancelExpiredBooking(Long bookingId) {
-    Optional<Booking> optBooking = bookingRepository.findById(bookingId);
-    if (optBooking.isEmpty()) {
-      log.error("Booking with id {} not found", bookingId);
-      return;
+    Booking booking = getBookingWithRooms(bookingId);
+    if (booking.getStatus() == BookingStatus.PENDING) {
+      LocalDate checkIn = booking.getCheckIn().toLocalDate();
+      LocalDate checkOut = booking.getCheckOut().toLocalDate();
+      Long roomTypeId = roomTypeService.getIdByBookingId(bookingId);
+      int quantity = booking.getNumRooms();
+
+      transactionTemplate.execute(
+          status -> {
+            roomInventoryService.increaseRoomInventory(roomTypeId, checkIn, checkOut, quantity);
+            bookingRoomService.releaseRoomByBooking(booking);
+            paymentService.updatePaymentStatus(bookingId, PaymentRecordStatus.CANCELLED);
+            return updateBookingStatus(booking, BookingStatus.EXPIRED);
+          });
+    }
+  }
+
+  public int updateBookingStatus(Booking booking, BookingStatus newStatus) {
+    BookingStatus currStatus = booking.getStatus();
+    if (!currStatus.canTransitionTo(newStatus)) {
+      log.error("Booking status transition is invalid");
+      throw new AppException(ErrorCode.INVALID_STATUS_TRANSITION, "Booking", currStatus, newStatus);
     }
 
-    Booking booking = optBooking.get();
-    if (booking.getStatus() == BookingStatus.PENDING) {
-      booking.setStatus(BookingStatus.CANCELLED);
-      bookingRepository.save(booking);
-    }
+    return bookingRepository.updateBookingStatusById(booking.getId(), newStatus);
+  }
+
+  public Booking getBookingWithRooms(Long id) {
+    return bookingRepository
+        .findByIdFetchRooms(id)
+        .orElseThrow(() -> new AppException(ErrorCode.BOOKING_NOT_FOUND, id));
   }
 
   private void lockAndValidateInventory(

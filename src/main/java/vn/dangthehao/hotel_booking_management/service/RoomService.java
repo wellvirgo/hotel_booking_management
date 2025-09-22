@@ -49,9 +49,8 @@ public class RoomService {
         bookingRequest.getRoomTypeId(), RoomStatus.AVAILABLE, limit);
   }
 
-  public void updateRoomsWithStatus(List<Room> oldListRoom, RoomStatus status) {
-    oldListRoom.forEach(room -> room.setStatus(status));
-    roomRepository.saveAll(oldListRoom);
+  public void updateRoomStatuses(List<Long> roomIds, RoomStatus status) {
+    roomRepository.updateRoomStatusByIds(roomIds, status);
   }
 
   private RoomCrtResponse generateRoomCrtResponse(Room room, RoomType roomType) {

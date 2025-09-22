@@ -3,6 +3,7 @@ package vn.dangthehao.hotel_booking_management.service;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
 import lombok.AccessLevel;
@@ -29,6 +30,7 @@ import vn.dangthehao.hotel_booking_management.model.Amenity;
 import vn.dangthehao.hotel_booking_management.model.Hotel;
 import vn.dangthehao.hotel_booking_management.model.RoomType;
 import vn.dangthehao.hotel_booking_management.repository.AmenityRepository;
+import vn.dangthehao.hotel_booking_management.repository.BookingRepository;
 import vn.dangthehao.hotel_booking_management.repository.RoomTypeRepository;
 import vn.dangthehao.hotel_booking_management.util.ImageNameToUrlMapper;
 import vn.dangthehao.hotel_booking_management.util.ResponseGenerator;
@@ -39,6 +41,7 @@ import vn.dangthehao.hotel_booking_management.util.ResponseGenerator;
 @Service
 public class RoomTypeService {
   RoomTypeRepository roomTypeRepository;
+  BookingRepository bookingRepository;
   HotelService hotelService;
   RoomTypeMapper roomTypeMapper;
   RoomInventoryService roomInventoryService;
@@ -67,7 +70,7 @@ public class RoomTypeService {
     RoomType savedRoomType = roomTypeRepository.save(roomType);
     RoomTypeCrtResponse roomTypeCrtResponse = buildRoomTypeCrtResponse(savedRoomType, hotel);
 
-    // Tạo trước 6 tháng trống tương ứng trong RoomInventory
+    // Create some inventories in advance
     roomInventoryService.createRoomInventories(savedRoomType);
 
     return responseGenerator.generateSuccessResponse(
@@ -131,6 +134,16 @@ public class RoomTypeService {
 
     String message = String.format("Detail of information about room type %s", roomType.getName());
     return responseGenerator.generateSuccessResponse(message, response);
+  }
+
+  public Long getIdByBookingId(Long bookingId) {
+    Optional<Long> optRoomTypeId = bookingRepository.findRoomTypeIdByBookingId(bookingId);
+    if (optRoomTypeId.isEmpty()) {
+      log.error("Cannot find room type id from booking with id {}", bookingId);
+      throw new AppException(ErrorCode.BOOKING_NOT_FOUND, bookingId);
+    }
+
+    return optRoomTypeId.get();
   }
 
   private RoomType buildRoomType(

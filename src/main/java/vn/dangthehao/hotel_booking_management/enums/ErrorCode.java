@@ -24,7 +24,7 @@ public enum ErrorCode {
           + "including an uppercase letter, a lowercase letter, a number, and a special character."),
   THE_SAME_OLD_PASSWORD(
       1011, HttpStatus.BAD_REQUEST, "New password must be different old password"),
-  INVALID_GRANT_TYPE_TOKEN(1012, HttpStatus.BAD_REQUEST, "Invalid grant type refresh "),
+  INVALID_GRANT_TYPE_TOKEN(1012, HttpStatus.BAD_REQUEST, "Invalid grant type refresh"),
   FAILED_PARSE_TOKEN(1013, HttpStatus.BAD_REQUEST, "Failed to parse jwt token"),
   REFRESH_TOKEN_EXPIRED(1014, HttpStatus.BAD_REQUEST, "Refresh token is expired"),
   EMAIL_NOT_EXIST(1015, HttpStatus.BAD_REQUEST, "Email is not registered in the system"),
@@ -43,6 +43,9 @@ public enum ErrorCode {
   UNSUPPORTED_HASH_ALGORITHM(
       1028, HttpStatus.INTERNAL_SERVER_ERROR, "Hash algorithm %s is not supported"),
   PAYMENT_NOT_FOUND(1029, HttpStatus.NOT_FOUND, "Payment with %s not found"),
+  INVALID_STATUS_TRANSITION(
+      1030, HttpStatus.INTERNAL_SERVER_ERROR, "%s cannot jump from %s status to %s status"),
+  BOOKING_NOT_FOUND(1031, HttpStatus.NOT_FOUND, "Booking with id %s not found"),
   UNCATEGORIZED_EXCEPTION(9999, HttpStatus.INTERNAL_SERVER_ERROR, "Internal server error");
 
   int code;
