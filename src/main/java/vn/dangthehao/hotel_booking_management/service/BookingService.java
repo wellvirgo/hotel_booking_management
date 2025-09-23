@@ -28,6 +28,7 @@ import vn.dangthehao.hotel_booking_management.mapper.BookingMapper;
 import vn.dangthehao.hotel_booking_management.messaging.BookingProducer;
 import vn.dangthehao.hotel_booking_management.model.*;
 import vn.dangthehao.hotel_booking_management.repository.BookingRepository;
+import vn.dangthehao.hotel_booking_management.security.SecurityUtils;
 import vn.dangthehao.hotel_booking_management.util.BookingCodeGenerator;
 import vn.dangthehao.hotel_booking_management.util.JwtUtil;
 import vn.dangthehao.hotel_booking_management.util.ResponseGenerator;
@@ -189,7 +190,7 @@ public class BookingService {
 
   private void setGuestInfo(Booking booking, BookingRequest bookingRequest) {
     // If user log in, will use user account information
-    if (authService.isLoggedIn()) {
+    if (SecurityUtils.isLoggedIn()) {
       User user = userService.findByID(jwtUtil.getUserID(authService.getJwt()));
       booking.setUser(user);
       return;

@@ -2,21 +2,15 @@ package vn.dangthehao.hotel_booking_management.annotations;
 
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
-import lombok.AccessLevel;
-import lombok.RequiredArgsConstructor;
-import lombok.experimental.FieldDefaults;
 import org.apache.commons.validator.routines.EmailValidator;
 import vn.dangthehao.hotel_booking_management.dto.request.BookingRequest;
-import vn.dangthehao.hotel_booking_management.service.AuthenticationService;
+import vn.dangthehao.hotel_booking_management.security.SecurityUtils;
 
-@RequiredArgsConstructor
-@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class GuestInfoValidator implements ConstraintValidator<ValidGuestInfo, BookingRequest> {
-  AuthenticationService authService;
 
   @Override
   public boolean isValid(BookingRequest request, ConstraintValidatorContext context) {
-    if (!authService.isLoggedIn()) {
+    if (!SecurityUtils.isLoggedIn()) {
       boolean isValidName = request.getGuestName() != null && !request.getGuestName().isBlank();
       boolean isValidEmail =
           request.getGuestEmail() != null
