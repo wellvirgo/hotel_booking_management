@@ -1,5 +1,6 @@
 package vn.dangthehao.hotel_booking_management.dto.request;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -9,6 +10,10 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class CheckEmailRequest {
+public class PasswordResetOtpVerifyRequest {
+  @NotNull(message = "Email must not be null")
   String email;
+
+  @NotNull(message = "OTP must not be null")
+  String otp;
 }

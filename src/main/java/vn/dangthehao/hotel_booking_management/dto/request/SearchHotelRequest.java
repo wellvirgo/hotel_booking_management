@@ -4,8 +4,8 @@ import jakarta.validation.constraints.*;
 import java.time.LocalDate;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import vn.dangthehao.hotel_booking_management.annotations.HasDateRange;
 import vn.dangthehao.hotel_booking_management.annotations.ValidDateRange;
-import vn.dangthehao.hotel_booking_management.dto.HasDateRange;
 
 @Getter
 @Setter

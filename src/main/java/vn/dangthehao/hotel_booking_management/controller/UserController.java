@@ -15,7 +15,7 @@ import vn.dangthehao.hotel_booking_management.dto.request.ChangePasswordRequest;
 import vn.dangthehao.hotel_booking_management.dto.request.UserCrtRequest;
 import vn.dangthehao.hotel_booking_management.dto.request.UserUpdateRequest;
 import vn.dangthehao.hotel_booking_management.dto.response.*;
-import vn.dangthehao.hotel_booking_management.service.AuthenticationService;
+import vn.dangthehao.hotel_booking_management.service.AuthService;
 import vn.dangthehao.hotel_booking_management.service.UserService;
 
 @Slf4j
@@ -25,7 +25,7 @@ import vn.dangthehao.hotel_booking_management.service.UserService;
 @RequestMapping("/api/v1/users")
 public class UserController {
   UserService userService;
-  AuthenticationService authenticationService;
+  AuthService authenticationService;
 
   @GetMapping("/me")
   public ResponseEntity<ApiResponse<UserResponse>> getCurrentUser(

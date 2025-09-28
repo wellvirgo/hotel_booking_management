@@ -7,7 +7,7 @@ import lombok.experimental.FieldDefaults;
 import lombok.experimental.NonFinal;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -29,45 +29,51 @@ import vn.dangthehao.hotel_booking_management.util.ResponseGenerator;
 @Service
 public class UserService {
   UserRepository userRepository;
-  UserMapper userMapper;
   RoleRepository roleRepository;
-  BCryptPasswordEncoder bCryptPasswordEncoder;
   UploadFileService uploadFileService;
+  PasswordEncoder passwordEncoder;
+  UserMapper userMapper;
   ResponseGenerator responseGenerator;
 
   @NonFinal
-  @Value("${base_url}")
+  @Value("${base-url}")
   String baseUrl;
 
   @NonFinal
-  @Value("${file.user_avatar_folder_name}")
+  @Value("${file.user-avatar-folder}")
   String avatarFolderName;
 
-  public User findByID(Long id) {
+  public User getByIdWithRole(Long id) {
+    return userRepository
+        .findByIdAndDeletedFalseFetchRole(id)
+        .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+  }
+
+  public User getById(Long id) {
     return userRepository
         .findByIdAndDeletedFalse(id)
         .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
   }
 
-  public User findByUsername(String username) {
+  public User getByUsername(String username) {
     return userRepository
         .findByUsernameAndDeletedFalse(username)
         .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
   }
 
-  public User findByEmail(String email) {
+  public User getByEmail(String email) {
     return userRepository
         .findByEmailAndDeletedFalse(email)
         .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
   }
 
-  public boolean checkEmailExist(String email) {
+  public boolean isEmailExists(String email) {
     return userRepository.existsByEmailAndDeletedFalse(email);
   }
 
   public ApiResponse<UserCrtResponse> create(UserCrtRequest request) {
     User user = userMapper.toUser(request);
-    user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
+    user.setPassword(passwordEncoder.encode(user.getPassword()));
     Role role =
         roleRepository
             .findById(request.getRoleId())
@@ -81,8 +87,8 @@ public class UserService {
   }
 
   public ApiResponse<UserResponse> getCurrentUser(Jwt jwt) {
-    Long userId = jwt.getClaim("userID");
-    User currentUser = findByID(userId);
+    Long userId = Long.parseLong(jwt.getSubject());
+    User currentUser = getByIdWithRole(userId);
     UserResponse userResponse = userMapper.toUserResponse(currentUser);
     String avatar =
         (currentUser.getAvatar() != null)
@@ -96,7 +102,7 @@ public class UserService {
 
   public ApiResponse<UserUpdateResponse> updateAccountInf(
       Long userID, UserUpdateRequest request, MultipartFile file) {
-    User currentUser = findByID(userID);
+    User currentUser = getByIdWithRole(userID);
     currentUser.setFullName(request.getFullName());
     currentUser.setEmail(request.getEmail());
     currentUser.setPhone(request.getPhone());
@@ -119,15 +125,27 @@ public class UserService {
   }
 
   public ApiResponse<Void> deleteByID(Long id) {
-    User user = findByID(id);
+    User user = getByIdWithRole(id);
     user.setDeleted(true);
     userRepository.save(user);
 
     return responseGenerator.generateSuccessResponse("Delete user successfully!");
   }
 
-  public void saveOrUpdate(User user) {
+  public void updateTokenVersion(User user) {
+    user.setTokenVersion(user.getTokenVersion() + 1);
     userRepository.save(user);
+  }
+
+  public void updatePassword(User user, String newPassword) {
+    user.setPassword(passwordEncoder.encode(newPassword));
+    userRepository.save(user);
+  }
+
+  public long getTokenVersion(Long id) {
+    return userRepository
+        .findTokenVersionById(id)
+        .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
   }
 
   // Used in list users to map link avatar in server and role name

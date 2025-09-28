@@ -51,15 +51,15 @@ public class RoomTypeService {
   ImageNameToUrlMapper imageNameToUrlMapper;
 
   @NonFinal
-  @Value("${base_url}")
+  @Value("${base-url}")
   String baseUrl;
 
   @NonFinal
-  @Value("${file.room_type_img_folder_name}")
+  @Value("${file.room-type-img-folder}")
   String roomTypeImgFolderName;
 
   @NonFinal
-  @Value("${file.upload_folder}")
+  @Value("${file.upload-folder}")
   String uploadFolder;
 
   @PreAuthorize("@hotelService.isOwner(#hotelId, authentication.principal)")

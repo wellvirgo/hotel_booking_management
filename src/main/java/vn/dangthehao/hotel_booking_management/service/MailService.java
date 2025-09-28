@@ -22,13 +22,20 @@ public class MailService {
   Environment env;
 
   @Async
-  public void sendChangePasswordEmailAsync(String mailTo) {
-    Mail mail = generateMail(mailTo, "Change Password", "You have changed your password");
+  public void sendPasswordChangedAsync(String mailTo) {
+    Mail mail =
+        generateMail(mailTo, "Password changed successfully", "You have changed your password");
     sendEmail(mail);
   }
 
   @Async
-  public void sendOTPEmailAsync(String mailTo, String otp) {
+  public void sendPasswordResetAsync(String mailTo) {
+    Mail mail = generateMail(mailTo, "Password reset successfully", "You have reset your password");
+    sendEmail(mail);
+  }
+
+  @Async
+  public void sendOtpAsync(String mailTo, String otp) {
     Mail mail = generateMail(mailTo, "OTP for reset password", otp);
     sendEmail(mail);
   }

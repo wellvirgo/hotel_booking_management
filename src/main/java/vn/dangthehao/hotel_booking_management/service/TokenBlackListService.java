@@ -1,15 +1,17 @@
 package vn.dangthehao.hotel_booking_management.service;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
-import java.util.Map;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 import vn.dangthehao.hotel_booking_management.model.InvalidToken;
 import vn.dangthehao.hotel_booking_management.repository.InvalidTokenRepository;
-import vn.dangthehao.hotel_booking_management.util.JwtUtil;
+import vn.dangthehao.hotel_booking_management.security.JwtService;
+import vn.dangthehao.hotel_booking_management.util.TimeConverter;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -17,19 +19,21 @@ import vn.dangthehao.hotel_booking_management.util.JwtUtil;
 @Service
 public class TokenBlackListService {
   InvalidTokenRepository invalidTokenRepository;
-  JwtUtil jwtUtil;
+  JwtService jwtService;
 
-  public void revokeAccessToken(String token) {
-    Map<String, Object> claims = jwtUtil.getClaims(token);
-    LocalDateTime expiredTime = jwtUtil.getExpiredTime(claims);
-    String accTokenID = jwtUtil.getTokenID(claims);
-    InvalidToken invalidToken =
-        InvalidToken.builder().id(accTokenID).token(token).expiredTime(expiredTime).build();
-    invalidTokenRepository.save(invalidToken);
+  public void revokeAccessToken(Jwt accessJwt) {
+    LocalDateTime expiredTime = jwtService.getJwtExpiration(accessJwt);
+    LocalDateTime now = TimeConverter.instantToLocalDateTime(Instant.now());
+
+    if (expiredTime.isAfter(now)) {
+      String jti = jwtService.getJwtId(accessJwt);
+      String value = jwtService.getValue(accessJwt);
+      var token = InvalidToken.builder().id(jti).token(value).expiredTime(expiredTime).build();
+      invalidTokenRepository.save(token);
+    }
   }
 
   public boolean isRevoked(String token) {
-    Map<String, Object> claims = jwtUtil.getClaims(token);
-    return invalidTokenRepository.existsById(jwtUtil.getTokenID(claims));
+    return invalidTokenRepository.existsById(jwtService.getJwtId(token));
   }
 }

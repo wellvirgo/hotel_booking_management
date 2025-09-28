@@ -30,11 +30,14 @@ public class User extends BaseEntity {
   @Column(columnDefinition = "boolean default false", nullable = false)
   boolean deleted;
 
-  @ManyToOne(cascade = CascadeType.ALL)
+  @ManyToOne
   @JoinColumn(name = "role_id", nullable = false)
   Role role;
 
   String avatar;
+
+  @Column(nullable = false)
+  int tokenVersion;
 
   @Override
   public boolean equals(Object object) {

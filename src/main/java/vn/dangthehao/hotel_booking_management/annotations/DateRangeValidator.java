@@ -3,7 +3,6 @@ package vn.dangthehao.hotel_booking_management.annotations;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 import java.time.LocalDate;
-import vn.dangthehao.hotel_booking_management.dto.HasDateRange;
 
 public class DateRangeValidator implements ConstraintValidator<ValidDateRange, HasDateRange> {
   @Override

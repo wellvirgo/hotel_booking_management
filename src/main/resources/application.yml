@@ -39,12 +39,17 @@ spring:
     username: ${RABBITMQ_USERNAME}
     password: ${RABBITMQ_PASSWORD}
 
-#Config JWT token
+#Config token
 jwt:
-  private_key: ${PRIVATE_KEY}
-  access_token_valid_duration: 1800 #seconds
-  refresh_token_valid_duration: 86400 #seconds
+  private-key: ${PRIVATE_KEY}
+  valid-duration: 600 #seconds
   issuer: hotel_booking_management
+
+refresh-token:
+  ttl: 15 #days
+
+password-reset-token:
+  ttl-seconds: 300 #seconds
 
 #Spring actuator
 management:
@@ -60,20 +65,17 @@ logging:
       springframework:
         security: DEBUG
         security.oauth2: DEBUG
-
-mail:
-  smtp:
-    debug: true
 #End for log and debug
 
-base_url: http://localhost:8080
+#Base URL
+base-url: http://localhost:8080
 
-#Config upload file
+#Config folder name storing upload file
 file:
-  upload_folder: uploads/images/
-  user_avatar_folder_name: avatars
-  room_type_img_folder_name: roomTypeImages
-  hotel_img_folder_name: hotelImages
+  upload-folder: uploads/images/
+  user-avatar-folder: avatars
+  room-type-img-folder: roomTypeImages
+  hotel-img-folder: hotelImages
 
 #Lock strategy
 lock-strategy: pessimistic
@@ -105,3 +107,8 @@ rabbitmq:
   routingKey:
     bookingDelay: booking.delay
     bookingCancel: booking.cancel
+
+#Config otp
+otp:
+  password-reset:
+    ttl-seconds: 300 #seconds

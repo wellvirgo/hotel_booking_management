@@ -6,10 +6,10 @@ import jakarta.validation.constraints.Size;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import vn.dangthehao.hotel_booking_management.annotations.EmailNotExists;
+import vn.dangthehao.hotel_booking_management.annotations.PasswordConfirm;
 import vn.dangthehao.hotel_booking_management.annotations.PasswordMatches;
 import vn.dangthehao.hotel_booking_management.annotations.PasswordStrength;
 import vn.dangthehao.hotel_booking_management.annotations.UsernameNotExists;
-import vn.dangthehao.hotel_booking_management.dto.PasswordConfirm;
 
 @Getter
 @Setter
@@ -17,7 +17,7 @@ import vn.dangthehao.hotel_booking_management.dto.PasswordConfirm;
 @AllArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-@PasswordMatches(message = "PASSWORD_NOT_MATCH")
+@PasswordMatches
 public class UserCrtRequest implements PasswordConfirm {
   @Size(min = 5, message = "INVALID_USERNAME")
   @UsernameNotExists

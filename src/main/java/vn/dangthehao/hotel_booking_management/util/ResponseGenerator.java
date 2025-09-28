@@ -1,6 +1,5 @@
 package vn.dangthehao.hotel_booking_management.util;
 
-import java.util.Map;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -31,10 +30,7 @@ public class ResponseGenerator {
         .build();
   }
 
-  public AuthResponse generateAuthResponse(Map<String, String> keyPair) {
-    return AuthResponse.builder()
-        .accessToken(keyPair.get("accessToken"))
-        .refreshToken(keyPair.get("refreshToken"))
-        .build();
+  public AuthResponse generateAuthResponse(String accessToken, String refreshToken) {
+    return AuthResponse.builder().accessToken(accessToken).refreshToken(refreshToken).build();
   }
 }

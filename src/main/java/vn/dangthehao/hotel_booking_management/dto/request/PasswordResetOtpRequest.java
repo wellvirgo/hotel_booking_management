@@ -1,5 +1,6 @@
 package vn.dangthehao.hotel_booking_management.dto.request;
 
+import jakarta.validation.constraints.Email;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -9,7 +10,7 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class VerifyOTPRequest {
+public class PasswordResetOtpRequest {
+  @Email(message = "INVALID_EMAIL")
   String email;
-  String otp;
 }

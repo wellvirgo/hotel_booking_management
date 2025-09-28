@@ -17,8 +17,8 @@ public class RedisService {
     redisTemplate.opsForValue().set(key, value);
   }
 
-  public void setTimeToLive(String key, long timeout) {
-    redisTemplate.expire(key, timeout, TimeUnit.MINUTES);
+  public void setEx(String key, Object value, long timeout, TimeUnit unit) {
+    redisTemplate.opsForValue().set(key, value, timeout, unit);
   }
 
   public Object get(String key) {
@@ -29,17 +29,7 @@ public class RedisService {
     redisTemplate.delete(key);
   }
 
-  public void saveOTPWithExpiredTime(String email, String otp) {
-    final long expiredTimeOTP = 5;
-    String key = email + "_otp";
-    set(key, otp);
-    setTimeToLive(key, expiredTimeOTP);
-  }
-
-  public void saveResetToken(String email, String resetToken) {
-    final long expiredTimeToken = 5;
-    String key = email + "_resetToken";
-    set(key, resetToken);
-    setTimeToLive(key, expiredTimeToken);
+  public boolean exists(String key) {
+    return redisTemplate.hasKey(key);
   }
 }

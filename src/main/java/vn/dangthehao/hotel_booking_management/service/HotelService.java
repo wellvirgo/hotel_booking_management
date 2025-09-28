@@ -37,8 +37,8 @@ import vn.dangthehao.hotel_booking_management.repository.HotelRepository;
 import vn.dangthehao.hotel_booking_management.repository.ReviewRepository;
 import vn.dangthehao.hotel_booking_management.repository.RoomInventoryRepository;
 import vn.dangthehao.hotel_booking_management.repository.RoomTypeRepository;
+import vn.dangthehao.hotel_booking_management.security.JwtService;
 import vn.dangthehao.hotel_booking_management.util.ImageNameToUrlMapper;
-import vn.dangthehao.hotel_booking_management.util.JwtUtil;
 import vn.dangthehao.hotel_booking_management.util.ResponseGenerator;
 
 @RequiredArgsConstructor
@@ -47,11 +47,11 @@ import vn.dangthehao.hotel_booking_management.util.ResponseGenerator;
 public class HotelService {
   HotelMapper hotelMapper;
   HotelRepository hotelRepository;
-  JwtUtil jwtUtil;
   ResponseGenerator responseGenerator;
   UserService userService;
   MailService mailService;
   UploadFileService uploadFileService;
+  JwtService jwtService;
   ImageNameToUrlMapper imageNameToUrlMapper;
   RoomTypeRepository roomTypeRepository;
   RoomInventoryRepository roomInventoryRepository;
@@ -61,11 +61,11 @@ public class HotelService {
   static String BASE_AVATAR_URL = "http://localhost:8080/avatars/";
 
   @NonFinal
-  @Value("${base_url}")
+  @Value("${base-url}")
   String baseUrl;
 
   @NonFinal
-  @Value("${file.hotel_img_folder_name}")
+  @Value("${file.hotel-img-folder}")
   String hotelImgFolderName;
 
   public Hotel findById(Long id) {
@@ -89,7 +89,7 @@ public class HotelService {
     Hotel registeredHotel = createHotelFromRequest(request, thumbnailFile, jwt);
     Hotel savedHotel = hotelRepository.save(registeredHotel);
     HotelRegistrationResponse response =
-        buildHotelRegistrationResponse(savedHotel, jwtUtil.getUserID(jwt));
+        buildHotelRegistrationResponse(savedHotel, jwtService.getUserId(jwt));
 
     return responseGenerator.generateSuccessResponse(
         "Your application will be handled soon!", response);
@@ -162,7 +162,7 @@ public class HotelService {
     OwnerHotelsResponse ownerHotelsResponse;
     if ("false".equals(isApproved)) {
       ownerHotelItemDTOPage =
-          hotelRepository.findUnApprovedHotelsByOwner(pageable, jwtUtil.getUserID(jwt));
+          hotelRepository.findUnApprovedHotelsByOwner(pageable, jwtService.getUserId(jwt));
       ownerHotelsResponse =
           OwnerHotelsResponse.builder()
               .ownerHotelItems(ownerHotelItemDTOPage.getContent())
@@ -175,7 +175,7 @@ public class HotelService {
     }
 
     ownerHotelItemDTOPage =
-        hotelRepository.findApprovedHotelsByOwner(pageable, jwtUtil.getUserID(jwt));
+        hotelRepository.findApprovedHotelsByOwner(pageable, jwtService.getUserId(jwt));
     ownerHotelsResponse =
         OwnerHotelsResponse.builder()
             .ownerHotelItems(ownerHotelItemDTOPage.getContent())
@@ -189,7 +189,7 @@ public class HotelService {
 
   public boolean isOwner(Long hotelId, Jwt jwt) {
     Long ownerId = findById(hotelId).getOwner().getId();
-    return ownerId.equals(jwtUtil.getUserID(jwt));
+    return ownerId.equals(jwtService.getUserId(jwt));
   }
 
   public ApiResponse<SearchHotelResponse> searchHotels(
@@ -212,8 +212,8 @@ public class HotelService {
   private Hotel createHotelFromRequest(
       HotelRegistrationRequest request, MultipartFile thumbnailFile, Jwt jwt) {
     Hotel registeredHotel = hotelMapper.toHotel(request);
-    Long ownerId = jwtUtil.getUserID(jwt);
-    registeredHotel.setOwner(userService.findByID(ownerId));
+    Long ownerId = jwtService.getUserId(jwt);
+    registeredHotel.setOwner(userService.getByIdWithRole(ownerId));
 
     if (validateThumbnailFile(thumbnailFile)) {
       String thumbnail =

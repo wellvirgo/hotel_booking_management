@@ -30,7 +30,7 @@ public class TokenRevocationFilter extends OncePerRequestFilter {
     if (tokenOptional.isPresent() && tokenBlackListService.isRevoked(tokenOptional.get())) {
       response.setContentType("application/json");
       response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-      ErrorCode errorCode = ErrorCode.TOKEN_IS_REVOKED;
+      ErrorCode errorCode = ErrorCode.UNAUTHENTICATED;
       int code = errorCode.getCode();
       String message = errorCode.getMessage();
       String body =

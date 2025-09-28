@@ -13,7 +13,6 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.security.web.SecurityFilterChain;
@@ -34,8 +33,8 @@ public class SecurityConfig {
   TokenRevocationFilter tokenRevocationFilter;
 
   String[] PUBLIC_POST_ENDPOINT = {
-    "/api/v1/auth/sessions",
-    "/api/v1/auth/tokens",
+    "/api/v1/auth/login",
+    "/api/v1/auth/refresh",
     "/api/v1/users",
     "/api/v1/auth/passwords/resets/**",
     "/api/v1/hotels/{hotelId}/room-types/{roomTypeId}/bookings"
@@ -90,11 +89,6 @@ public class SecurityConfig {
     httpSecurity.addFilterBefore(tokenRevocationFilter, BasicAuthenticationFilter.class);
 
     return httpSecurity.build();
-  }
-
-  @Bean
-  public BCryptPasswordEncoder bCryptPasswordEncoder() {
-    return new BCryptPasswordEncoder();
   }
 
   @Bean

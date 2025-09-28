@@ -1,4 +1,4 @@
-package vn.dangthehao.hotel_booking_management.dto;
+package vn.dangthehao.hotel_booking_management.annotations;
 
 public interface PasswordConfirm {
   String getPassword();

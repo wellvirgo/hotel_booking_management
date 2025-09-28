@@ -22,11 +22,11 @@ import vn.dangthehao.hotel_booking_management.exception.AppException;
 @Service
 public class UploadFileService {
   @NonFinal
-  @Value("${file.upload_folder}")
+  @Value("${file.upload-folder}")
   String baseUploadFolder;
 
   @NonFinal
-  @Value("${base_url}")
+  @Value("${base-url}")
   String baseUrl;
 
   private String createFolderIfNotExists(String targetFolderName) {

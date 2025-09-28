@@ -11,6 +11,7 @@ import lombok.experimental.FieldDefaults;
 import lombok.experimental.NonFinal;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.support.TransactionTemplate;
 import vn.dangthehao.hotel_booking_management.dto.request.BookingRequest;
@@ -28,9 +29,9 @@ import vn.dangthehao.hotel_booking_management.mapper.BookingMapper;
 import vn.dangthehao.hotel_booking_management.messaging.BookingProducer;
 import vn.dangthehao.hotel_booking_management.model.*;
 import vn.dangthehao.hotel_booking_management.repository.BookingRepository;
+import vn.dangthehao.hotel_booking_management.security.JwtService;
 import vn.dangthehao.hotel_booking_management.security.SecurityUtils;
 import vn.dangthehao.hotel_booking_management.util.BookingCodeGenerator;
-import vn.dangthehao.hotel_booking_management.util.JwtUtil;
 import vn.dangthehao.hotel_booking_management.util.ResponseGenerator;
 
 @Slf4j
@@ -45,13 +46,12 @@ public class BookingService {
   HotelService hotelService;
   RoomTypeService roomTypeService;
   UserService userService;
-  AuthenticationService authService;
   PaymentService paymentService;
   PaymentGatewayService paymentGatewayService;
   BookingRoomService bookingRoomService;
   RoomInventoryService roomInventoryService;
   BookingRepository bookingRepository;
-  JwtUtil jwtUtil;
+  JwtService jwtService;
   ResponseGenerator responseGenerator;
   BookingMapper bookingMapper;
   TransactionTemplate transactionTemplate;
@@ -191,7 +191,8 @@ public class BookingService {
   private void setGuestInfo(Booking booking, BookingRequest bookingRequest) {
     // If user log in, will use user account information
     if (SecurityUtils.isLoggedIn()) {
-      User user = userService.findByID(jwtUtil.getUserID(authService.getJwt()));
+      Long userId = jwtService.getUserId((Jwt) SecurityUtils.getAuthentication().getPrincipal());
+      User user = userService.getByIdWithRole(userId);
       booking.setUser(user);
       return;
     }

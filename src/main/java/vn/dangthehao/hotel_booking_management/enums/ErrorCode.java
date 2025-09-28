@@ -26,7 +26,7 @@ public enum ErrorCode {
       1011, HttpStatus.BAD_REQUEST, "New password must be different old password"),
   INVALID_GRANT_TYPE_TOKEN(1012, HttpStatus.BAD_REQUEST, "Invalid grant type refresh"),
   FAILED_PARSE_TOKEN(1013, HttpStatus.BAD_REQUEST, "Failed to parse jwt token"),
-  REFRESH_TOKEN_EXPIRED(1014, HttpStatus.BAD_REQUEST, "Refresh token is expired"),
+  INVALID_REFRESH_TOKEN(1014, HttpStatus.BAD_REQUEST, "Refresh token is invalid"),
   EMAIL_NOT_EXIST(1015, HttpStatus.BAD_REQUEST, "Email is not registered in the system"),
   INVALID_OTP(1016, HttpStatus.BAD_REQUEST, "Invalid OTP"),
   INVALID_RESET_TOKEN(1017, HttpStatus.BAD_REQUEST, "Reset password token is invalid"),

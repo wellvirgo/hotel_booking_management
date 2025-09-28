@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class ImageNameToUrlMapper {
-  @Value("${base_url}")
+  @Value("${base-url}")
   private String baseUrl;
 
   public List<String> toUrls(List<String> imageFileNames, String archiveFolderName) {
