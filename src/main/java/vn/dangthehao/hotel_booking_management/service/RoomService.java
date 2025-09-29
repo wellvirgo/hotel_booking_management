@@ -18,7 +18,7 @@ import vn.dangthehao.hotel_booking_management.mapper.RoomMapper;
 import vn.dangthehao.hotel_booking_management.model.Room;
 import vn.dangthehao.hotel_booking_management.model.RoomType;
 import vn.dangthehao.hotel_booking_management.repository.RoomRepository;
-import vn.dangthehao.hotel_booking_management.util.ResponseGenerator;
+import vn.dangthehao.hotel_booking_management.util.ApiResponseBuilder;
 
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -27,7 +27,6 @@ public class RoomService {
   RoomRepository roomRepository;
   RoomMapper roomMapper;
   RoomTypeService roomTypeService;
-  ResponseGenerator responseGenerator;
 
   public ApiResponse<RoomCrtResponse> createRoom(RoomCrtRequest roomCrtRequest) {
     Long roomTypeId = roomCrtRequest.getRoomTypeId();
@@ -40,7 +39,7 @@ public class RoomService {
     room.setRoomType(roomType);
 
     RoomCrtResponse roomCrtResponse = generateRoomCrtResponse(roomRepository.save(room), roomType);
-    return responseGenerator.generateSuccessResponse("Create room successfully", roomCrtResponse);
+    return ApiResponseBuilder.success("Create room successfully", roomCrtResponse);
   }
 
   public List<Room> getAvailableRoomsForBooking(BookingRequest bookingRequest) {

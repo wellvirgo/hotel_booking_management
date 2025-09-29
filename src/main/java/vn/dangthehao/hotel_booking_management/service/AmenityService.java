@@ -11,14 +11,13 @@ import vn.dangthehao.hotel_booking_management.enums.ErrorCode;
 import vn.dangthehao.hotel_booking_management.exception.AppException;
 import vn.dangthehao.hotel_booking_management.model.Amenity;
 import vn.dangthehao.hotel_booking_management.repository.AmenityRepository;
-import vn.dangthehao.hotel_booking_management.util.ResponseGenerator;
+import vn.dangthehao.hotel_booking_management.util.ApiResponseBuilder;
 
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @Service
 public class AmenityService {
   AmenityRepository amenityRepository;
-  ResponseGenerator responseGenerator;
 
   public ApiResponse<Void> createAmenity(AmenityCrtRequest crtRequest) {
     Optional<Amenity> amenityOptional = amenityRepository.findByName(crtRequest.getName());
@@ -27,6 +26,6 @@ public class AmenityService {
     amenity.setName(crtRequest.getName());
     amenityRepository.save(amenity);
 
-    return responseGenerator.generateSuccessResponse("Add a new amenity successfully!");
+    return ApiResponseBuilder.success("Add a new amenity successfully!");
   }
 }

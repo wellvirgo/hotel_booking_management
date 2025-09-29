@@ -1,4 +1,4 @@
-package vn.dangthehao.hotel_booking_management.util;
+package vn.dangthehao.hotel_booking_management.mapper;
 
 import java.util.Collections;
 import java.util.List;
@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 @Component
-public class ImageNameToUrlMapper {
+public class ImageUrlMapper {
   @Value("${base-url}")
   private String baseUrl;
 

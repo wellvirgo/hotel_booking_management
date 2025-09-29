@@ -2,7 +2,7 @@ package vn.dangthehao.hotel_booking_management.util;
 
 import jakarta.servlet.http.HttpServletRequest;
 
-public class IPUtil {
+public class IPUtils {
   public static String getClientIP(HttpServletRequest request) {
     String ip = request.getHeader("X-Forwarded-For");
     if (ip != null && !ip.isBlank() && !"unknown".equalsIgnoreCase(ip)) {

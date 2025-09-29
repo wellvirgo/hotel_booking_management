@@ -19,7 +19,7 @@ import vn.dangthehao.hotel_booking_management.enums.ErrorCode;
 import vn.dangthehao.hotel_booking_management.exception.AppException;
 
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class VNPUtil {
+public class VNPUtils {
   static final long DEFAULT_PAYMENT_LINK_VALID_MINUTES = 15;
 
   public static String buildPaymentUrl(VNPParamsDTO params) {

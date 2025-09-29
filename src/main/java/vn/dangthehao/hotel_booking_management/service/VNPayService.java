@@ -18,7 +18,7 @@ import vn.dangthehao.hotel_booking_management.exception.AppException;
 import vn.dangthehao.hotel_booking_management.model.Booking;
 import vn.dangthehao.hotel_booking_management.model.Payment;
 import vn.dangthehao.hotel_booking_management.repository.BookingRepository;
-import vn.dangthehao.hotel_booking_management.util.VNPUtil;
+import vn.dangthehao.hotel_booking_management.util.VNPUtils;
 
 @Slf4j
 @Component("vnpPayment")
@@ -37,27 +37,27 @@ public class VNPayService implements PaymentGatewayService {
   public String createDepositPaymentUrl(PaymentRequest paymentRequest) {
     Booking booking = paymentRequest.getBooking();
     String clientIp = paymentRequest.getClientIp();
-    String amountString = VNPUtil.formatAmount(booking.getDepositAmount());
+    String amountString = VNPUtils.formatAmount(booking.getDepositAmount());
     String orderInfo = String.format(orderInfoPattern, booking.getBookingCode());
-    String expireDate = VNPUtil.generateExpTime(booking.getHotel().getDepositDeadlineMinutes());
+    String expireDate = VNPUtils.generateExpTime(booking.getHotel().getDepositDeadlineMinutes());
     Payment payment = paymentService.createPayment(booking, booking.getDepositAmount());
 
     VNPParamsDTO vnpParamsDTO =
         buildVNPParams(clientIp, amountString, expireDate, payment.getTransactionId(), orderInfo);
 
-    return VNPUtil.buildPaymentUrl(vnpParamsDTO);
+    return VNPUtils.buildPaymentUrl(vnpParamsDTO);
   }
 
   @Override
   @Transactional
   public VNPResponse handleIPN(Map<String, String> params) {
     try {
-      if (!VNPUtil.validateCheckSum(params, vnpConfig.getHashSecret())) {
+      if (!VNPUtils.validateCheckSum(params, vnpConfig.getHashSecret())) {
         return buildResForVNP(RspForVNP.INVALID_CHECKSUM);
       }
 
       Payment payment = paymentService.findByTransactionId(params.get("vnp_TxnRef"));
-      String expectedAmount = VNPUtil.formatAmount(payment.getAmount());
+      String expectedAmount = VNPUtils.formatAmount(payment.getAmount());
       String receivedAmount = params.get("vnp_Amount");
       if (!expectedAmount.equals(receivedAmount)) {
         return buildResForVNP(RspForVNP.INVALID_AMOUNT);

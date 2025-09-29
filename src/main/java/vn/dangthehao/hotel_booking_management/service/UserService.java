@@ -21,7 +21,7 @@ import vn.dangthehao.hotel_booking_management.model.Role;
 import vn.dangthehao.hotel_booking_management.model.User;
 import vn.dangthehao.hotel_booking_management.repository.RoleRepository;
 import vn.dangthehao.hotel_booking_management.repository.UserRepository;
-import vn.dangthehao.hotel_booking_management.util.ResponseGenerator;
+import vn.dangthehao.hotel_booking_management.util.ApiResponseBuilder;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -33,7 +33,6 @@ public class UserService {
   UploadFileService uploadFileService;
   PasswordEncoder passwordEncoder;
   UserMapper userMapper;
-  ResponseGenerator responseGenerator;
 
   @NonFinal
   @Value("${base-url}")
@@ -83,7 +82,7 @@ public class UserService {
     UserCrtResponse userCrtResponse = userMapper.toUserCrtResponse(user);
     userCrtResponse.setRoleName(role.getRoleName());
 
-    return responseGenerator.generateSuccessResponse("User is created", userCrtResponse);
+    return ApiResponseBuilder.success("User is created", userCrtResponse);
   }
 
   public ApiResponse<UserResponse> getCurrentUser(Jwt jwt) {
@@ -97,7 +96,7 @@ public class UserService {
     userResponse.setAvatar(avatar);
     userResponse.setRoleName(currentUser.getRole().getRoleName());
 
-    return responseGenerator.generateSuccessResponse("Current user's information", userResponse);
+    return ApiResponseBuilder.success("Current user's information", userResponse);
   }
 
   public ApiResponse<UserUpdateResponse> updateAccountInf(
@@ -113,7 +112,7 @@ public class UserService {
         userMapper.toUserUpdateResponse(userRepository.save(currentUser));
     userUpdateResponse.setAvatar(avatar);
 
-    return responseGenerator.generateSuccessResponse("User is updated", userUpdateResponse);
+    return ApiResponseBuilder.success("User is updated", userUpdateResponse);
   }
 
   public ApiResponse<List<UserListResponse>> listUsers() {
@@ -121,7 +120,7 @@ public class UserService {
     List<UserListResponse> userListResponse =
         userList.stream().map(this::addAvatarAndRoleName).toList();
 
-    return responseGenerator.generateSuccessResponse("List users successfully!", userListResponse);
+    return ApiResponseBuilder.success("List users successfully!", userListResponse);
   }
 
   public ApiResponse<Void> deleteByID(Long id) {
@@ -129,7 +128,7 @@ public class UserService {
     user.setDeleted(true);
     userRepository.save(user);
 
-    return responseGenerator.generateSuccessResponse("Delete user successfully!");
+    return ApiResponseBuilder.success("Delete user successfully!");
   }
 
   public void updateTokenVersion(User user) {

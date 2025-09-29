@@ -25,6 +25,7 @@ import vn.dangthehao.hotel_booking_management.dto.request.RoomTypeUpdateRequest;
 import vn.dangthehao.hotel_booking_management.dto.response.*;
 import vn.dangthehao.hotel_booking_management.enums.ErrorCode;
 import vn.dangthehao.hotel_booking_management.exception.AppException;
+import vn.dangthehao.hotel_booking_management.mapper.ImageUrlMapper;
 import vn.dangthehao.hotel_booking_management.mapper.RoomTypeMapper;
 import vn.dangthehao.hotel_booking_management.model.Amenity;
 import vn.dangthehao.hotel_booking_management.model.Hotel;
@@ -32,8 +33,7 @@ import vn.dangthehao.hotel_booking_management.model.RoomType;
 import vn.dangthehao.hotel_booking_management.repository.AmenityRepository;
 import vn.dangthehao.hotel_booking_management.repository.BookingRepository;
 import vn.dangthehao.hotel_booking_management.repository.RoomTypeRepository;
-import vn.dangthehao.hotel_booking_management.util.ImageNameToUrlMapper;
-import vn.dangthehao.hotel_booking_management.util.ResponseGenerator;
+import vn.dangthehao.hotel_booking_management.util.ApiResponseBuilder;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -45,10 +45,9 @@ public class RoomTypeService {
   HotelService hotelService;
   RoomTypeMapper roomTypeMapper;
   RoomInventoryService roomInventoryService;
-  ResponseGenerator responseGenerator;
   AmenityRepository amenityRepository;
   UploadFileService uploadFileService;
-  ImageNameToUrlMapper imageNameToUrlMapper;
+  ImageUrlMapper imageNameToUrlMapper;
 
   @NonFinal
   @Value("${base-url}")
@@ -73,8 +72,7 @@ public class RoomTypeService {
     // Create some inventories in advance
     roomInventoryService.createRoomInventories(savedRoomType);
 
-    return responseGenerator.generateSuccessResponse(
-        "Config room type successfully!", roomTypeCrtResponse);
+    return ApiResponseBuilder.success("Config room type successfully!", roomTypeCrtResponse);
   }
 
   public RoomType findById(Long id) {
@@ -103,7 +101,7 @@ public class RoomTypeService {
             .totalPages(ownerRoomTypeDTOPage.getTotalPages())
             .build();
 
-    return responseGenerator.generateSuccessResponse("List room type in this hotel", response);
+    return ApiResponseBuilder.success("List room type in this hotel", response);
   }
 
   @PreAuthorize("@hotelService.isOwner(#hotelId, authentication.principal)")
@@ -120,7 +118,7 @@ public class RoomTypeService {
     RoomTypeUpdateResponse response =
         mapRoomTypeToRoomTypeUpdateResponse(roomTypeRepository.save(roomTypeBeforeUpdate));
 
-    return responseGenerator.generateSuccessResponse("Update room type successfully!", response);
+    return ApiResponseBuilder.success("Update room type successfully!", response);
   }
 
   @PreAuthorize("@hotelService.isOwner(#hotelId, authentication.principal)")
@@ -133,7 +131,7 @@ public class RoomTypeService {
     response.setImageUrls(imageUrls);
 
     String message = String.format("Detail of information about room type %s", roomType.getName());
-    return responseGenerator.generateSuccessResponse(message, response);
+    return ApiResponseBuilder.success(message, response);
   }
 
   public Long getIdByBookingId(Long bookingId) {

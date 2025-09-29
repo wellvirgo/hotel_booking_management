@@ -31,8 +31,8 @@ import vn.dangthehao.hotel_booking_management.model.*;
 import vn.dangthehao.hotel_booking_management.repository.BookingRepository;
 import vn.dangthehao.hotel_booking_management.security.JwtService;
 import vn.dangthehao.hotel_booking_management.security.SecurityUtils;
+import vn.dangthehao.hotel_booking_management.util.ApiResponseBuilder;
 import vn.dangthehao.hotel_booking_management.util.BookingCodeGenerator;
-import vn.dangthehao.hotel_booking_management.util.ResponseGenerator;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -52,7 +52,6 @@ public class BookingService {
   RoomInventoryService roomInventoryService;
   BookingRepository bookingRepository;
   JwtService jwtService;
-  ResponseGenerator responseGenerator;
   BookingMapper bookingMapper;
   TransactionTemplate transactionTemplate;
   BookingProducer bookingProducer;
@@ -245,6 +244,6 @@ public class BookingService {
     // Message for api booking response
     String message = depositRequired ? DEPOSIT_REQUIREMENT_MESS : NOT_DEPOSIT_REQUIREMENT_MESS;
 
-    return responseGenerator.generateSuccessResponse(message, bookingResponse);
+    return ApiResponseBuilder.success(message, bookingResponse);
   }
 }

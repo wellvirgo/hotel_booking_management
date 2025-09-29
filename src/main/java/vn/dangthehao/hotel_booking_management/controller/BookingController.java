@@ -11,7 +11,7 @@ import vn.dangthehao.hotel_booking_management.dto.request.BookingRequest;
 import vn.dangthehao.hotel_booking_management.dto.response.ApiResponse;
 import vn.dangthehao.hotel_booking_management.dto.response.BookingResponse;
 import vn.dangthehao.hotel_booking_management.service.BookingService;
-import vn.dangthehao.hotel_booking_management.util.IPUtil;
+import vn.dangthehao.hotel_booking_management.util.IPUtils;
 
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -28,7 +28,7 @@ public class BookingController {
       HttpServletRequest httpServletRequest) {
     bookingRequest.setHotelId(hotelId);
     bookingRequest.setRoomTypeId(roomTypeId);
-    bookingRequest.setClientIp(IPUtil.getClientIP(httpServletRequest));
+    bookingRequest.setClientIp(IPUtils.getClientIP(httpServletRequest));
 
     return ResponseEntity.ok(bookingService.holdReservation(bookingRequest));
   }

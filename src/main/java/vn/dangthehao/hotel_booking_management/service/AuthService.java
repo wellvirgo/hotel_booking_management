@@ -18,8 +18,8 @@ import vn.dangthehao.hotel_booking_management.model.User;
 import vn.dangthehao.hotel_booking_management.security.JwtProvider;
 import vn.dangthehao.hotel_booking_management.security.JwtService;
 import vn.dangthehao.hotel_booking_management.security.SecurityUtils;
+import vn.dangthehao.hotel_booking_management.util.ApiResponseBuilder;
 import vn.dangthehao.hotel_booking_management.util.OTPUtils;
-import vn.dangthehao.hotel_booking_management.util.ResponseGenerator;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -34,7 +34,6 @@ public class AuthService {
   PasswordResetCacheService passwordResetCacheService;
   JwtProvider jwtProvider;
   PasswordEncoder passwordEncoder;
-  ResponseGenerator responseGenerator;
 
   public ApiResponse<AuthResponse> authenticate(AuthRequest request) {
     User user = verifyCredentials(request);
@@ -42,9 +41,9 @@ public class AuthService {
     String accessToken = jwtProvider.generateToken(user);
     String refreshToken = refreshTokenService.issueRefreshToken(user.getId());
 
-    AuthResponse data = responseGenerator.generateAuthResponse(accessToken, refreshToken);
+    AuthResponse data = ApiResponseBuilder.auth(accessToken, refreshToken);
 
-    return responseGenerator.generateSuccessResponse("Is authenticated", data);
+    return ApiResponseBuilder.success("Is authenticated", data);
   }
 
   public ApiResponse<AuthResponse> renewTokenPair(String currRefreshToken) {
@@ -57,9 +56,9 @@ public class AuthService {
     String newAccessToken = jwtProvider.generateToken(user);
     String newRefreshToken = refreshTokenService.renewRefreshToken(userId, currRefreshToken);
 
-    AuthResponse data = responseGenerator.generateAuthResponse(newAccessToken, newRefreshToken);
+    AuthResponse data = ApiResponseBuilder.auth(newAccessToken, newRefreshToken);
 
-    return responseGenerator.generateSuccessResponse("Access and refresh token are renewed", data);
+    return ApiResponseBuilder.success("Access and refresh token are renewed", data);
   }
 
   public ApiResponse<String> logout(Jwt accessJwt, String refreshToken) {
@@ -68,7 +67,7 @@ public class AuthService {
 
     SecurityUtils.clearAuthentication();
 
-    return responseGenerator.generateSuccessResponse("Logout successfully");
+    return ApiResponseBuilder.success("Logout successfully");
   }
 
   public ApiResponse<String> logoutAll(Jwt accessJwt) {
@@ -78,7 +77,7 @@ public class AuthService {
 
     refreshTokenService.revokeAllByUser(userId);
 
-    return responseGenerator.generateSuccessResponse("Logout all device successfully");
+    return ApiResponseBuilder.success("Logout all device successfully");
   }
 
   public ApiResponse<AuthResponse> changePassword(ChangePasswordRequest request, Jwt jwt) {
@@ -103,7 +102,7 @@ public class AuthService {
 
     mailService.sendPasswordChangedAsync(user.getEmail());
 
-    return responseGenerator.generateSuccessResponse("Password changed successfully!", response);
+    return ApiResponseBuilder.success("Password changed successfully!", response);
   }
 
   public ApiResponse<Void> sendPasswordResetOtp(PasswordResetOtpRequest request) {
@@ -116,7 +115,7 @@ public class AuthService {
     mailService.sendOtpAsync(email, otp);
     passwordResetCacheService.cacheOtp(email, otp);
 
-    return responseGenerator.generateSuccessResponse("OTP will be sent to your email");
+    return ApiResponseBuilder.success("OTP will be sent to your email");
   }
 
   public ApiResponse<PasswordResetOtpVerifyResponse> verifyPasswordResetOtp(
@@ -137,7 +136,7 @@ public class AuthService {
     PasswordResetOtpVerifyResponse data =
         PasswordResetOtpVerifyResponse.builder().resetToken(resetToken).build();
 
-    return responseGenerator.generateSuccessResponse("Verify OTP successfully", data);
+    return ApiResponseBuilder.success("Verify OTP successfully", data);
   }
 
   public ApiResponse<Void> resetPassword(ResetPasswordRequest request, String resetToken) {
@@ -158,7 +157,7 @@ public class AuthService {
     passwordResetCacheService.deleteToken(email);
     mailService.sendPasswordResetAsync(email);
 
-    return responseGenerator.generateSuccessResponse("Reset password successfully");
+    return ApiResponseBuilder.success("Reset password successfully");
   }
 
   private User verifyCredentials(AuthRequest request) {

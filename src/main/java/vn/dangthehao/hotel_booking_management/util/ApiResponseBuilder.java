@@ -1,19 +1,12 @@
 package vn.dangthehao.hotel_booking_management.util;
 
-import lombok.AccessLevel;
-import lombok.RequiredArgsConstructor;
-import lombok.experimental.FieldDefaults;
 import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Component;
 import vn.dangthehao.hotel_booking_management.dto.response.ApiResponse;
 import vn.dangthehao.hotel_booking_management.dto.response.AuthResponse;
 
-@RequiredArgsConstructor
-@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-@Component
-public class ResponseGenerator {
+public class ApiResponseBuilder {
 
-  public <T> ApiResponse<T> generateSuccessResponse(String message, T data) {
+  public static <T> ApiResponse<T> success(String message, T data) {
     return ApiResponse.<T>builder()
         .status("Success")
         .code(HttpStatus.OK.value())
@@ -22,7 +15,7 @@ public class ResponseGenerator {
         .build();
   }
 
-  public <T> ApiResponse<T> generateSuccessResponse(String message) {
+  public static <T> ApiResponse<T> success(String message) {
     return ApiResponse.<T>builder()
         .status("Success")
         .code(HttpStatus.OK.value())
@@ -30,7 +23,7 @@ public class ResponseGenerator {
         .build();
   }
 
-  public AuthResponse generateAuthResponse(String accessToken, String refreshToken) {
+  public static AuthResponse auth(String accessToken, String refreshToken) {
     return AuthResponse.builder().accessToken(accessToken).refreshToken(refreshToken).build();
   }
 }

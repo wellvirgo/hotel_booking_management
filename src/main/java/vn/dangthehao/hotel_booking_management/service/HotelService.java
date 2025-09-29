@@ -28,6 +28,7 @@ import vn.dangthehao.hotel_booking_management.enums.ErrorCode;
 import vn.dangthehao.hotel_booking_management.enums.HotelStatus;
 import vn.dangthehao.hotel_booking_management.exception.AppException;
 import vn.dangthehao.hotel_booking_management.mapper.HotelMapper;
+import vn.dangthehao.hotel_booking_management.mapper.ImageUrlMapper;
 import vn.dangthehao.hotel_booking_management.mapper.RoomTypeMapper;
 import vn.dangthehao.hotel_booking_management.model.Amenity;
 import vn.dangthehao.hotel_booking_management.model.Hotel;
@@ -38,8 +39,7 @@ import vn.dangthehao.hotel_booking_management.repository.ReviewRepository;
 import vn.dangthehao.hotel_booking_management.repository.RoomInventoryRepository;
 import vn.dangthehao.hotel_booking_management.repository.RoomTypeRepository;
 import vn.dangthehao.hotel_booking_management.security.JwtService;
-import vn.dangthehao.hotel_booking_management.util.ImageNameToUrlMapper;
-import vn.dangthehao.hotel_booking_management.util.ResponseGenerator;
+import vn.dangthehao.hotel_booking_management.util.ApiResponseBuilder;
 
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -47,12 +47,11 @@ import vn.dangthehao.hotel_booking_management.util.ResponseGenerator;
 public class HotelService {
   HotelMapper hotelMapper;
   HotelRepository hotelRepository;
-  ResponseGenerator responseGenerator;
   UserService userService;
   MailService mailService;
   UploadFileService uploadFileService;
   JwtService jwtService;
-  ImageNameToUrlMapper imageNameToUrlMapper;
+  ImageUrlMapper imageUrlMapper;
   RoomTypeRepository roomTypeRepository;
   RoomInventoryRepository roomInventoryRepository;
   ReviewRepository reviewRepository;
@@ -91,8 +90,7 @@ public class HotelService {
     HotelRegistrationResponse response =
         buildHotelRegistrationResponse(savedHotel, jwtService.getUserId(jwt));
 
-    return responseGenerator.generateSuccessResponse(
-        "Your application will be handled soon!", response);
+    return ApiResponseBuilder.success("Your application will be handled soon!", response);
   }
 
   public ApiResponse<UnapprovedHotelsResponse> findUnapprovedHotels(int page, int size) {
@@ -106,8 +104,7 @@ public class HotelService {
             .currentPage(page)
             .totalPages(unapprovedHotelDTOPage.getTotalPages())
             .build();
-    return responseGenerator.generateSuccessResponse(
-        "List of unapproved hotels", unapprovedHotelsResponse);
+    return ApiResponseBuilder.success("List of unapproved hotels", unapprovedHotelsResponse);
   }
 
   public ApiResponse<DetailHotelResponse> getDetailHotel(Long id) {
@@ -122,7 +119,7 @@ public class HotelService {
             : "";
     response.setOwnerAvatar(avatarUrl);
 
-    return responseGenerator.generateSuccessResponse("Hotel detail", response);
+    return ApiResponseBuilder.success("Hotel detail", response);
   }
 
   public ApiResponse<Void> approveHotel(Long id) {
@@ -137,7 +134,7 @@ public class HotelService {
     String ownerEmail = hotel.getOwner().getEmail();
     mailService.sendApproveHotelEmailAsync(ownerEmail, hotel.getHotelName());
 
-    return responseGenerator.generateSuccessResponse("Hotel is approved");
+    return ApiResponseBuilder.success("Hotel is approved");
   }
 
   public ApiResponse<Void> rejectHotel(Long id) {
@@ -152,7 +149,7 @@ public class HotelService {
     String ownerEmail = hotel.getOwner().getEmail();
     mailService.sendRejectHotelEmailAsync(ownerEmail, hotel.getHotelName());
 
-    return responseGenerator.generateSuccessResponse("Hotel is rejected");
+    return ApiResponseBuilder.success("Hotel is rejected");
   }
 
   public ApiResponse<OwnerHotelsResponse> findHotelsByOwner(
@@ -170,8 +167,7 @@ public class HotelService {
               .totalPages(ownerHotelItemDTOPage.getTotalPages())
               .build();
 
-      return responseGenerator.generateSuccessResponse(
-          "List of owner unapproved hotels", ownerHotelsResponse);
+      return ApiResponseBuilder.success("List of owner unapproved hotels", ownerHotelsResponse);
     }
 
     ownerHotelItemDTOPage =
@@ -183,8 +179,7 @@ public class HotelService {
             .totalPages(ownerHotelItemDTOPage.getTotalPages())
             .build();
 
-    return responseGenerator.generateSuccessResponse(
-        "List of approved hotels", ownerHotelsResponse);
+    return ApiResponseBuilder.success("List of approved hotels", ownerHotelsResponse);
   }
 
   public boolean isOwner(Long hotelId, Jwt jwt) {
@@ -206,7 +201,7 @@ public class HotelService {
     SearchHotelResponse response =
         buildSearchHotelResponse(request, hotelPageByLocation, hotelInSearchResultList);
 
-    return responseGenerator.generateSuccessResponse("List of hotels found", response);
+    return ApiResponseBuilder.success("List of hotels found", response);
   }
 
   private Hotel createHotelFromRequest(
@@ -235,8 +230,7 @@ public class HotelService {
   private HotelRegistrationResponse buildHotelRegistrationResponse(Hotel hotel, Long ownerId) {
     HotelRegistrationResponse response = hotelMapper.toHotelRegistrationResponse(hotel);
     response.setOwnerId(ownerId);
-    response.setThumbnailUrl(
-        imageNameToUrlMapper.toUrl(hotel.getThumbnail(), this.hotelImgFolderName));
+    response.setThumbnailUrl(imageUrlMapper.toUrl(hotel.getThumbnail(), this.hotelImgFolderName));
     response.setRoomTypes(Collections.emptyList());
 
     return response;
@@ -338,9 +332,7 @@ public class HotelService {
     HotelInSearchResult hotelInSearchResult = hotelMapper.toHotelInSearchResult(hotel);
     String thumbnail = hotel.getThumbnail();
     String thumbnailUrl =
-        StringUtils.hasText(thumbnail)
-            ? imageNameToUrlMapper.toUrl(thumbnail, hotelImgFolderName)
-            : "";
+        StringUtils.hasText(thumbnail) ? imageUrlMapper.toUrl(thumbnail, hotelImgFolderName) : "";
     hotelInSearchResult.setThumbnailUrl(thumbnailUrl);
     hotelInSearchResult.setTotalReviewCount(reviewRepository.countByHotelId(hotel.getId()));
     hotelInSearchResult.setLowestPriceRoomType(lowestPriceRoomType);
