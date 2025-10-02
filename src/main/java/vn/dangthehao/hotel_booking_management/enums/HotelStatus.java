@@ -1,8 +1,13 @@
 package vn.dangthehao.hotel_booking_management.enums;
 
 public enum HotelStatus {
+  PENDING,
   ACTIVE,
   INACTIVE,
-  MAINTENANCE,
-  REJECTED
+  REJECTED,
+  SUSPENDED;
+
+  public static boolean canConfigure(HotelStatus status) {
+    return status != PENDING && status != REJECTED && status != SUSPENDED;
+  }
 }
