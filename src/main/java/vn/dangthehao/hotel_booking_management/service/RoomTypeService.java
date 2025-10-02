@@ -47,7 +47,7 @@ public class RoomTypeService {
   RoomInventoryService roomInventoryService;
   AmenityRepository amenityRepository;
   UploadFileService uploadFileService;
-  ImageUrlMapper imageNameToUrlMapper;
+  ImageUrlMapper imageUrlMapper;
 
   @NonFinal
   @Value("${base-url}")
@@ -61,10 +61,10 @@ public class RoomTypeService {
   @Value("${file.upload-folder}")
   String uploadFolder;
 
-  @PreAuthorize("@hotelService.isOwner(#hotelId, authentication.principal)")
+  @PreAuthorize("@hotelService.isOwner(#hotelId, #ownerId)")
   public ApiResponse<RoomTypeCrtResponse> create(
-      Long hotelId, RoomTypeCrtRequest request, List<MultipartFile> imageFiles) {
-    Hotel hotel = hotelService.findApprovedHotelById(hotelId);
+      Long hotelId, Long ownerId, RoomTypeCrtRequest request, List<MultipartFile> imageFiles) {
+    Hotel hotel = hotelService.getConfigurableHotel(hotelId);
     RoomType roomType = buildRoomType(hotel, request, imageFiles);
     RoomType savedRoomType = roomTypeRepository.save(roomType);
     RoomTypeCrtResponse roomTypeCrtResponse = buildRoomTypeCrtResponse(savedRoomType, hotel);
@@ -87,27 +87,27 @@ public class RoomTypeService {
         .orElseThrow(() -> new AppException(ErrorCode.ROOM_TYPE_NOT_FOUND, id));
   }
 
-  @PreAuthorize("@hotelService.isOwner(#hotelId, authentication.principal)")
-  public ApiResponse<OwnerRoomTypesResponse> getRoomTypesByHotelId(
-      Long hotelId, int page, int size) {
+  @PreAuthorize("@hotelService.isOwner(#hotelId, #ownerId)")
+  public OwnerRoomTypesResponse getRoomTypesForOwner(
+      Long hotelId, Long ownerId, int page, int size) {
     Pageable pageable = PageRequest.of(page - 1, size);
     Page<OwnerRoomTypeDTO> ownerRoomTypeDTOPage =
         roomTypeRepository.findByHotelId(hotelId, pageable);
-    List<OwnerRoomTypeDTO> ownerRoomTypeDTOList = ownerRoomTypeDTOPage.getContent();
-    OwnerRoomTypesResponse response =
-        OwnerRoomTypesResponse.builder()
-            .roomTypes(ownerRoomTypeDTOList)
-            .currentPage(page)
-            .totalPages(ownerRoomTypeDTOPage.getTotalPages())
-            .build();
 
-    return ApiResponseBuilder.success("List room type in this hotel", response);
+    List<OwnerRoomTypeDTO> roomTypes = ownerRoomTypeDTOPage.getContent();
+
+    return OwnerRoomTypesResponse.builder()
+        .roomTypes(roomTypes)
+        .currentPage(page)
+        .totalPages(ownerRoomTypeDTOPage.getTotalPages())
+        .build();
   }
 
-  @PreAuthorize("@hotelService.isOwner(#hotelId, authentication.principal)")
-  public ApiResponse<RoomTypeUpdateResponse> updateRoomType(
+  @PreAuthorize("@hotelService.isOwner(#hotelId, #ownerId)")
+  public RoomTypeUpdateResponse updateRoomType(
       Long roomTypeId,
       Long hotelId,
+      Long ownerId,
       RoomTypeUpdateRequest request,
       List<MultipartFile> imageFiles) {
     RoomType roomTypeBeforeUpdate = findById(roomTypeId);
@@ -115,23 +115,19 @@ public class RoomTypeService {
     mapRoomTypeUpdateRequestToRoomType(request, roomTypeBeforeUpdate);
     roomTypeBeforeUpdate.setAmenities(amenities);
     updateRoomTypeImages(roomTypeBeforeUpdate, imageFiles);
-    RoomTypeUpdateResponse response =
-        mapRoomTypeToRoomTypeUpdateResponse(roomTypeRepository.save(roomTypeBeforeUpdate));
 
-    return ApiResponseBuilder.success("Update room type successfully!", response);
+    return mapRoomTypeToRoomTypeUpdateResponse(roomTypeRepository.save(roomTypeBeforeUpdate));
   }
 
-  @PreAuthorize("@hotelService.isOwner(#hotelId, authentication.principal)")
-  public ApiResponse<OwnerDetailRoomTypeResponse> detailRoomType(Long hotelId, Long roomTypeId) {
+  @PreAuthorize("@hotelService.isOwner(#hotelId, #ownerId)")
+  public OwnerDetailRoomTypeResponse detailRoomType(Long hotelId, Long roomTypeId, Long ownerId) {
     RoomType roomType = findById(roomTypeId);
     OwnerDetailRoomTypeResponse response = roomTypeMapper.toOwnerDetailRoomTypeResponse(roomType);
     response.setAmenityNames(convertToAmenityNames(roomType.getAmenities()));
-    List<String> imageUrls =
-        imageNameToUrlMapper.toUrls(roomType.getImageNames(), roomTypeImgFolderName);
+    List<String> imageUrls = imageUrlMapper.toUrls(roomType.getImageNames(), roomTypeImgFolderName);
     response.setImageUrls(imageUrls);
 
-    String message = String.format("Detail of information about room type %s", roomType.getName());
-    return ApiResponseBuilder.success(message, response);
+    return response;
   }
 
   public Long getIdByBookingId(Long bookingId) {
@@ -164,7 +160,7 @@ public class RoomTypeService {
     RoomTypeCrtResponse roomTypeCrtResponse = roomTypeMapper.toRoomTypeCrtResponse(savedRoomType);
     roomTypeCrtResponse.setHotelId(hotel.getId());
     List<String> imageUrls =
-        imageNameToUrlMapper.toUrls(savedRoomType.getImageNames(), roomTypeImgFolderName);
+        imageUrlMapper.toUrls(savedRoomType.getImageNames(), roomTypeImgFolderName);
     roomTypeCrtResponse.setImageUrls(imageUrls);
     roomTypeCrtResponse.setAmenityNames(convertToAmenityNames(savedRoomType.getAmenities()));
 
@@ -217,8 +213,7 @@ public class RoomTypeService {
 
   private RoomTypeUpdateResponse mapRoomTypeToRoomTypeUpdateResponse(RoomType roomType) {
     RoomTypeUpdateResponse response = roomTypeMapper.toRoomTypeUpdateResponse(roomType);
-    List<String> imageUrls =
-        imageNameToUrlMapper.toUrls(roomType.getImageNames(), roomTypeImgFolderName);
+    List<String> imageUrls = imageUrlMapper.toUrls(roomType.getImageNames(), roomTypeImgFolderName);
     response.setImageUrls(imageUrls);
     response.setAmenityNames(convertToAmenityNames(roomType.getAmenities()));
 

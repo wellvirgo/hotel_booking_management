@@ -25,4 +25,12 @@ public class ImageUrlMapper {
 
     return String.format("%s/%s/%s", this.baseUrl, archiveFolderName, imageFileName);
   }
+
+  public String toImageName(String url, String archiveFolderName) {
+    if (url == null || url.isBlank()) {
+      return "";
+    }
+
+    return url.replace(String.format("%s/%s/", this.baseUrl, archiveFolderName), "");
+  }
 }

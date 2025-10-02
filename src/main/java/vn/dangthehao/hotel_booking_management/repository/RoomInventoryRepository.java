@@ -38,7 +38,7 @@ public interface RoomInventoryRepository extends JpaRepository<RoomInventory, Lo
   @Query(
       """
         update RoomInventory ri
-        set ri.availableRooms = ri.availableRooms + :quantity
+        set ri.availableRooms = ri.availableRooms + :quantity, ri.updatedAt = current_timestamp
         where ri.roomType.id = :roomTypeId
         and ri.inventoryDate >= :checkIn
         and ri.inventoryDate < :checkOut

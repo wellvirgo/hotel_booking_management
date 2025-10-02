@@ -31,8 +31,7 @@ public enum ErrorCode {
   INVALID_OTP(1016, HttpStatus.BAD_REQUEST, "Invalid OTP"),
   INVALID_RESET_TOKEN(1017, HttpStatus.BAD_REQUEST, "Reset password token is invalid"),
   HOTEL_NOT_FOUND(1018, HttpStatus.NOT_FOUND, "Hotel not found"),
-  CAN_NOT_APPROVE_HOTEL(1019, HttpStatus.BAD_REQUEST, "Can't approve the hotel"),
-  CAN_NOT_REJECT_HOTEL(1020, HttpStatus.BAD_REQUEST, "Can't reject the hotel"),
+  HOTEL_ALREADY_PROCESS(1019, HttpStatus.BAD_REQUEST, "Hotel has been already processed"),
   AMENITY_EXISTS(1021, HttpStatus.BAD_REQUEST, "Amenity already exists"),
   DUPLICATE_DATA(1022, HttpStatus.BAD_REQUEST, "Invalid data, duplicate data in field not allowed"),
   HOTEL_NOT_APPROVED(1023, HttpStatus.BAD_REQUEST, "Hotel is not approved"),
@@ -46,6 +45,8 @@ public enum ErrorCode {
   INVALID_STATUS_TRANSITION(
       1030, HttpStatus.INTERNAL_SERVER_ERROR, "%s cannot jump from %s status to %s status"),
   BOOKING_NOT_FOUND(1031, HttpStatus.NOT_FOUND, "Booking with id %s not found"),
+  PERMISSION_NOT_FOUND(1032, HttpStatus.NOT_FOUND, "Permission with name %s not found"),
+  HOTEL_NOT_CONFIGURABLE(1033, HttpStatus.BAD_REQUEST, "Hotel with id %s is not configurable"),
   UNCATEGORIZED_EXCEPTION(9999, HttpStatus.INTERNAL_SERVER_ERROR, "Internal server error");
 
   int code;

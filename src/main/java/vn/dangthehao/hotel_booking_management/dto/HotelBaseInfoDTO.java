@@ -2,18 +2,19 @@ package vn.dangthehao.hotel_booking_management.dto;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import lombok.experimental.SuperBuilder;
 
 @Getter
 @Setter
-@NoArgsConstructor
+@SuperBuilder
 @AllArgsConstructor
-@Builder
+@NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class UnapprovedHotelDTO {
+public class HotelBaseInfoDTO {
+  Long id;
   String hotelName;
-  String ownerName;
   String address;
   String location;
-  float depositRate;
-  long depositDeadlineMinutes;
+  String thumbnail;
+  float rating;
 }

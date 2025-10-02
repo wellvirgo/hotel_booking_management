@@ -4,16 +4,16 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import vn.dangthehao.hotel_booking_management.dto.HotelInSearchResult;
 import vn.dangthehao.hotel_booking_management.dto.request.HotelRegistrationRequest;
-import vn.dangthehao.hotel_booking_management.dto.response.DetailHotelResponse;
+import vn.dangthehao.hotel_booking_management.dto.response.AdminDetailHotelResponse;
 import vn.dangthehao.hotel_booking_management.dto.response.HotelRegistrationResponse;
 import vn.dangthehao.hotel_booking_management.model.Hotel;
 
 @Mapper(componentModel = "spring")
 public interface HotelMapper {
-  @Mapping(target = "status", constant = "INACTIVE")
+  @Mapping(target = "status", constant = "PENDING")
   Hotel toHotel(HotelRegistrationRequest request);
 
-  DetailHotelResponse toDetailHotelResponse(Hotel hotel);
+  AdminDetailHotelResponse toDetailHotelResponse(Hotel hotel);
 
   HotelRegistrationResponse toHotelRegistrationResponse(Hotel hotel);
 

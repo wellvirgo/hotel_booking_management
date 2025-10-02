@@ -1,17 +1,18 @@
 package vn.dangthehao.hotel_booking_management.dto.response;
 
-import java.util.List;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.SuperBuilder;
-import vn.dangthehao.hotel_booking_management.dto.UnapprovedHotelDTO;
+import vn.dangthehao.hotel_booking_management.dto.OwnerHotelListItemDTO;
+
+import java.util.List;
 
 @Getter
 @Setter
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-@SuperBuilder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class UnapprovedHotelsResponse extends BaseFormListResponse {
-  List<UnapprovedHotelDTO> unapprovedHotels;
+public class OwnerHotelListResponse extends BaseFormListResponse {
+    List<OwnerHotelListItemDTO> hotelList;
 }

@@ -3,20 +3,19 @@ package vn.dangthehao.hotel_booking_management.dto.response;
 import java.time.LocalTime;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import lombok.experimental.SuperBuilder;
+import vn.dangthehao.hotel_booking_management.dto.HotelBaseInfoDTO;
+import vn.dangthehao.hotel_booking_management.enums.HotelStatus;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
+@SuperBuilder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class DetailHotelResponse {
-  String hotelName;
-  String address;
-  String location;
+public class AdminDetailHotelResponse extends HotelBaseInfoDTO {
   String description;
-  float rating;
-  String status;
+  HotelStatus status;
   float depositRate;
   long depositDeadlineMinutes;
   LocalTime checkInTime;

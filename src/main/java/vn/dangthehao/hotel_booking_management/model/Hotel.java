@@ -47,9 +47,6 @@ public class Hotel extends BaseEntity {
   HotelStatus status;
 
   @Column(columnDefinition = "boolean default false", nullable = false)
-  boolean approved;
-
-  @Column(columnDefinition = "boolean default false", nullable = false)
   boolean deleted;
 
   @Column(nullable = false)

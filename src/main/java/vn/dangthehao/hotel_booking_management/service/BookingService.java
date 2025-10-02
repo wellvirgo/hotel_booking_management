@@ -65,7 +65,7 @@ public class BookingService {
   String lockStrategyName;
 
   public ApiResponse<BookingResponse> holdReservation(BookingRequest bookingRequest) {
-    Hotel hotel = hotelService.findApprovedHotelById(bookingRequest.getHotelId());
+    Hotel hotel = hotelService.getActiveHotel(bookingRequest.getHotelId());
     RoomType roomType = roomTypeService.findActiveRoomTypeById(bookingRequest.getRoomTypeId());
 
     BookingLockStrategy bookingLockStrategy = lockStrategyFactory.getLockStrategy(lockStrategyName);

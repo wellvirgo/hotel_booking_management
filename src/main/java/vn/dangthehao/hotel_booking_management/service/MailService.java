@@ -41,18 +41,15 @@ public class MailService {
   }
 
   @Async
-  public void sendApproveHotelEmailAsync(String mailTo, String hotelName) {
-    Mail mail =
-        generateMail(
-            mailTo, "Approve Hotel", String.format("Your %s hotel has been approved", hotelName));
-    sendEmail(mail);
-  }
+  public void sendApprovalResultAsync(String mailTo, String hotelName, boolean approved) {
+    String content;
+    if (approved) {
+      content = String.format("Your %s hotel has been approved", hotelName);
+    } else {
+      content = String.format("Your %s hotel has been rejected", hotelName);
+    }
 
-  @Async
-  public void sendRejectHotelEmailAsync(String mailTo, String hotelName) {
-    Mail mail =
-        generateMail(
-            mailTo, "Reject Hotel", String.format("Your %s hotel has been reject", hotelName));
+    Mail mail = generateMail(mailTo, "Hotel Approval Result", content);
     sendEmail(mail);
   }
 

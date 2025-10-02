@@ -7,42 +7,38 @@ import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
-import vn.dangthehao.hotel_booking_management.dto.OwnerHotelItemDTO;
-import vn.dangthehao.hotel_booking_management.dto.UnapprovedHotelDTO;
+import vn.dangthehao.hotel_booking_management.dto.AdminHotelListItemDTO;
+import vn.dangthehao.hotel_booking_management.dto.OwnerHotelListItemDTO;
 import vn.dangthehao.hotel_booking_management.enums.HotelStatus;
 import vn.dangthehao.hotel_booking_management.model.Hotel;
 
 @Repository
 public interface HotelRepository extends JpaRepository<Hotel, Long> {
-  @Query(
-      "select new vn.dangthehao.hotel_booking_management.dto.UnapprovedHotelDTO("
-          + "h.hotelName, ow.fullName, h.address, h.location, h.depositRate, h.depositDeadlineMinutes) "
-          + "from Hotel h join h.owner ow "
-          + "where h.approved=false and h.deleted=false and h.status=:status")
-  Page<UnapprovedHotelDTO> findUnapprovedHotels(Pageable pageable, HotelStatus status);
+  @Query("select h from Hotel h where h.id=:id and h.deleted=false")
+  Optional<Hotel> findByIdFetchOwner(Long id);
 
+  @EntityGraph(attributePaths = {})
   Optional<Hotel> findByIdAndDeletedFalse(Long id);
 
-  @EntityGraph(attributePaths = {})
-  Optional<Hotel> findByIdAndDeletedFalseAndApprovedTrue(Long id);
+  @Query(
+      "select new vn.dangthehao.hotel_booking_management.dto.AdminHotelListItemDTO("
+          + " h.id, h.hotelName, ow.fullName, h.address, h.location, h.thumbnail, h.rating)"
+          + " from Hotel h join h.owner ow"
+          + " where h.deleted = false and h.status=:status")
+  Page<AdminHotelListItemDTO> findHotelsForAdminByStatus(Pageable pageable, HotelStatus status);
 
   @Query(
-      "select new vn.dangthehao.hotel_booking_management.dto.OwnerHotelItemDTO("
-          + "h.id, h.hotelName, h.address, h.createdAt, h.status, h.rating) "
-          + "from Hotel h join h.owner ow "
-          + "where ow.id=:id and h.approved=true and h.deleted=false ")
-  Page<OwnerHotelItemDTO> findApprovedHotelsByOwner(Pageable pageable, Long id);
-
-  @Query(
-      "select new vn.dangthehao.hotel_booking_management.dto.OwnerHotelItemDTO("
-          + "h.id, h.hotelName, h.address, h.createdAt, h.status, h.rating) "
-          + "from Hotel h join h.owner ow "
-          + "where ow.id=:id and h.approved=false and h.deleted=false ")
-  Page<OwnerHotelItemDTO> findUnApprovedHotelsByOwner(Pageable pageable, Long id);
+      "select new vn.dangthehao.hotel_booking_management.dto.OwnerHotelListItemDTO("
+          + " h.id, h.hotelName, h.address, h.location, h.thumbnail, h.rating)"
+          + " from Hotel h"
+          + " where h.deleted = false and h.owner.id=:ownerId and h.status=:status")
+  @EntityGraph(attributePaths = {})
+  Page<OwnerHotelListItemDTO> findHotelsForOwnerByOwnerIdAndStatus(
+      Pageable pageable, Long ownerId, HotelStatus status);
 
   @EntityGraph(attributePaths = {})
-  Page<Hotel> findByLocationAndApprovedTrueAndDeletedFalse(String location, Pageable pageable);
+  Optional<Hotel> findByIdAndStatusAndDeletedFalse(Long id, HotelStatus status);
 
   @EntityGraph(attributePaths = {})
-  Page<Hotel> findByLocation(String location, Pageable pageable);
+  Page<Hotel> findByLocationAndDeletedFalse(String location, Pageable pageable);
 }

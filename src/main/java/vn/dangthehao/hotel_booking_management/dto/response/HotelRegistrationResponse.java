@@ -4,28 +4,22 @@ import java.time.LocalTime;
 import java.util.List;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import lombok.experimental.SuperBuilder;
+import vn.dangthehao.hotel_booking_management.dto.HotelBaseInfoDTO;
 import vn.dangthehao.hotel_booking_management.dto.OwnerRoomTypeDTO;
 
 @Getter
 @Setter
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class HotelRegistrationResponse {
-  Long id;
-  String hotelName;
-  String address;
-  String location;
+public class HotelRegistrationResponse extends HotelBaseInfoDTO {
   String description;
-  String thumbnailUrl;
   float depositRate;
   long depositDeadlineMinutes;
   LocalTime checkInTime;
   LocalTime checkOutTime;
   String status;
-  boolean approved;
-  float rating;
-  Long ownerId;
   List<OwnerRoomTypeDTO> roomTypes;
 }
