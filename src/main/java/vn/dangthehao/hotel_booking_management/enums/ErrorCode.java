@@ -15,8 +15,6 @@ public enum ErrorCode {
   ROLE_NOT_FOUND(1005, HttpStatus.BAD_REQUEST, "Role not found"),
   FAILED_UPLOAD_FILE(1006, HttpStatus.BAD_REQUEST, "Failed upload file"),
   VALIDATION_FAILED(1007, HttpStatus.BAD_REQUEST, "Validation failed"),
-  TOKEN_IS_REVOKED(1008, HttpStatus.UNAUTHORIZED, "Token is revoked"),
-  REFRESH_TOKEN_NOT_FOUND(1009, HttpStatus.NOT_FOUND, "Refresh token not found"),
   WEAK_PASSWORD(
       1010,
       HttpStatus.BAD_REQUEST,
@@ -25,7 +23,6 @@ public enum ErrorCode {
   THE_SAME_OLD_PASSWORD(
       1011, HttpStatus.BAD_REQUEST, "New password must be different old password"),
   INVALID_GRANT_TYPE_TOKEN(1012, HttpStatus.BAD_REQUEST, "Invalid grant type refresh"),
-  FAILED_PARSE_TOKEN(1013, HttpStatus.BAD_REQUEST, "Failed to parse jwt token"),
   INVALID_REFRESH_TOKEN(1014, HttpStatus.BAD_REQUEST, "Refresh token is invalid"),
   EMAIL_NOT_EXIST(1015, HttpStatus.BAD_REQUEST, "Email is not registered in the system"),
   INVALID_OTP(1016, HttpStatus.BAD_REQUEST, "Invalid OTP"),
@@ -47,6 +44,8 @@ public enum ErrorCode {
   BOOKING_NOT_FOUND(1031, HttpStatus.NOT_FOUND, "Booking with id %s not found"),
   PERMISSION_NOT_FOUND(1032, HttpStatus.NOT_FOUND, "Permission with name %s not found"),
   HOTEL_NOT_CONFIGURABLE(1033, HttpStatus.BAD_REQUEST, "Hotel with id %s is not configurable"),
+  ROLE_NOT_ALLOWED_FOR_REGISTRATION(
+      1034, HttpStatus.BAD_REQUEST, "Role %s is not allowed for registration"),
   UNCATEGORIZED_EXCEPTION(9999, HttpStatus.INTERNAL_SERVER_ERROR, "Internal server error");
 
   int code;

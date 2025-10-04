@@ -2,9 +2,9 @@ package vn.dangthehao.hotel_booking_management.mapper;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import vn.dangthehao.hotel_booking_management.dto.UserListItemDTO;
 import vn.dangthehao.hotel_booking_management.dto.request.UserCrtRequest;
 import vn.dangthehao.hotel_booking_management.dto.response.UserCrtResponse;
-import vn.dangthehao.hotel_booking_management.dto.response.UserListResponse;
 import vn.dangthehao.hotel_booking_management.dto.response.UserResponse;
 import vn.dangthehao.hotel_booking_management.dto.response.UserUpdateResponse;
 import vn.dangthehao.hotel_booking_management.model.User;
@@ -19,7 +19,7 @@ public interface UserMapper {
   UserUpdateResponse toUserUpdateResponse(User user);
 
   @Mapping(target = "avatar", ignore = true)
-  UserListResponse toUserListResponse(User user);
+  UserListItemDTO toUserListItem(User user);
 
   @Mapping(target = "avatar", ignore = true)
   UserResponse toUserResponse(User user);

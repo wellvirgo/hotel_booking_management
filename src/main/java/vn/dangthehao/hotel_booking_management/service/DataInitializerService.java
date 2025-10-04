@@ -1,22 +1,18 @@
 package vn.dangthehao.hotel_booking_management.service;
 
-import java.util.LinkedHashMap;
+import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import vn.dangthehao.hotel_booking_management.model.Permission;
 import vn.dangthehao.hotel_booking_management.model.Role;
 import vn.dangthehao.hotel_booking_management.model.User;
-import vn.dangthehao.hotel_booking_management.repository.PermissionRepository;
-import vn.dangthehao.hotel_booking_management.repository.RoleRepository;
 import vn.dangthehao.hotel_booking_management.repository.UserRepository;
 import vn.dangthehao.hotel_booking_management.security.Authorities;
 
@@ -26,75 +22,118 @@ import vn.dangthehao.hotel_booking_management.security.Authorities;
 @Service
 public class DataInitializerService {
   UserRepository userRepository;
-  RoleRepository roleRepository;
   RoleService roleService;
-  PermissionRepository permissionRepository;
-  BCryptPasswordEncoder bCryptPasswordEncoder;
+  PermissionService permissionService;
+  PasswordEncoder passwordEncoder;
+
+  static final String SYSTEM_ADMIN = "System Administrator";
 
   @Transactional
   public void initializeDefaultData() {
-    if (userRepository.existsByUsernameAndDeletedFalse("admin")) return;
+    if (userRepository.existsByUsernameAndDeletedFalse(SYSTEM_ADMIN)) return;
 
-    List<Permission> permissions = createPermissions();
-    createRoles(permissions);
-    createAdmin();
+    List<Permission> permissions = permissionService.createPermissions();
+
+    List<Role> roles =
+        List.of(
+            createAdminRole(permissions),
+            createHotelOwnerRole(permissions),
+            createCustomerRole(permissions));
+    roleService.createRoles(roles);
+
+    Role systemAdminRole = createSystemAdminRole(permissions);
+    createSystemAdmin(systemAdminRole);
   }
 
-  public void createAdmin() {
-    Role roleAdmin = roleService.findByRoleName(Authorities.ROLE_ADMIN);
-    User admin =
+  public void createSystemAdmin(Role role) {
+    User systemAdmin =
         User.builder()
-            .username("admin")
-            .password(bCryptPasswordEncoder.encode("admin"))
-            .email("admin@gmail.com")
-            .fullName("admin")
-            .role(roleAdmin)
+            .username(SYSTEM_ADMIN)
+            .password(passwordEncoder.encode(SYSTEM_ADMIN))
+            .email("systemadmin@gmail.com")
+            .fullName(SYSTEM_ADMIN)
+            .role(role)
             .build();
 
-    userRepository.save(admin);
-    log.info("Admin is created successfully");
+    userRepository.save(systemAdmin);
+    log.info("System admin is created successfully");
   }
 
-  public List<Permission> createPermissions() {
-    // Dùng linked hash map -> thứ tự insert vào db giống thứ tự put vào map
-    Map<String, String> permissionsSpec = new LinkedHashMap<>();
-    permissionsSpec.put(Authorities.ALL_USER, "Full control user resource");
-    permissionsSpec.put(Authorities.READ_USER, "Only read user resource");
-    permissionsSpec.put(Authorities.UPDATE_USER, "Only update user resource");
-    permissionsSpec.put(Authorities.DELETE_USER, "Only delete user resource");
-    List<Permission> permissions =
-        permissionsSpec.entrySet().stream()
-            .map(entry -> buildPermission(entry.getKey(), entry.getValue()))
-            .toList();
+  private Role createSystemAdminRole(List<Permission> permissions) {
+    List<String> needPermissions =
+        List.of(Authorities.USER_ALL, Authorities.HOTEL_ALL, Authorities.BOOKING_ALL);
 
-    return permissionRepository.saveAll(permissions);
+    return roleService.createRole(
+        Authorities.SYSTEM_ADMIN,
+        "Full access to manage the entire system",
+        getPermissionSet(needPermissions, permissions));
   }
 
-  public void createRoles(List<Permission> permissions) {
-    Set<Permission> permissionForAdmin =
-        permissions.stream()
-            .filter(p -> Authorities.ALL_USER.equals(p.getPermissionName()))
-            .collect(Collectors.toSet());
+  private Role createAdminRole(List<Permission> permissions) {
+    List<String> needPermissions =
+        List.of(
+            Authorities.USER_CREATE,
+            Authorities.USER_READ,
+            Authorities.USER_UPDATE,
+            Authorities.HOTEL_READ,
+            Authorities.HOTEL_UPDATE,
+            Authorities.BOOKING_READ,
+            Authorities.BOOKING_UPDATE);
 
-    Set<Permission> permissionsForUser =
-        permissions.stream().filter(p -> permissions.indexOf(p) > 0).collect(Collectors.toSet());
-    Role roleAdmin = buildRole(Authorities.ROLE_ADMIN, "Super admin", permissionForAdmin);
-    Role roleUser = buildRole(Authorities.ROLE_USER, "Normal user", permissionsForUser);
-    Role roleHotelOwner =
-        buildRole(Authorities.ROLE_HOTEL_OWNER, "Hotel owner", permissionsForUser);
-
-    roleRepository.saveAll(List.of(roleAdmin, roleUser, roleHotelOwner));
-  }
-
-  private Permission buildPermission(String permissionName, String description) {
-    return Permission.builder().permissionName(permissionName).description(description).build();
-  }
-
-  private Role buildRole(String roleName, String description, Set<Permission> permissions) {
     return Role.builder()
-        .roleName(roleName)
-        .description(description)
-        .permissions(permissions)
+        .roleName(Authorities.ADMIN)
+        .description("Manage users, hotels, and bookings within assigned scope")
+        .permissions(getPermissionSet(needPermissions, permissions))
         .build();
+  }
+
+  private Role createHotelOwnerRole(List<Permission> permissions) {
+    List<String> needPermissions =
+        List.of(
+            Authorities.USER_READ,
+            Authorities.USER_UPDATE,
+            Authorities.HOTEL_CREATE,
+            Authorities.HOTEL_READ,
+            Authorities.HOTEL_UPDATE,
+            Authorities.HOTEL_DELETE,
+            Authorities.BOOKING_READ,
+            Authorities.BOOKING_UPDATE,
+            Authorities.BOOKING_CANCEL);
+
+    return Role.builder()
+        .roleName(Authorities.HOTEL_OWNER)
+        .description("Full control over own hotel and its bookings")
+        .permissions(getPermissionSet(needPermissions, permissions))
+        .build();
+  }
+
+  private Role createCustomerRole(List<Permission> permissions) {
+    List<String> needPermissions =
+        List.of(
+            Authorities.USER_READ,
+            Authorities.USER_UPDATE,
+            Authorities.USER_DELETE,
+            Authorities.HOTEL_READ,
+            Authorities.BOOKING_CREATE,
+            Authorities.BOOKING_READ,
+            Authorities.BOOKING_UPDATE,
+            Authorities.BOOKING_CANCEL);
+
+    return Role.builder()
+        .roleName(Authorities.CUSTOMER)
+        .description("Can book hotels and manage own reservations")
+        .permissions(getPermissionSet(needPermissions, permissions))
+        .build();
+  }
+
+  private Set<Permission> getPermissionSet(
+      List<String> permissionNames, List<Permission> permissions) {
+    Set<Permission> permissionSet = new HashSet<>();
+
+    for (String permissionName : permissionNames) {
+      permissionSet.add(permissionService.getByPermissionName(permissionName, permissions));
+    }
+
+    return permissionSet;
   }
 }

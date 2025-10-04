@@ -1,0 +1,3 @@
+[2025-10-03 07:55:25] Admin 1 deleted user 13
+[2025-10-03 07:57:19] Admin 1 deleted user 14
+[2025-10-04 14:49:01] User with id=13 deleted their account voluntarily

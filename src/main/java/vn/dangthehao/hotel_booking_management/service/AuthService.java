@@ -80,8 +80,7 @@ public class AuthService {
     return ApiResponseBuilder.success("Logout all device successfully");
   }
 
-  public ApiResponse<AuthResponse> changePassword(ChangePasswordRequest request, Jwt jwt) {
-    Long userId = jwtService.getUserId(jwt);
+  public AuthResponse changePassword(ChangePasswordRequest request, Long userId) {
     User user = userService.getByIdWithRole(userId);
 
     if (!passwordEncoder.matches(request.getOldPassword(), user.getPassword()))
@@ -94,15 +93,12 @@ public class AuthService {
     refreshTokenService.revokeAllByUser(userId);
 
     // Renew a token pair
-    var response =
-        AuthResponse.builder()
-            .accessToken(jwtProvider.generateToken(user))
-            .refreshToken(refreshTokenService.issueRefreshToken(userId))
-            .build();
-
     mailService.sendPasswordChangedAsync(user.getEmail());
 
-    return ApiResponseBuilder.success("Password changed successfully!", response);
+    return AuthResponse.builder()
+        .accessToken(jwtProvider.generateToken(user))
+        .refreshToken(refreshTokenService.issueRefreshToken(userId))
+        .build();
   }
 
   public ApiResponse<Void> sendPasswordResetOtp(PasswordResetOtpRequest request) {
@@ -161,7 +157,7 @@ public class AuthService {
   }
 
   private User verifyCredentials(AuthRequest request) {
-    User user = userService.getByUsername(request.getUsername());
+    User user = userService.getByUsernameWithRole(request.getUsername());
     boolean isPassValid = passwordEncoder.matches(request.getPassword(), user.getPassword());
     if (!isPassValid) throw new AppException(ErrorCode.WRONG_PASSWORD);
 

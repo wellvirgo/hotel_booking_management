@@ -1,14 +1,15 @@
 package vn.dangthehao.hotel_booking_management.service;
 
-import java.util.List;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.NonFinal;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import vn.dangthehao.hotel_booking_management.dto.request.UserCrtRequest;
@@ -16,12 +17,12 @@ import vn.dangthehao.hotel_booking_management.dto.request.UserUpdateRequest;
 import vn.dangthehao.hotel_booking_management.dto.response.*;
 import vn.dangthehao.hotel_booking_management.enums.ErrorCode;
 import vn.dangthehao.hotel_booking_management.exception.AppException;
+import vn.dangthehao.hotel_booking_management.mapper.ImageUrlMapper;
 import vn.dangthehao.hotel_booking_management.mapper.UserMapper;
 import vn.dangthehao.hotel_booking_management.model.Role;
 import vn.dangthehao.hotel_booking_management.model.User;
-import vn.dangthehao.hotel_booking_management.repository.RoleRepository;
 import vn.dangthehao.hotel_booking_management.repository.UserRepository;
-import vn.dangthehao.hotel_booking_management.util.ApiResponseBuilder;
+import vn.dangthehao.hotel_booking_management.security.Authorities;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -29,10 +30,12 @@ import vn.dangthehao.hotel_booking_management.util.ApiResponseBuilder;
 @Service
 public class UserService {
   UserRepository userRepository;
-  RoleRepository roleRepository;
+  RoleService roleService;
   UploadFileService uploadFileService;
+  LogService logService;
   PasswordEncoder passwordEncoder;
   UserMapper userMapper;
+  ImageUrlMapper imageUrlMapper;
 
   @NonFinal
   @Value("${base-url}")
@@ -54,9 +57,9 @@ public class UserService {
         .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
   }
 
-  public User getByUsername(String username) {
+  public User getByUsernameWithRole(String username) {
     return userRepository
-        .findByUsernameAndDeletedFalse(username)
+        .findByUsernameAndDeletedFalseFetchRole(username)
         .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
   }
 
@@ -70,65 +73,58 @@ public class UserService {
     return userRepository.existsByEmailAndDeletedFalse(email);
   }
 
-  public ApiResponse<UserCrtResponse> create(UserCrtRequest request) {
+  public User create(UserCrtRequest request, Role role) {
     User user = userMapper.toUser(request);
-    user.setPassword(passwordEncoder.encode(user.getPassword()));
-    Role role =
-        roleRepository
-            .findById(request.getRoleId())
-            .orElseThrow(() -> new AppException(ErrorCode.ROLE_NOT_FOUND));
-    user.setRole(role);
-    userRepository.save(user);
-    UserCrtResponse userCrtResponse = userMapper.toUserCrtResponse(user);
-    userCrtResponse.setRoleName(role.getRoleName());
 
-    return ApiResponseBuilder.success("User is created", userCrtResponse);
+    user.setRole(role);
+    user.setPassword(passwordEncoder.encode(user.getPassword()));
+
+    return userRepository.save(user);
   }
 
-  public ApiResponse<UserResponse> getCurrentUser(Jwt jwt) {
-    Long userId = Long.parseLong(jwt.getSubject());
+  public UserCrtResponse register(UserCrtRequest request) {
+    String roleName = request.getRoleName();
+
+    if (!Authorities.canRegister(roleName))
+      throw new AppException(ErrorCode.ROLE_NOT_ALLOWED_FOR_REGISTRATION, roleName);
+
+    Role role = roleService.getRoleByName(roleName);
+
+    User savedUser = create(request, role);
+
+    UserCrtResponse userCrtResponse = userMapper.toUserCrtResponse(savedUser);
+    userCrtResponse.setRoleName(role.getRoleName());
+
+    return userCrtResponse;
+  }
+
+  public UserResponse getCurrentUser(Long userId) {
     User currentUser = getByIdWithRole(userId);
     UserResponse userResponse = userMapper.toUserResponse(currentUser);
-    String avatar =
-        (currentUser.getAvatar() != null)
-            ? String.format("%s/%s/%s", baseUrl, avatarFolderName, currentUser.getAvatar())
-            : "";
+
+    String avatar = imageUrlMapper.toUrl(currentUser.getAvatar(), avatarFolderName);
     userResponse.setAvatar(avatar);
     userResponse.setRoleName(currentUser.getRole().getRoleName());
 
-    return ApiResponseBuilder.success("Current user's information", userResponse);
+    return userResponse;
   }
 
-  public ApiResponse<UserUpdateResponse> updateAccountInf(
-      Long userID, UserUpdateRequest request, MultipartFile file) {
-    User currentUser = getByIdWithRole(userID);
+  public UserUpdateResponse updateUserInf(
+      Long userId, UserUpdateRequest request, MultipartFile avatarFile) {
+    User currentUser = getByIdWithRole(userId);
+
     currentUser.setFullName(request.getFullName());
     currentUser.setEmail(request.getEmail());
     currentUser.setPhone(request.getPhone());
-    String avatar = uploadFileService.saveFile(avatarFolderName, file);
-    String avatarFileName = avatar.replace(String.format("%s/%s/", baseUrl, avatarFolderName), "");
+
+    String avatar = uploadFileService.saveFile(avatarFolderName, avatarFile);
+    String avatarFileName = imageUrlMapper.toImageName(avatar, avatarFolderName);
     currentUser.setAvatar(avatarFileName);
-    UserUpdateResponse userUpdateResponse =
-        userMapper.toUserUpdateResponse(userRepository.save(currentUser));
-    userUpdateResponse.setAvatar(avatar);
 
-    return ApiResponseBuilder.success("User is updated", userUpdateResponse);
-  }
+    UserUpdateResponse response = userMapper.toUserUpdateResponse(userRepository.save(currentUser));
+    response.setAvatar(avatar);
 
-  public ApiResponse<List<UserListResponse>> listUsers() {
-    List<User> userList = userRepository.findAllByDeletedFalse();
-    List<UserListResponse> userListResponse =
-        userList.stream().map(this::addAvatarAndRoleName).toList();
-
-    return ApiResponseBuilder.success("List users successfully!", userListResponse);
-  }
-
-  public ApiResponse<Void> deleteByID(Long id) {
-    User user = getByIdWithRole(id);
-    user.setDeleted(true);
-    userRepository.save(user);
-
-    return ApiResponseBuilder.success("Delete user successfully!");
+    return response;
   }
 
   public void updateTokenVersion(User user) {
@@ -147,16 +143,26 @@ public class UserService {
         .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
   }
 
-  // Used in list users to map link avatar in server and role name
-  private UserListResponse addAvatarAndRoleName(User user) {
-    UserListResponse userLResponse = userMapper.toUserListResponse(user);
-    String avatar =
-        (user.getAvatar() != null)
-            ? String.format("%s/%s/%s", baseUrl, avatarFolderName, user.getAvatar())
-            : "";
-    userLResponse.setAvatar(avatar);
-    userLResponse.setRoleName(user.getRole().getRoleName());
+  public Page<User> getUsers(int page, int size) {
+    Pageable pageable = PageRequest.of(page, size);
+    return userRepository.findAllByDeletedFalse(pageable);
+  }
 
-    return userLResponse;
+  public String getAvatarUrl(User user) {
+    return imageUrlMapper.toUrl(user.getAvatar(), avatarFolderName);
+  }
+
+  public void deleteMyAccount(Long userId) {
+    User user = getById(userId);
+    user.setDeleted(true);
+    user.setTokenVersion(user.getTokenVersion() + 1);
+    saveUser(user);
+
+    String log = String.format("User with id=%d deleted their account voluntarily", userId);
+    logService.logUserManagement(log);
+  }
+
+  public User saveUser(User user) {
+    return userRepository.save(user);
   }
 }

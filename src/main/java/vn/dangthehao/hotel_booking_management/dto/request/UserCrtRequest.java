@@ -36,5 +36,6 @@ public class UserCrtRequest implements PasswordConfirm {
   @Size(min = 10, message = "INVALID_PHONE")
   String phone;
 
-  Long roleId;
+  @NotBlank(message = "Role name must not be blank")
+  String roleName;
 }

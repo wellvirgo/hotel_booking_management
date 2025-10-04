@@ -47,23 +47,11 @@ public class JwtProvider {
             .issuer(this.issuer)
             .issueTime(Date.from(now))
             .expirationTime(Date.from(now.plusSeconds(this.acTokenValidDuration)))
-            .claim("scope", buildScope(user))
+            .claim("scope", user.getRole().getRoleName())
             .claim("version", user.getTokenVersion())
             .build();
 
     return buildToken(claimsSet);
-  }
-
-  private String buildScope(User user) {
-    StringJoiner joiner = new StringJoiner(" ");
-
-    joiner.add(user.getRole().getRoleName());
-
-    user.getRole()
-        .getPermissions()
-        .forEach(permission -> joiner.add(permission.getPermissionName()));
-
-    return String.valueOf(joiner);
   }
 
   private String buildToken(JWTClaimsSet claimsSet) {

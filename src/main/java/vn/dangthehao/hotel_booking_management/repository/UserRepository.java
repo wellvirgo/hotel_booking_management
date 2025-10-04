@@ -1,7 +1,8 @@
 package vn.dangthehao.hotel_booking_management.repository;
 
-import java.util.List;
 import java.util.Optional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -11,11 +12,13 @@ public interface UserRepository extends JpaRepository<User, Long> {
   @Query("select u from User u where u.id=:id")
   Optional<User> findByIdAndDeletedFalseFetchRole(Long id);
 
-  Optional<User> findByUsernameAndDeletedFalse(String username);
+  @Query("select u from User u where u.username=:username and u.deleted = false")
+  Optional<User> findByUsernameAndDeletedFalseFetchRole(String username);
 
+  @EntityGraph(attributePaths = {})
   Optional<User> findByEmailAndDeletedFalse(String email);
 
-  List<User> findAllByDeletedFalse();
+  Page<User> findAllByDeletedFalse(Pageable pageable);
 
   boolean existsByUsernameAndDeletedFalse(String username);
 
